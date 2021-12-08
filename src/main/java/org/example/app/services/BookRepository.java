@@ -14,7 +14,7 @@ public class BookRepository implements ProjectRepository<Book> {
     private final List<Book> repo = new ArrayList<>();
 
     @Override
-    public List<Book> retreiveAll() {
+    public List<Book> retrieveAll() {
         return new ArrayList<>(repo);
     }
 
@@ -27,7 +27,7 @@ public class BookRepository implements ProjectRepository<Book> {
 
     @Override
     public boolean removeItemById(Integer bookIdToRemove) {
-        for (Book book : retreiveAll()) {
+        for (Book book : retrieveAll()) {
             if (book.getId().equals(bookIdToRemove)) {
                 logger.info("remove book by id completed: " + book);
                 return repo.remove(book);
@@ -38,7 +38,7 @@ public class BookRepository implements ProjectRepository<Book> {
 
     @Override
     public boolean removeBookByAuthor(String author) {
-        for (Book book : retreiveAll()) {
+        for (Book book : retrieveAll()) {
             if (book.getAuthor().equals(author)) {
                 logger.info("remove book by author completed: " + book);
                 repo.remove(book);
@@ -49,7 +49,7 @@ public class BookRepository implements ProjectRepository<Book> {
 
     @Override
     public boolean removeBookByTitle(String title) {
-        for (Book book : retreiveAll()) {
+        for (Book book : retrieveAll()) {
             if (book.getTitle().equals(title)) {
                 logger.info("remove book by title completed: " + book);
                 repo.remove(book);
@@ -60,7 +60,7 @@ public class BookRepository implements ProjectRepository<Book> {
 
     @Override
     public boolean removeBookBySize(Integer size) {
-        for (Book book : retreiveAll()) {
+        for (Book book : retrieveAll()) {
             if (book.getSize().equals(size)) {
                 logger.info("remove book by size completed: " + book);
                 repo.remove(book);
