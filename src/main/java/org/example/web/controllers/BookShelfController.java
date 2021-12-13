@@ -10,14 +10,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import java.util.Objects;
 
 @Controller
 @RequestMapping(value = "/books")
 public class BookShelfController {
 
-    private Logger logger = Logger.getLogger(BookShelfController.class);
-    private BookService bookService;
+    private final Logger logger = Logger.getLogger(BookShelfController.class);
+    private final BookService bookService;
 
     @Autowired
     public BookShelfController(BookService bookService) {
@@ -42,13 +41,13 @@ public class BookShelfController {
     }
 
     @PostMapping("/remove")
-    public String removeBook(@RequestParam(value = "bookIdToRemove") Integer bookIdToRemove) {
+    public String removeBookById(@RequestParam(value = "bookIdToRemove") String bookIdToRemove) {
         bookService.removeBookById(bookIdToRemove);
         return "redirect:/books/shelf";
     }
 
     @PostMapping("/removeByRegex")
-    public String removeBook(@RequestParam(value = "queryRegex") String queryRegex) {
+    public String removeBookByParam(@RequestParam(value = "queryRegex") String queryRegex) {
 
         if(queryRegex.contains("author=")) {
             String author = queryRegex.replace("author=","");
