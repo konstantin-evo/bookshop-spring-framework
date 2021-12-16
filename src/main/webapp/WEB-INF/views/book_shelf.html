@@ -50,24 +50,27 @@
         </table>
     </form>
 
-    <form method="post" th:action="@{/books/remove}">
+    <form method="post" th:action="@{/books/remove}" th:object="${bookIdToRemove}">
         <table>
             <tr>
                 <td>
-                    <input type="text" placeholder="id number" th:name="bookIdToRemove">
+                    <input type="text" placeholder="id number" th:field="*{id}">
                 </td>
                 <td>
                     <input type="submit" value="remove">
+                </td>
+                <td th:if="${#fields.hasErrors()}">
+                    <p>Wrong id or not found</p>
                 </td>
             </tr>
         </table>
     </form>
 
-    <form method="post" th:action="@{/books/removeByRegex}">
+    <form method="post" th:action="@{/books/removeByRegex}" th:object="${bookRegexToRemove}">
         <table>
             <tr>
                 <td>
-                    <input type="text" placeholder="regex" th:name="queryRegex">
+                    <input type="text" placeholder="regex" th:field="*{param}">
                 </td>
                 <td>
                     <input type="submit" value="remove by regex">

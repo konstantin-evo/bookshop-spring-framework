@@ -4,12 +4,17 @@ import lombok.AllArgsConstructor;
 import org.apache.log4j.Logger;
 import org.example.app.services.BookService;
 import org.example.web.dto.Book;
+import org.example.web.dto.BookIdToRemove;
+import org.example.web.dto.BookRegexToRemove;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.validation.Valid;
+
 
 @Controller
 @RequestMapping(value = "/books")
@@ -23,6 +28,8 @@ public class BookShelfController {
     public String books(Model model) {
         logger.info("got book shelf");
         model.addAttribute("book", new Book());
+        model.addAttribute("bookIdToRemove", new BookIdToRemove());
+        model.addAttribute("bookRegexToRemove", new BookRegexToRemove());
         model.addAttribute("bookList", bookService.getAllBooks());
         return "book_shelf";
     }
@@ -37,26 +44,34 @@ public class BookShelfController {
     }
 
     @PostMapping("/remove")
-    public String removeBookById(@RequestParam(value = "bookIdToRemove") String bookIdToRemove) {
-        bookService.removeBookById(bookIdToRemove);
-        return "redirect:/books/shelf";
+    public String removeBook(@Valid BookIdToRemove bookIdToRemove, BindingResult bindingResult, Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("book", new Book());
+            model.addAttribute("bookRegexToRemove", new BookRegexToRemove());
+            model.addAttribute("bookList", bookService.getAllBooks());
+            return "book_shelf";
+        } else {
+            bookService.removeBookById(bookIdToRemove.getId());
+            return "redirect:/books/shelf";
+        }
     }
 
     @PostMapping("/removeByRegex")
-    public String removeBookByParam(@RequestParam(value = "queryRegex") String queryRegex) {
+    public String removeBookByParam(@Valid BookRegexToRemove queryRegex, BindingResult bindingResult, Model model) {
 
-        if(queryRegex.contains("author=")) {
-            String author = queryRegex.replace("author=","");
+        if(queryRegex.getParam().contains("author=")) {
+            String author = queryRegex.getParam().replace("author=","");
             bookService.removeBookByAuthor(author);
         }
 
-        if(queryRegex.contains("title=")) {
-            String title = queryRegex.replace("title=","");
+        if(queryRegex.getParam().contains("title=")) {
+            String title = queryRegex.getParam().replace("title=","");
             bookService.removeBookByTitle(title);
         }
 
-        if(queryRegex.contains("size=")) {
-            String size = queryRegex.replace("size=","");
+        if(queryRegex.getParam().contains("size=")) {
+            String size = queryRegex.getParam().replace("size=","");
             bookService.removeBookBySize(Integer.valueOf(size));
         }
 
