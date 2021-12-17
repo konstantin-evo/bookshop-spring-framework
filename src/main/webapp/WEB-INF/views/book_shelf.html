@@ -42,6 +42,7 @@
                 </td>
                 <td>
                     <input type="text" placeholder="size (pages)" th:field="*{size}">
+                    <p th:if="${#fields.hasErrors()}">field value must be digit and less than 4 signs</p>
                 </td>
                 <td>
                     <input type="submit" value="save">
