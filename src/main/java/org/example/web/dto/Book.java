@@ -8,7 +8,7 @@ import javax.validation.constraints.Digits;
 @Getter @Setter
 public class Book {
 
-    private String id;
+    private Integer id;
     private String author;
     private String title;
     @Digits(integer = 4, fraction = 0)
