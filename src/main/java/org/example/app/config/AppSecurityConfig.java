@@ -36,6 +36,7 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         logger.info("config http security");
+        http.headers().frameOptions().disable(); //required for rendering the H2 database web interface
         http
                 .csrf().disable()//cross-site request forgery
                 .authorizeRequests()
