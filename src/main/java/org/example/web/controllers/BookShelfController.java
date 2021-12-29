@@ -1,5 +1,6 @@
 package org.example.web.controllers;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.apache.log4j.Logger;
 import org.example.app.services.BookService;
@@ -14,9 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.annotation.MultipartConfig;
-import javax.validation.Valid;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,6 +44,7 @@ public class BookShelfController {
 
     @PostMapping("/save")
     public String saveBook(@Valid Book book, BindingResult bindingResult, Model model) {
+
         if (bindingResult.hasErrors()) {
             model.addAttribute("book", book);
             model.addAttribute("bookIdToRemove", new BookIdToRemove());
@@ -51,7 +53,7 @@ public class BookShelfController {
             return "book_shelf";
         } else {
             bookService.saveBook(book);
-            logger.info("current repository size: " + bookService.getAllBooks().size());
+            logger.info("the new book is saved. current repository size: " + bookService.getAllBooks().size());
             return "redirect:/books/shelf";
         }
     }
@@ -73,26 +75,38 @@ public class BookShelfController {
     @PostMapping("/removeByRegex")
     public String removeBookByParam(@Valid BookRegexToRemove queryRegex, BindingResult bindingResult, Model model) {
 
-        if(queryRegex.getParam().contains("author=")) {
-            String author = queryRegex.getParam().replace("author=","");
-            bookService.removeBookByAuthor(author);
-        }
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("book", new Book());
+            model.addAttribute("bookIdToRemove", new BookIdToRemove());
+            model.addAttribute("bookList", bookService.getAllBooks());
+            return "book_shelf";
+        } else {
+            if (queryRegex.getParam().contains("author=")) {
+                String author = queryRegex.getParam().replace("author=", "");
+                bookService.removeBookByAuthor(author);
+            }
 
-        if(queryRegex.getParam().contains("title=")) {
-            String title = queryRegex.getParam().replace("title=","");
-            bookService.removeBookByTitle(title);
-        }
+            if (queryRegex.getParam().contains("title=")) {
+                String title = queryRegex.getParam().replace("title=", "");
+                bookService.removeBookByTitle(title);
+            }
 
-        if(queryRegex.getParam().contains("size=")) {
-            String size = queryRegex.getParam().replace("size=","");
-            bookService.removeBookBySize(Integer.valueOf(size));
+            if (queryRegex.getParam().contains("size=")) {
+                String size = queryRegex.getParam().replace("size=", "");
+                bookService.removeBookBySize(Integer.valueOf(size));
+            }
+            return "redirect:/books/shelf";
         }
-
-        return "redirect:/books/shelf";
     }
 
     @PostMapping("/uploadFile")
-    public String uploadFile(@RequestParam("file") MultipartFile file) throws Exception {
+    public String uploadFile(@RequestParam("file") MultipartFile file, RedirectAttributes attributes) throws Exception {
+
+        if (file.isEmpty()) {
+            attributes.addFlashAttribute("message", "Please select a file to upload.");
+            return "redirect:/books/shelf";
+        }
+
         String name = file.getOriginalFilename();
         byte[] bytes = file.getBytes();
 

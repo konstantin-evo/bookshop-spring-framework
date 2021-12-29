@@ -36,13 +36,15 @@
             <tr>
                 <td>
                     <input type="text" placeholder="author" th:field="*{author}">
+                    <p th:if="${#fields.hasErrors('author')}" th:errors="*{author}">invalid input (author name should not contain special characters and numbers)</p>
                 </td>
                 <td>
                     <input type="text" placeholder="book_title" th:field="*{title}">
+                    <p th:if="${#fields.hasErrors('title')}">invalid input (cannot be empty)</p>
                 </td>
                 <td>
                     <input type="text" placeholder="size (pages)" th:field="*{size}">
-                    <p th:if="${#fields.hasErrors()}">field value must be digit and less than 4 signs</p>
+                    <p th:if="${#fields.hasErrors('size')}" th:errors="*{size}">field value must be digit and less than 4 signs</p>
                 </td>
                 <td>
                     <input type="submit" value="save">
@@ -76,6 +78,9 @@
                 <td>
                     <input type="submit" value="remove by regex">
                 </td>
+                <td th:if="${#fields.hasErrors()}">
+                    <p>Wrong id or not found</p>
+                </td>
             </tr>
         </table>
     </form>
@@ -89,6 +94,10 @@
                 <td>
                     <input type="submit" value="Upload">
                 </td>
+                <td>
+                    <p th:text="${message}" th:if="${message ne null}"></p>
+                </td>
+
             </tr>
         </table>
     </form>
