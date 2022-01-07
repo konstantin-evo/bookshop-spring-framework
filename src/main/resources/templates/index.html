@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Тут название страницы написать</title>
+  <title>Главная</title>
   <meta name="description" content="Описание страницы">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -54,15 +54,15 @@
     <div class="wrap">
       <nav class="menuModal" id="navigate">
         <ul class="menu menu_main">
-          <li class="menu-item menu-item_ACTIVE"><a class="menu-link" href="/index.html">Главная</a>
+          <li class="menu-item menu-item_ACTIVE"><a class="menu-link" th:href="@{main}">Главная</a>
           </li>
-          <li class="menu-item"><a class="menu-link" href="/genres/index.html">Жанры</a>
+          <li class="menu-item"><a class="menu-link" th:href="@{genres}">Жанры</a>
           </li>
           <li class="menu-item"><a class="menu-link" href="/books/recent.html">Новинки</a>
           </li>
           <li class="menu-item"><a class="menu-link" href="/books/popular.html">Популярное</a>
           </li>
-          <li class="menu-item"><a class="menu-link" href="/authors/index.html">Авторы</a>
+          <li class="menu-item"><a class="menu-link" th:href="@{authors}">Авторы</a>
           </li>
         </ul>
       </nav>
@@ -85,7 +85,7 @@
                   <div class="Card-content">
                     <strong class="Card-title"><a href="#" th:text="${book.title}">n/a</a>
                     </strong>
-                    <div class="Card-description" th:text="${book.author}">n/a
+                    <div class="Card-description" th:text="${book.author.name}+' '+${book.author.surname}">n/a
                     </div>
                     <div class="Card-cost"><span class="Card-priceOld" th:text="${book.priceOld}">n/a</span><span
                             class="Card-price" th:text="${book.price}">n/a</span>

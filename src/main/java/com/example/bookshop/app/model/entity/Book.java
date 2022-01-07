@@ -1,4 +1,4 @@
-package com.example.MyBookShopApp.data;
+package com.example.bookshop.app.model.entity;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import lombok.Setter;
 public class Book {
 
     private Integer id;
-    private String author;
+    private Integer authorId;
     private String title;
     private String priceOld;
     private String price;
@@ -16,7 +16,7 @@ public class Book {
     public String toString() {
         return "Book{" +
                 "id=" + id +
-                ", author='" + author + '\'' +
+                ", author_id='" + authorId + '\'' +
                 ", title='" + title + '\'' +
                 ", priceOld=" + priceOld +
                 ", price=" + price +

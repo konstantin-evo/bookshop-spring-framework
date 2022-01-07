@@ -1,6 +1,7 @@
-package com.example.MyBookShopApp.controllers;
+package com.example.bookshop.web.controllers;
 
-import com.example.MyBookShopApp.data.BookService;
+import com.example.bookshop.app.model.dao.BookDao;
+import com.example.bookshop.app.services.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,6 +23,5 @@ public class MainPageController {
     public String mainPage(Model model){
         model.addAttribute("bookData", bookService.getBooksData());
         return "index";
-
     }
 }
