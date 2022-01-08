@@ -19,7 +19,6 @@ public class AuthorDao {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final JdbcTemplate jdbcTemplate;
 
-
     @Autowired
     public AuthorDao(NamedParameterJdbcTemplate namedParameterJdbcTemplate, JdbcTemplate jdbcTemplate) {
         this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
@@ -30,23 +29,23 @@ public class AuthorDao {
         List<Author> authors = jdbcTemplate.query("SELECT * FROM authors", (ResultSet rs, int rownum)->{
             Author author = new Author();
             author.setId(rs.getInt("id"));
-            author.setSurname(rs.getString("surname"));
-            author.setName(rs.getString("name"));
+            author.setName(rs.getString("first_name"));
+            author.setSurname(rs.getString("last_name"));
             return author;
         });
         return new ArrayList<>(authors);
     }
 
     public Author getAuthorByBookId(int id) {
-        String sql = "SELECT a.id, a.surname, a.name " +
+        String sql = "SELECT a.id, a.last_name, a.first_name " +
                 "FROM authors AS a JOIN books ON books.author_id = a.id " +
-                "WHERE books.author_id = :id";
+                "WHERE books.id = :id";
         SqlParameterSource namedParameters = new MapSqlParameterSource().addValue("id", id);
         return namedParameterJdbcTemplate.queryForObject(sql, namedParameters, (ResultSet rs, int rownum) -> {
             Author author = new Author();
             author.setId(rs.getInt("id"));
-            author.setName(rs.getString("name"));
-            author.setSurname(rs.getString("surname"));
+            author.setName(rs.getString("first_name"));
+            author.setSurname(rs.getString("last_name"));
             return author;
         });
     }
