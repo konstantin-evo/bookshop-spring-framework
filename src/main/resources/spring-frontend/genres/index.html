@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Тут название страницы написать</title>
+  <title th:text="#{topbar.genres}">n/a</title>
   <meta name="description" content="Описание страницы">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -15,13 +15,14 @@
   <link rel="stylesheet" href="/assets/css/extra.min.css?v=52263780"><!--[if lt IE 9]>
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
   <script defer src="/assets/js/scripts.min.js?v=52263780"></script>
+  <script defer src="/assets/js/local.js"></script>
 </head>
 <body class="Site">
   <header th:replace="~{fragments/header_fragment :: headFragment}"></header>
   <div class="Middle">
     <div class="wrap">
       <main class="Middle-main">
-        <h1 class="Middle-title">Жанры
+        <h1 class="Middle-title" th:text="#{topbar.genres}">n/a
         </h1>
         <div class="Section">
           <div class="Tags Tags_genres">
