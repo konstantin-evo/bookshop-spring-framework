@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Главная</title>
+  <title th:text="#{topbar.main}">n/a</title>
   <meta name="description" content="Описание страницы">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="/assets/css/basic.min.css?v=64223515">
   <link rel="stylesheet" href="/assets/css/extra.min.css?v=64223515">
   <script defer src="/assets/js/scripts.min.js?v=64223515"></script>
+  <script defer src="/assets/js/local.js"></script>
 </head>
 <body class="Site">
 <header th:replace="~{fragments/header_fragment :: headFragment}"></header>
@@ -22,7 +23,7 @@
     <main class="Middle-main">
       <div class="Section">
         <div class="Section-header">
-          <h2 class="Section-title">Рекомендуемое
+          <h2 class="Section-title" th:text="#{main.recommended}">n/a
           </h2>
         </div>
         <div class="Slider Slider_carousel">
@@ -56,7 +57,7 @@
           </div>
         </div>
         <div class="Section-header">
-          <h2 class="Section-title">Новинки
+          <h2 class="Section-title" th:text="#{main.recent}">n/a
           </h2>
         </div>
         <div class="Slider Slider_carousel">
@@ -227,7 +228,7 @@
           </div>
         </div>
         <div class="Section-header">
-          <h2 class="Section-title">Популярное
+          <h2 class="Section-title" th:text="#{topbar.popular}">n/a
           </h2>
         </div>
         <div class="Slider Slider_carousel">
@@ -389,7 +390,7 @@
           </div>
         </div>
       </div>
-      <h2 class="Middle-title">Книги по тегам
+      <h2 class="Middle-title" th:text="#{main.tags}">n/a
       </h2>
       <div class="Tags" id="tags">
         <div class="Tag Tag_xs"><a href="/tags/index.html">современная литература</a>
