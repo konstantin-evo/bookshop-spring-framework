@@ -1,15 +1,13 @@
 package com.example.bookshop.web.controllers;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-
 @Controller
-public class GenresPageController {
+public class SigninPageController {
 
-    @GetMapping("/genres")
-    public String genresPage(Model model){
-        return "genres/index";
+    @GetMapping("/signin")
+    public String signinPage(){
+        return "signin";
     }
 }
