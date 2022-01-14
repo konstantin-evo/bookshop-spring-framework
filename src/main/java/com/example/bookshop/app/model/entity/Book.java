@@ -7,8 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 
 @Getter
@@ -21,9 +22,8 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-//    @ManyToOne
-//    @JoinColumn(name="author_id", nullable=false)
-    @Transient
+    @ManyToOne
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
     private Author author;
     private String title;
     private String priceOld;

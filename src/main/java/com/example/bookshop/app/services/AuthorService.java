@@ -1,6 +1,6 @@
 package com.example.bookshop.app.services;
 
-import com.example.bookshop.app.model.dao.AuthorDao;
+import com.example.bookshop.app.model.dao.AuthorRepository;
 import com.example.bookshop.web.dto.AuthorDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,15 +11,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthorService {
-    private final AuthorDao authorRepo;
+
+    private final AuthorRepository authorRepo;
 
     @Autowired
-    public AuthorService(AuthorDao authorRepo) {
+    public AuthorService(AuthorRepository authorRepo) {
         this.authorRepo = authorRepo;
     }
 
     public List<AuthorDto> getAuthors() {
-        return authorRepo.getAll().stream().map(Mapper.INSTANCE::authorToDto)
+        return authorRepo.findAll().stream().map(Mapper.INSTANCE::authorToDto)
                 .collect(Collectors.toList());
     }
 
