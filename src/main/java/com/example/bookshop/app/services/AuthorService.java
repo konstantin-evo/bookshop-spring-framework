@@ -25,6 +25,6 @@ public class AuthorService {
 
     public Map<String, List<AuthorDto>> getAuthorsMap(){
         return getAuthors().stream()
-                .collect(Collectors.groupingBy((AuthorDto a)-> a.getSurname().substring(0,1)));
+                .collect(Collectors.groupingBy((AuthorDto a)-> a.getLastName().substring(0,1)));
     }
 }

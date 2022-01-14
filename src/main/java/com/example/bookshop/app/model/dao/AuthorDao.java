@@ -29,8 +29,8 @@ public class AuthorDao {
         List<Author> authors = jdbcTemplate.query("SELECT * FROM authors", (ResultSet rs, int rownum)->{
             Author author = new Author();
             author.setId(rs.getInt("id"));
-            author.setName(rs.getString("first_name"));
-            author.setSurname(rs.getString("last_name"));
+            author.setFirstName(rs.getString("first_name"));
+            author.setLastName(rs.getString("last_name"));
             return author;
         });
         return new ArrayList<>(authors);
@@ -44,8 +44,8 @@ public class AuthorDao {
         return namedParameterJdbcTemplate.queryForObject(sql, namedParameters, (ResultSet rs, int rownum) -> {
             Author author = new Author();
             author.setId(rs.getInt("id"));
-            author.setName(rs.getString("first_name"));
-            author.setSurname(rs.getString("last_name"));
+            author.setFirstName(rs.getString("first_name"));
+            author.setLastName(rs.getString("last_name"));
             return author;
         });
     }
