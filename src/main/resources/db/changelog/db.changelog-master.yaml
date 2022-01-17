@@ -1,0 +1,285 @@
+databaseChangeLog:
+- changeSet:
+    id: 1642366168877-1
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: authors_id_seq
+- changeSet:
+    id: 1642366168877-2
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: authors_id_seq1
+- changeSet:
+    id: 1642366168877-3
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: authors_id_seq2
+- changeSet:
+    id: 1642366168877-4
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: authors_id_seq3
+- changeSet:
+    id: 1642366168877-5
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: authors_id_seq4
+- changeSet:
+    id: 1642366168877-6
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_id_seq
+- changeSet:
+    id: 1642366168877-7
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_id_seq1
+- changeSet:
+    id: 1642366168877-8
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_id_seq2
+- changeSet:
+    id: 1642366168877-9
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_id_seq3
+- changeSet:
+    id: 1642366168877-10
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_id_seq4
+- changeSet:
+    id: 1642366168877-11
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_id_seq5
+- changeSet:
+    id: 1642366168877-12
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_type_id_seq
+- changeSet:
+    id: 1642366168877-13
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_type_id_seq1
+- changeSet:
+    id: 1642366168877-14
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_type_id_seq2
+- changeSet:
+    id: 1642366168877-15
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_type_id_seq3
+- changeSet:
+    id: 1642366168877-16
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_type_id_seq4
+- changeSet:
+    id: 1642366168877-17
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: book_file_type_id_seq5
+- changeSet:
+    id: 1642366168877-18
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: books_id_seq
+- changeSet:
+    id: 1642366168877-19
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: books_id_seq1
+- changeSet:
+    id: 1642366168877-20
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: books_id_seq2
+- changeSet:
+    id: 1642366168877-21
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: books_id_seq3
+- changeSet:
+    id: 1642366168877-22
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: books_id_seq4
+- changeSet:
+    id: 1642366168877-23
+    author: kpriluch (generated)
+    changes:
+      - createSequence:
+          sequenceName: books_id_seq5
+- changeSet:
+    id: 1642366168877-24
+    author: kpriluch (generated)
+    changes:
+      - createTable:
+          columns:
+            - column:
+                autoIncrement: true
+                constraints:
+                  constraints:
+                    nullable: false
+                name: id
+                type: INT
+            - column:
+                name: description
+                type: TEXT
+            - column:
+                name: first_name
+                type: VARCHAR(255)
+            - column:
+                name: last_name
+                type: VARCHAR(255)
+            - column:
+                name: photo
+                type: VARCHAR(255)
+          tableName: authors
+- changeSet:
+    id: 1642366168877-25
+    author: kpriluch (generated)
+    changes:
+      - createTable:
+          columns:
+            - column:
+                autoIncrement: true
+                constraints:
+                  constraints:
+                    nullable: false
+                name: id
+                type: INT
+            - column:
+                name: hash
+                type: VARCHAR(255)
+            - column:
+                name: path
+                type: VARCHAR(255)
+            - column:
+                name: type_id
+                type: INT
+          tableName: book_file
+- changeSet:
+    id: 1642366168877-26
+    author: kpriluch (generated)
+    changes:
+      - createTable:
+          columns:
+            - column:
+                autoIncrement: true
+                constraints:
+                  constraints:
+                    nullable: false
+                name: id
+                type: INT
+            - column:
+                name: description
+                type: TEXT
+            - column:
+                name: name
+                type: VARCHAR(255)
+          tableName: book_file_type
+- changeSet:
+    id: 1642366168877-27
+    author: kpriluch (generated)
+    changes:
+      - createTable:
+          columns:
+            - column:
+                autoIncrement: true
+                constraints:
+                  constraints:
+                    nullable: false
+                name: id
+                type: INT
+            - column:
+                name: description
+                type: TEXT
+            - column:
+                name: image
+                type: VARCHAR(255)
+            - column:
+                name: is_bestseller
+                type: SMALLINT
+            - column:
+                name: price
+                type: INT
+            - column:
+                name: price_old
+                type: VARCHAR(255)
+            - column:
+                name: pub_date
+                type: date
+            - column:
+                name: title
+                type: VARCHAR(255)
+            - column:
+                name: author_id
+                type: INT
+          tableName: books
+- changeSet:
+    id: 1642366168877-28
+    author: kpriluch (generated)
+    changes:
+      - addUniqueConstraint:
+          columnNames: id
+          constraintName: authors_id_key
+          tableName: authors
+- changeSet:
+    id: 1642366168877-29
+    author: kpriluch (generated)
+    changes:
+      - addUniqueConstraint:
+          columnNames: id
+          constraintName: book_file_type_id_key
+          tableName: book_file_type
+- changeSet:
+    id: 1642366168877-30
+    author: kpriluch (generated)
+    changes:
+      - addUniqueConstraint:
+          columnNames: type_id
+          constraintName: uk_n69d1m4gwkymnapuy8w9rv947
+          tableName: book_file
+- changeSet:
+    id: 1642366168877-31
+    author: kpriluch (generated)
+    changes:
+      - addForeignKeyConstraint:
+          baseColumnNames: type_id
+          baseTableName: book_file
+          constraintName: fkab7ynoex2ahy28trbmkk9uxu4
+          deferrable: false
+          initiallyDeferred: false
+          onDelete: NO ACTION
+          onUpdate: NO ACTION
+          referencedColumnNames: id
+          referencedTableName: book_file_type
+

@@ -3,6 +3,7 @@ package com.example.bookshop.app.model.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.sql.Date;
 
 
 @Getter
@@ -22,11 +24,28 @@ public class Book {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(columnDefinition = "DATE NOT NULL")
+    private Date pubDate;
+
+    @Column(columnDefinition = "SMALLINT NOT NULL")
+    private Integer isBestseller;
+
+    @Column(columnDefinition = "VARCHAR(255)")
+    private String image;
+
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
+    private String title;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(columnDefinition = "INT NOT NULL")
+    private String price;
+
+    private String priceOld;
+
     @ManyToOne
     @JoinColumn(name = "author_id", referencedColumnName = "id")
     private Author author;
-    private String title;
-    private String priceOld;
-    private String price;
 
 }
