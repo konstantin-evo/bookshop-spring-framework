@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @ApiModel(description = "DTO Object for book entity")
@@ -17,23 +19,60 @@ public class BookDto {
             position = 1)
     private Integer id;
 
-    @ApiModelProperty(position = 2)
-    private AuthorDto author;
-
     @ApiModelProperty(
             value = "the name of a book",
             dataType = "String",
             example = "Crime and Punishment",
-            position = 3)
+            position = 2)
     private String title;
 
-    @ApiModelProperty(value = "old price",position = 4)
+    @ApiModelProperty(
+            value = "book description text",
+            example = "Raskolnikov, a destitute and desperate former student, wanders through the slums of St Petersburg and commits a random murder without remorse or regret. He imagines himself to be a great man, a Napoleon: acting for a higher purpose beyond conventional moral law.",
+            position = 3)
+    private String description;
+
+    @ApiModelProperty(
+            value = "date of book publication",
+            example = "1866-03-20",
+            position = 4)
+    private Date pubDate;
+
+    @ApiModelProperty(
+            value = "if isBestseller = 1 so the book is considered to be bestseller and if 0 the book is not a " +
+            "bestseller",
+            example = "1",
+            position = 5)
+    private Integer isBestseller;
+
+    @ApiModelProperty(
+            value = "book price with discounts",
+            example = "1110 ₽.",
+            position = 6)
     private String priceOld;
 
     @ApiModelProperty(
             value = "book price at the moment without discounts and so on",
             dataType = "String",
-            example = "1250",
-            position = 5)
+            example = "1250 ₽.",
+            position = 7)
     private String price;
+
+    @ApiModelProperty(
+            value = "mnemonic identity sequence of characters",
+            hidden = true)
+    private String slug;
+
+    @ApiModelProperty(
+            value = "book url",
+            hidden = true)
+    private String image;
+
+    @ApiModelProperty(
+            value = "discount value for book",
+            hidden = true)
+    private Double discount;
+
+    @ApiModelProperty()
+    private AuthorDto author;
 }

@@ -20,7 +20,7 @@ public class AuthorService {
     }
 
     public List<AuthorDto> getAuthors() {
-        return authorRepo.findAll().stream().map(Mapper.INSTANCE::authorToDto)
+        return authorRepo.findAll().stream().map(Mapper.INSTANCE::map)
                 .collect(Collectors.toList());
     }
 

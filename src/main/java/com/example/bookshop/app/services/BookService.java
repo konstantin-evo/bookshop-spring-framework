@@ -1,13 +1,12 @@
 package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.dao.BookRepository;
-import com.example.bookshop.web.dto.AuthorDto;
+import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.web.dto.BookDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -20,11 +19,41 @@ public class BookService {
     }
 
     public List<BookDto> getBooksData() {
-        return bookRepo.findAll().stream().map(book -> {
-            BookDto bookDto = Mapper.INSTANCE.bookToDto(book);
-            AuthorDto authorDto = Mapper.INSTANCE.authorToDto(book.getAuthor());
-            bookDto.setAuthor(authorDto);
-            return bookDto;
-        }).collect(Collectors.toList());
+        return Mapper.INSTANCE.map(bookRepo.findAll());
+    }
+
+    public List<BookDto> getBooksByAuthor(String authorName){
+        List<Book> books = bookRepo.findBooksByAuthorFirstNameContaining(authorName);
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getBooksByTitle(String title){
+        List<Book> books = bookRepo.findBooksByTitleContaining(title);
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getBooksWithPriceBetween(Integer min, Integer max){
+        List<Book> books = bookRepo.findBooksByPriceBetween(min, max);
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getBooksWithDiscountBetween(Double min, Double max){
+        List<Book> books = bookRepo.findBooksByDiscountBetween(min, max);
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getBooksWithPrice(Integer price){
+        List<Book> books = bookRepo.findBooksByPriceIs(price);
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getBooksWithMaxPrice(){
+        List<Book> books =  bookRepo.getBooksWithMaxDiscount();
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getBestsellers(){
+        List<Book> books = bookRepo.getBestsellers();
+        return Mapper.INSTANCE.map(books);
     }
 }

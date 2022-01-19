@@ -30,19 +30,23 @@ public class Book {
     @Column(columnDefinition = "SMALLINT NOT NULL")
     private Integer isBestseller;
 
-    @Column(columnDefinition = "VARCHAR(255)")
-    private String image;
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
+    private String slug;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String title;
+
+    @Column(columnDefinition = "VARCHAR(255)")
+    private String image;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(columnDefinition = "INT NOT NULL")
-    private String price;
+    private Integer price;
 
-    private String priceOld;
+    @Column(columnDefinition = "FLOAT8")
+    private Double discount;
 
     @ManyToOne
     @JoinColumn(name = "author_id", referencedColumnName = "id")
