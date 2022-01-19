@@ -36,7 +36,7 @@
                     <strong class="Card-title">
                       <a href="#" th:text="${book.title}">n/a</a>
                     </strong>
-                    <div class="Card-description" th:text="${book.author.name}+' '+${book.author.surname}">n/a
+                    <div class="Card-description" th:text="${book.author.getFirstName}+' '+${book.author.getLastName}">n/a
                     </div>
                     <div class="Card-cost">
                       <span class="Card-priceOld" th:text="'₽'+${book.priceOld}">n/a</span>

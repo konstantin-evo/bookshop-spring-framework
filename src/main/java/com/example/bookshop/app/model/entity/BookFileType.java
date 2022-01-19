@@ -1,5 +1,6 @@
 package com.example.bookshop.app.model.entity;
 
+import com.example.bookshop.app.model.entity.enumuration.FileType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,35 +14,24 @@ import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Getter
 @Setter
-@Table(name = "authors")
+@Table(name = "book_file_type")
 @Entity
-public class Author {
+public class BookFileType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "last_name", columnDefinition = "VARCHAR(255)")
-    private String lastName;
-
-    @Column(name = "first_name", columnDefinition = "VARCHAR(255)")
-    private String firstName;
-
-    @Column(columnDefinition = "VARCHAR(255)")
-    private String photo;
-
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @OneToMany(mappedBy = "author")
-    private List<Book> bookList = new ArrayList<>();
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
+    private FileType name;
 
-    @Override
-    public String toString() {
-        return firstName + ' ' +lastName;
-    }
+    @OneToMany(mappedBy = "bookFileType")
+    @Column(columnDefinition = "INT NOT NULL")
+    private List<BookFile> bookFiles = new ArrayList<>();
 
 }

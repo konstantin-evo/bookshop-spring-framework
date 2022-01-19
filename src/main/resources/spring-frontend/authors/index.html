@@ -35,7 +35,7 @@
             </h2>
             <div class="Authors-letter">
               <div class="Authors-item" th:each="author : ${authorsList.value}">
-                <a th:text="${author.getSurname()+' '+author.getName()}" href="/authors/slug.html">n/a</a>
+                <a th:text="${author.getLastName()+' '+author.getFirstName()}" href="/authors/slug.html">n/a</a>
               </div>
             </div>
           </div>
