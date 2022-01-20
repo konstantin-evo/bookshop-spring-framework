@@ -4,6 +4,10 @@ import com.example.bookshop.app.model.dao.BookRepository;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.web.dto.BookDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +24,13 @@ public class BookService {
 
     public List<BookDto> getBooksData() {
         return Mapper.INSTANCE.map(bookRepo.findAll());
+    }
+
+    public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit){
+        Pageable nextPage = PageRequest.of(offset,limit);
+        Page<Book> books = bookRepo.findAll(nextPage);
+        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
     public List<BookDto> getBooksByAuthor(String authorName){
