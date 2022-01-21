@@ -33,6 +33,13 @@ public class BookService {
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
+    public Page<BookDto> getPageOfSearchResultBooks(String searchWord, Integer offset, Integer limit){
+        Pageable nextPage = PageRequest.of(offset,limit);
+        Page<Book> books = bookRepo.findBookByTitleContaining(searchWord,nextPage);
+        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
+    }
+
     public List<BookDto> getBooksByAuthor(String authorName){
         List<Book> books = bookRepo.findBooksByAuthorFirstNameContaining(authorName);
         return Mapper.INSTANCE.map(books);

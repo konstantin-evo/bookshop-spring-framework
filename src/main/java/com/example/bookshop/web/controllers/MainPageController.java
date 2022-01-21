@@ -3,6 +3,7 @@ package com.example.bookshop.web.controllers;
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.RecommendedBooksPageDto;
+import com.example.bookshop.web.dto.SearchWordDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,11 @@ public class MainPageController {
     @ModelAttribute("recommendedBooks")
     public List<BookDto> recommendedBooks(){
         return bookService.getPageOfRecommendedBooks(0,6).getContent();
+    }
+
+    @ModelAttribute("searchWordDto")
+    public SearchWordDto searchWordDto() {
+        return new SearchWordDto();
     }
 
     @GetMapping("/")
