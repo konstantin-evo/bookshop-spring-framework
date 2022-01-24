@@ -26,11 +26,6 @@ public class SearchPageController {
         this.bookService = bookService;
     }
 
-    @ModelAttribute("searchWordDto")
-    public SearchWordDto searchWordDto() {
-        return new SearchWordDto();
-    }
-
     @ModelAttribute("searchResults")
     public List<BookDto> searchResults() {
         return new ArrayList<>();

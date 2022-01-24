@@ -36,6 +36,9 @@ public class Author {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
+    private String slug;
+
     @OneToMany(mappedBy = "author")
     private List<Book> bookList = new ArrayList<>();
 

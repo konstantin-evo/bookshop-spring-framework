@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -36,7 +36,7 @@ public class BookDto {
             value = "date of book publication",
             example = "1866-03-20",
             position = 4)
-    private Date pubDate;
+    private LocalDate pubDate;
 
     @ApiModelProperty(
             value = "if isBestseller = 1 so the book is considered to be bestseller and if 0 the book is not a " +
@@ -57,6 +57,12 @@ public class BookDto {
             example = "1250 ₽.",
             position = 7)
     private String price;
+
+    @ApiModelProperty(
+            value = "rating of the book",
+            example = "1280",
+            position = 8)
+    private Integer rating;
 
     @ApiModelProperty(
             value = "mnemonic identity sequence of characters",

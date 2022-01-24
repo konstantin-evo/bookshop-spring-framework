@@ -19,6 +19,10 @@ public class AuthorService {
         this.authorRepo = authorRepo;
     }
 
+    public AuthorDto getAuthor(Integer id){
+        return Mapper.INSTANCE.map(authorRepo.findById(id).orElse(null));
+    }
+
     public List<AuthorDto> getAuthors() {
         return authorRepo.findAll().stream().map(Mapper.INSTANCE::map)
                 .collect(Collectors.toList());
@@ -28,4 +32,5 @@ public class AuthorService {
         return getAuthors().stream()
                 .collect(Collectors.groupingBy((AuthorDto a)-> a.getLastName().substring(0,1)));
     }
+
 }
