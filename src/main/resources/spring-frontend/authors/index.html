@@ -5,7 +5,7 @@
   <meta name="description" content="Описание страницы">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <link href="favicon.ico" rel="shortcut icon">
+  <link th:href="@{/spring-frontend/favicon.ico}" rel="shortcut icon">
   <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous">
   <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous">
   <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous">
@@ -28,14 +28,20 @@
       <div class="Section">
         <div class="Authors">
           <div class="Authors-links">
-            <a class="Authors-link" th:each="authorsList : ${authorsMap}" th:ref="'#'+${#strings.toLowerCase(authorsList.key)}" th:text="${authorsList.key}">n/a</a>
+            <a class="Authors-link"
+               th:each="authorsList : ${authorsMap}"
+               th:ref="'#'+${#strings.toLowerCase(authorsList.key)}"
+               th:text="${authorsList.key}">n/a</a>
           </div>
           <div class="Authors-block" th:each="authorsList : ${authorsMap}">
-            <h2 class="Authors-title" th:id="${#strings.toLowerCase(authorsList.key)}" th:text="${authorsList.key}">n/a
+            <h2 class="Authors-title"
+                th:id="${#strings.toLowerCase(authorsList.key)}"
+                th:text="${authorsList.key}">n/a
             </h2>
             <div class="Authors-letter">
               <div class="Authors-item" th:each="author : ${authorsList.value}">
-                <a th:text="${author.getLastName()+' '+author.getFirstName()}" href="/authors/slug.html">n/a</a>
+                <a th:text="${author.getLastName()+' '+author.getFirstName()}"
+                   th:href="@{/authors/{id}(id=${author.id})}">n/a</a>
               </div>
             </div>
           </div>

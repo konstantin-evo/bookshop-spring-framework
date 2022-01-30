@@ -1,21 +1,11 @@
-
-<!--END-->
-<!--END--><!DOCTYPE html><!--[if IE 7]>
-<html class="ie7" lang="ru">
-<![endif]-->
-<!--[if IE 8]>
-<html class="ie8" lang="ru">
-<![endif]-->
-<!--[if IE 9]>
-<html class="ie9" lang="ru">
-<![endif]-->
-<!--[if gt IE 9]><!--> <html lang="ru"> <!--<![endif]-->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <title>Тут название страницы написать</title>
   <meta name="description" content="Описание страницы">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
-  <link href="favicon.ico" rel="shortcut icon">
+  <link th:href="@{/spring-frontend/favicon.ico}" rel="shortcut icon">
   <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous">
   <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous">
   <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous">
@@ -25,6 +15,7 @@
   <link rel="stylesheet" href="/assets/css/extra.min.css?v=46559719"><!--[if lt IE 9]>
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
   <script defer src="/assets/js/scripts.min.js?v=46559719"></script>
+  <script defer src="/assets/js/local.js"></script>
 </head>
 <body class="Site">
   <header th:replace="~{fragments/header_fragment :: headFragment}"></header>
