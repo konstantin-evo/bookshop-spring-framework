@@ -27,10 +27,6 @@ public class BookService {
         this.bookRepo = bookRepo;
     }
 
-    public List<BookDto> getBooksData() {
-        return Mapper.INSTANCE.map(bookRepo.findAll());
-    }
-
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findAll(nextPage);
@@ -115,6 +111,16 @@ public class BookService {
     public List<BookDto> getBestsellers() {
         List<Book> books = bookRepo.findBestsellers();
         return Mapper.INSTANCE.map(books);
+    }
+
+    public BookDto getBook(String slug) {
+        return Mapper.INSTANCE.map(bookRepo.findBookBySlug(slug));
+    }
+
+    public void updateBook(String slug, String path){
+        Book book = bookRepo.findBookBySlug(slug);
+        book.setImage(path);
+        bookRepo.save(book);
     }
 
     public LocalDate convertToLocalDate(String date) {

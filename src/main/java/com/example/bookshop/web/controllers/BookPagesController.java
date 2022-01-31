@@ -2,12 +2,18 @@ package com.example.bookshop.web.controllers;
 
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.web.dto.BookDto;
+import com.example.bookshop.web.services.ResourceStorage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,29 +22,39 @@ import java.util.List;
 public class BookPagesController {
 
     private final BookService bookService;
+    private final ResourceStorage storage;
+
     private static final int OFFSET = 0;
     private static final int LIMIT = 6;
     private static final int DEFAULT_RECENT_MONTH = 6;
 
     @Autowired
-    public BookPagesController(BookService bookService) {
+    public BookPagesController(BookService bookService, ResourceStorage storage) {
         this.bookService = bookService;
+        this.storage = storage;
     }
 
-    @ModelAttribute("booksList")
-    public List<BookDto> bookList(){
-        return bookService.getBooksData();
+    @GetMapping("/popular")
+    public String popularPage(Model model) {
+        model.addAttribute("popularBooks", bookService
+                .getPageOfPopularBooks(OFFSET, LIMIT)
+                .getContent());
+        return "books/popular";
     }
 
-    @ModelAttribute("recommendedBooks")
-    public List<BookDto> recommendedBooks() {
-        return bookService
-                .getPageOfRecommendedBooks(OFFSET, LIMIT)
-                .getContent();
+    @GetMapping("/recent")
+    public String recentPage(Model model) {
+        model.addAttribute("recentBooks", recentBooks());
+        return "books/recent";
     }
 
-    @ModelAttribute("recentBooks")
-    public List<BookDto> recentBooks() {
+    @GetMapping("/{slug}")
+    public String genreSlugPage(@PathVariable String slug, Model model) {
+        model.addAttribute("book", bookService.getBook(slug));
+        return "books/slug";
+    }
+
+    private List<BookDto> recentBooks() {
         LocalDate dateTo = LocalDate.now();
         LocalDate dateFrom = LocalDate.now().minusMonths(DEFAULT_RECENT_MONTH);
         return bookService
@@ -46,22 +62,12 @@ public class BookPagesController {
                 .getContent();
     }
 
-    @ModelAttribute("popularBooks")
-    public List<BookDto> popularBooks() {
-        return bookService
-                .getPageOfPopularBooks(OFFSET,LIMIT)
-                .getContent();
-    }
-
-    @GetMapping("/popular")
-    public String popularPage(){
-        return "books/popular";
-    }
-
-
-    @GetMapping("/recent")
-    public String recentPage(){
-        return "books/recent";
+    @PostMapping("/{slug}/img/save")
+    public String saveNewBookImage(@RequestParam("file") MultipartFile file,
+                                   @PathVariable("slug") String slug) throws IOException {
+        String path = storage.saveNewBookCover(file, slug);
+        bookService.updateBook(slug, path);
+        return "redirect:/books/" + slug;
     }
 
 }

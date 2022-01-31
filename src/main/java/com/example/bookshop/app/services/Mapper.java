@@ -4,6 +4,7 @@ import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.web.dto.AuthorDto;
 import com.example.bookshop.web.dto.BookDto;
+import com.example.bookshop.web.dto.TagDto;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
@@ -13,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @org.mapstruct.Mapper
 public interface  Mapper {
@@ -20,6 +23,7 @@ public interface  Mapper {
     Mapper INSTANCE = Mappers.getMapper(Mapper.class);
 
     @Mapping(target = "priceOld", source =  ".", qualifiedByName = "calculatePriceOld")
+    @Mapping(target = "tags", source =  ".", qualifiedByName = "getTags")
     BookDto map(Book book);
     List<BookDto> map(List<Book> books);
     AuthorDto map(Author author);
@@ -32,7 +36,18 @@ public interface  Mapper {
                 .replace(".00","");
     }
 
-    default Integer convertRatingToInteger(Double rating){
+    @Named("getTags")
+    static Set<TagDto> getTags(Book book) {
+        return book.getBookToTag().stream()
+                .map(bookToTag -> {
+                    TagDto tag = new TagDto();
+                    tag.setId(bookToTag.getTag().getId());
+                    tag.setName(bookToTag.getTag().getName());
+                    return tag;
+                }).collect(Collectors.toSet());
+    }
+
+    default Integer convertToInteger(Double rating){
         return rating.intValue();
     }
 
