@@ -1,11 +1,13 @@
 package com.example.bookshop.app.model.entity;
 
-import com.example.bookshop.app.model.entity.enumuration.FileType;
+import com.example.bookshop.app.model.entity.enumuration.FileTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -16,9 +18,9 @@ import java.util.List;
 
 @Getter
 @Setter
-@Table(name = "book_file_type")
+@Table(name = "file_type")
 @Entity
-public class BookFileType {
+public class FileType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,10 +30,10 @@ public class BookFileType {
     private String description;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
-    private FileType name;
+    @Enumerated(EnumType.STRING)
+    private FileTypeEnum name;
 
-    @OneToMany(mappedBy = "bookFileType")
-    @Column(columnDefinition = "INT NOT NULL")
-    private List<BookFile> bookFiles = new ArrayList<>();
+    @OneToMany(mappedBy = "fileType")
+    private List<BookToFile> bookToFiles = new ArrayList<>();
 
 }

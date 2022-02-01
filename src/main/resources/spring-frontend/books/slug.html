@@ -14,11 +14,13 @@
     <link rel="stylesheet" href="/assets/css/basic.min.css?v=87821122">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="/assets/css/extra.min.css?v=87821122">
+    <link rel="stylesheet" href="/assets/css/download.css">
     <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
     <script defer src="/assets/js/scripts.min.js?v=87821122"></script>
     <script defer src="/assets/js/local.js"></script>
     <script defer src="/assets/js/uploadbookimage.js"></script>
+    <script defer src="/assets/js/downloadbook.js"></script>
 </head>
 <body class="Site">
 <header th:replace="~{fragments/header_fragment :: headFragment}"></header>
@@ -453,13 +455,18 @@
                                 </button>
                             </div>
                         </div>
-                        <!--+div.-cart-->
-                        <!--    //+div.-cartElement.-cartElement_amount-->
-                        <!--    //    +Amount._product-->
-                        <!--    +div.-cartElement-->
-                        <!--        +btn('button')(data-sendstatus='UNLINK' data-bookid="[1111]")._muted Вернуть из архива-->
+                        <div id="download-popup">
+                            <p th:text="#{book.download.link}">n/a</p>
+                            <div th:each="bookFile : ${book.fileList}">
+                                <a th:href="${'/books/download/' + bookFile.hash}"
+                                   th:text="${bookFile.fileType}"></a>
+                            </div>
+                            <span id="download-popup-close" class="close">❎</span>
+                        </div>
+                        <div id="download-popup-overlay"></div>
                     </div>
                 </div>
+
                 <div class="Product-comments">
                     <div class="Product-comments-header">
                         <h3 class="Product-comments-title"

@@ -1,0 +1,8 @@
+insert into file_type(id, description, name) values (1, 'PDF stands for the Portable Document Format, used to display documents in an electronic form independent of the software, hardware or operating system they are viewed on. Originally developed by Adobe® Systems as a universally compatible file format based on the PostScript format, it has become an international de-facto standard for exchanging documents and information.', 'PDF');
+insert into file_type(id, description, name) values (2, 'EPUB is an e-book file format. EPUBs are more accessible for impaired readers than PDFs – they function better with screen reading software. Pagination: With reflowable text, there is a difference in the way that the pages are rendered, because each time the text or window changes, the number of pages also changes.', 'EPUB');
+insert into file_type(id, description, name) values (3, 'Fb2 format is an XML file with a set of tags describing an electronic edition, a book or a magazine. This format is designed to create e-books of any complexity. At the same time, any book can be converted to fb2 format.', 'FB2');
+
+insert into book2file (id, hash, type_id, path, book_id) values (1, 'file-eev-pdf', 1, '/shark_tale.pdf', 14);
+insert into book2file (id, hash, type_id, path, book_id) values (2, 'file-eev-epu', 2, '/shark_tale.epub', 14);
+insert into book2file (id, hash, type_id, path, book_id) values (3, 'file-eev-fb2', 3, '/shark_tale.fb2', 14);
+insert into book2file (id, hash, type_id, path, book_id) values (4, 'file-ste-pdf', 1, '/Mysterious_Island.pdf', 2);

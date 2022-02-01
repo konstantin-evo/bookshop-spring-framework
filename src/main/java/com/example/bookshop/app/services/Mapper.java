@@ -2,8 +2,11 @@ package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.app.model.entity.BookToFile;
+import com.example.bookshop.app.model.entity.FileType;
 import com.example.bookshop.web.dto.AuthorDto;
 import com.example.bookshop.web.dto.BookDto;
+import com.example.bookshop.web.dto.BookFileDto;
 import com.example.bookshop.web.dto.TagDto;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -27,6 +30,7 @@ public interface  Mapper {
     BookDto map(Book book);
     List<BookDto> map(List<Book> books);
     AuthorDto map(Author author);
+    BookFileDto map(BookToFile file);
 
     @Named("calculatePriceOld")
     static String calculatePriceOld(Book book) {
@@ -53,6 +57,10 @@ public interface  Mapper {
 
     default LocalDate convertToLocalDate(Date date) {
         return new java.sql.Date(date.getTime()).toLocalDate();
+    }
+
+    default String convertBookFileType(FileType type) {
+        return String.valueOf(type.getName().getFileExtensionString());
     }
 
     /**

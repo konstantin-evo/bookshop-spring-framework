@@ -139,4 +139,16 @@ public class BooksRestApiController {
                         .getBooksByAuthorId(offset, limit,id)
                         .getContent());
     }
+
+    @GetMapping("/search/{query}")
+    @ResponseBody
+    public BooksPageDto getBooksBySearchQuery(@PathVariable String query,
+                                         @RequestParam("offset") Integer offset,
+                                         @RequestParam("limit") Integer limit) {
+        return new BooksPageDto(
+                bookService
+                        .getPageOfSearchResultBooks(query, offset, limit)
+                        .getContent());
+    }
+
 }

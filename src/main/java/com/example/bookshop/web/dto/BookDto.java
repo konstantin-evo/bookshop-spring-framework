@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -61,6 +62,11 @@ public class BookDto {
             value = "tags added to the book",
             example = "modern, psychological prose")
     private Set<TagDto> tags;
+
+    @ApiModelProperty(
+            value = "tags added to the book",
+            example = "modern, psychological prose")
+    private List<BookFileDto> fileList;
 
     @ApiModelProperty(
             value = "mnemonic identity sequence of characters",

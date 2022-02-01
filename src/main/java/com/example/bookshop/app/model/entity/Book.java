@@ -15,6 +15,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PostPersist;
 import javax.persistence.PostUpdate;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -68,6 +69,9 @@ public class Book {
 
     @OneToMany(mappedBy="book")
     private List<BookToTag> bookToTag;
+
+    @OneToMany(mappedBy = "book")
+    private List<BookToFile> fileList = new ArrayList<>();
 
     @PostPersist
     @PostUpdate
