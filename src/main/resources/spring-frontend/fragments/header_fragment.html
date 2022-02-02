@@ -12,11 +12,11 @@
                     </div>
                     <div class="Header-search">
                         <div class="search">
-                            <form class="form form_search" action="#" method="post" data-searchlimit="20"
-                                  th:object="${searchWordDto}">
+                            <form class="form form_search" action="#" method="post" data-searchlimit="6"
+                                  th:object="${searchWord}">
                                 <input class="search-input" id="query" name="query" type="text"
                                        th:placeholder="#{search.placeholder}"
-                                       th:field="*{example}"/>
+                                       th:value="${searchWord}"/>
                                 <button class="search-button" type="submit" name="search" id="search"
                                         th:text="#{topbar.search}">n/a
                                 </button>

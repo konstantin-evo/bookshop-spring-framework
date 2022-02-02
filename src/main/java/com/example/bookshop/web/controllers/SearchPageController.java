@@ -2,7 +2,6 @@ package com.example.bookshop.web.controllers;
 
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.web.dto.BookDto;
-import com.example.bookshop.web.dto.SearchWordDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,13 +31,13 @@ public class SearchPageController {
     }
 
     @GetMapping(value = "/search/{searchWord}")
-    public String getSearchResult(@PathVariable(value = "searchWord", required = false) SearchWordDto searchWordDto,
+    public String getSearchResult(@PathVariable(value = "searchWord", required = false) String searchWord,
                                   Model model) {
         //TODO: Refactor index.html (upload file is not working with js)
-        model.addAttribute("searchWordDto", searchWordDto);
+        model.addAttribute("searchWord", searchWord);
         model.addAttribute("searchResults",
                 bookService
-                        .getPageOfSearchResultBooks(searchWordDto.getExample(), OFFSET, LIMIT)
+                        .getPageOfSearchResultBooks(searchWord, OFFSET, LIMIT)
                         .getContent());
         return "/search/index";
     }

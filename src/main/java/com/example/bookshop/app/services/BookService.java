@@ -3,6 +3,7 @@ package com.example.bookshop.app.services;
 import com.example.bookshop.app.model.dao.BookRepository;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.web.dto.BookDto;
+import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -83,8 +84,11 @@ public class BookService {
         return Mapper.INSTANCE.map(books);
     }
 
-    public List<BookDto> getBooksByTitle(String title) {
+    public List<BookDto> getBooksByTitle(String title) throws BookstoreApiWrongParameterException {
         List<Book> books = bookRepo.findBooksByTitleContaining(title);
+        if (title.length() <= 1 || books.isEmpty()) {
+            throw new BookstoreApiWrongParameterException("Wrong values passed to one or more parameters");
+        }
         return Mapper.INSTANCE.map(books);
     }
 
@@ -117,7 +121,7 @@ public class BookService {
         return Mapper.INSTANCE.map(bookRepo.findBookBySlug(slug));
     }
 
-    public void updateBook(String slug, String path){
+    public void updateBook(String slug, String path) {
         Book book = bookRepo.findBookBySlug(slug);
         book.setImage(path);
         bookRepo.save(book);
