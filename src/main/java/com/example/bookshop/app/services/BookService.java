@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -117,6 +118,10 @@ public class BookService {
         return Mapper.INSTANCE.map(books);
     }
 
+    public List<BookDto> getBooksInCart(String cartContents) {
+        return Mapper.INSTANCE.map(findBooksInCart(cartContents));
+    }
+
     public BookDto getBook(String slug) {
         return Mapper.INSTANCE.map(bookRepo.findBookBySlug(slug));
     }
@@ -127,8 +132,25 @@ public class BookService {
         bookRepo.save(book);
     }
 
+    public Pair<String, String> getTotalPricesInCart(String cartContents) {
+        List<Book> books = findBooksInCart(cartContents);
+        String priceOld = String.valueOf(books.stream()
+                .mapToInt(Book::getPrice).sum());
+        String price = String.valueOf(books.stream()
+                .mapToInt(book -> (int) (book.getPrice() / (1 - book.getDiscount() / 100))).sum());
+        return Pair.of(price, priceOld);
+    }
+
     public LocalDate convertToLocalDate(String date) {
         return Mapper.INSTANCE.convertToLocalDate(date);
+    }
+
+    private List<Book> findBooksInCart(String cartContents) {
+        cartContents = cartContents.startsWith("/") ? cartContents.substring(1) : cartContents;
+        cartContents = cartContents.endsWith("/") ? cartContents.substring(0, cartContents.length() - 1) :
+                cartContents;
+        String[] cookieSlugs = cartContents.split("/");
+        return bookRepo.findBooksBySlugIn(cookieSlugs);
     }
 
 }

@@ -35,9 +35,7 @@ public interface  Mapper {
     @Named("calculatePriceOld")
     static String calculatePriceOld(Book book) {
         double discount = book.getDiscount()/100;
-        return String.format("%.2f", book.getPrice()/(1-discount))
-                .replace(',', '.')
-                .replace(".00","");
+        return String.valueOf((int) (book.getPrice()/(1-discount)));
     }
 
     @Named("getTags")

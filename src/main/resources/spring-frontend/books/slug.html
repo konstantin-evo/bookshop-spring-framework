@@ -413,22 +413,30 @@
                             <!--+div.-cartElement.-cartElement_amount-->
                             <!--    +Amount._product-->
                             <div class="ProductCard-cartElement">
-                                <button class="btn btn_primary btn_outline" data-sendstatus="KEPT" data-bookid="[1111]"
+                                <button class="btn btn_primary btn_outline" data-sendstatus="KEPT"
+                                        th:attr="data-bookid=${book.slug}"
                                         data-btntype="check" data-btnradio="buyblock" data-check="false"
-                                        data-alttext="Отложена"><span class="btn-icon"><img
-                                        src="/assets/img/icons/heart.svg" alt="heart.svg"/></span>
+                                        data-alttext="Отложена">
+                                    <span class="btn-icon"><img
+                                            src="/assets/img/icons/heart.svg" alt="heart.svg"/>
+                                    </span>
                                     <span class="btn-content"
-                                          th:text="#{book.kept}">n/a</span>
+                                          th:text="#{book.kept}">n/a
+                                    </span>
                                 </button>
                             </div>
                             <div class="ProductCard-cartElement">
-                                <button class="btn btn_primary btn_outline" data-sendstatus="CART" data-bookid="[1111]"
+                                <button class="btn btn_primary btn_outline" data-sendstatus="CART"
                                         data-btntype="check" data-btnradio="buyblock" data-check="false"
-                                        data-alttext="В корзине"><span class="btn-icon"><img
-                                        src="/assets/img/icons/shopping-basket.svg"
-                                        alt="shopping-basket.svg"/></span>
+                                        data-alttext="В корзине"
+                                        th:attr="data-bookid=${book.slug}">
+                                    <span class="btn-icon"><img
+                                            src="/assets/img/icons/shopping-basket.svg"
+                                            alt="shopping-basket.svg"/>
+                                    </span>
                                     <span class="btn-content"
-                                          th:text="#{book.buy}">n/a</span>
+                                          th:text="#{book.buy}">n/a
+                                    </span>
                                 </button>
                             </div>
                         </div>
@@ -461,7 +469,7 @@
                                 <a th:href="${'/books/download/' + bookFile.hash}"
                                    th:text="${bookFile.fileType}"></a>
                             </div>
-                            <span id="download-popup-close" class="close">❎</span>
+                            <span id="download-popup-close" class="close">&times;</span>
                         </div>
                         <div id="download-popup-overlay"></div>
                     </div>
