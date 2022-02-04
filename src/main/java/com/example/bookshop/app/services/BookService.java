@@ -14,9 +14,14 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.Cookie;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.StringJoiner;
 
 @Service
 @Transactional
@@ -118,8 +123,8 @@ public class BookService {
         return Mapper.INSTANCE.map(books);
     }
 
-    public List<BookDto> getBooksInCart(String cartContents) {
-        return Mapper.INSTANCE.map(findBooksInCart(cartContents));
+    public List<BookDto> getBooksByCookies(String cookie) {
+        return Mapper.INSTANCE.map(findBooksByCookies(cookie));
     }
 
     public BookDto getBook(String slug) {
@@ -133,7 +138,7 @@ public class BookService {
     }
 
     public Pair<String, String> getTotalPricesInCart(String cartContents) {
-        List<Book> books = findBooksInCart(cartContents);
+        List<Book> books = findBooksByCookies(cartContents);
         String priceOld = String.valueOf(books.stream()
                 .mapToInt(Book::getPrice).sum());
         String price = String.valueOf(books.stream()
@@ -145,12 +150,65 @@ public class BookService {
         return Mapper.INSTANCE.convertToLocalDate(date);
     }
 
-    private List<Book> findBooksInCart(String cartContents) {
-        cartContents = cartContents.startsWith("/") ? cartContents.substring(1) : cartContents;
-        cartContents = cartContents.endsWith("/") ? cartContents.substring(0, cartContents.length() - 1) :
-                cartContents;
-        String[] cookieSlugs = cartContents.split("/");
-        return bookRepo.findBooksBySlugIn(cookieSlugs);
+    /**
+     * The method updates a specific Cookie
+     * after a user tries to add a Book to this Cookie
+     *
+     * @param cookieName  - the name of the Cookie to update, for example "postponedBooks"
+     * @param cookieValue - current value cookie, can contain several books at once
+     *                    for example "book-bqr-bsi/book-ebf-jyu/book-ekp-gdh"
+     * @param slug        - unique identifier for the book being added to the Cookie
+     * @return updated Cookie
+     */
+    public Cookie getUpdatedCookies(String cookieValue, String cookieName, String slug) {
+        Cookie cookie = new Cookie(cookieName, cookieValue);
+        cookie.setPath("/");
+        if (cookieValue == null || cookieValue.equals("")) {
+            cookie.setValue(slug);
+        } else if (!cookieValue.contains(slug)) {
+            StringJoiner stringJoiner = new StringJoiner("/");
+            stringJoiner.add(cookieValue).add(slug);
+            cookie.setValue(stringJoiner.toString());
+        }
+        return cookie;
     }
 
+    /**
+     * The method removes a book from a specific Cookie
+     *
+     * @param cookieName  - the name of the Cookie to update, for example "postponedBooks"
+     * @param cookieValue - current value cookie, can contain several books at once
+     *                    for example "book-bqr-bsi/book-ebf-jyu/book-ekp-gdh"
+     * @param slug        - unique identifier for the book being removed from the Cookie
+     */
+    public Cookie removeBookFromCookie(String cookieValue, String cookieName, String slug) {
+        ArrayList<String> cookieBooks = new ArrayList<>(Arrays.asList(cookieValue.split("/")));
+        cookieBooks.remove(slug);
+        Cookie cookie = new Cookie(cookieName, String.join("/", cookieBooks));
+        cookie.setPath("/");
+        return cookie;
+    }
+
+    /**
+     * Util method that allows to determine if the current Cookie value is empty or not
+     * Used to define attributes such as "isCartEmpty", etc.
+     */
+    public boolean getBooleanAttribute(String cookieValue) {
+        if (cookieValue == null || cookieValue.equals("")) {
+            return true;
+        } else {
+            return (findBooksByCookies(cookieValue).isEmpty());
+        }
+    }
+
+    private List<Book> findBooksByCookies(String cookie) {
+        if (cookie == null) {
+            return Collections.emptyList();
+        } else {
+            cookie = cookie.startsWith("/") ? cookie.substring(1) : cookie;
+            cookie = cookie.endsWith("/") ? cookie.substring(0, cookie.length() - 1) : cookie;
+            String[] cookieSlugs = cookie.split("/");
+            return bookRepo.findBooksBySlugIn(cookieSlugs);
+        }
+    }
 }

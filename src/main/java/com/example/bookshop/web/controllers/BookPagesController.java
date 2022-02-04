@@ -4,6 +4,7 @@ import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.services.ResourceStorage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -30,9 +31,12 @@ public class BookPagesController {
     private final BookService bookService;
     private final ResourceStorage storage;
 
-    private static final int OFFSET = 0;
-    private static final int LIMIT = 6;
-    private static final int DEFAULT_RECENT_MONTH = 6;
+    @Value("${default.offset}")
+    private int OFFSET;
+    @Value("${default.limit}")
+    private int LIMIT;
+    @Value("${default.recentmonth}")
+    private int DEFAULT_RECENT_MONTH;
 
     @Autowired
     public BookPagesController(BookService bookService, ResourceStorage storage) {

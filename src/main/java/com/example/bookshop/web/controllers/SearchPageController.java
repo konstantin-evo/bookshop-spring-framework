@@ -3,6 +3,7 @@ package com.example.bookshop.web.controllers;
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.web.dto.BookDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,10 @@ public class SearchPageController {
 
     private final BookService bookService;
 
-    private static final int OFFSET = 0;
-    private static final int LIMIT = 6;
+    @Value("${default.offset}")
+    private int OFFSET;
+    @Value("${default.limit}")
+    private int LIMIT;
 
     @Autowired
     public SearchPageController(BookService bookService) {

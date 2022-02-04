@@ -26,106 +26,14 @@
             <h1 class="Middle-title"
                 th:text="#{cart.name}">n/a
             </h1>
-            <h4 th:if="${isCartEmpty}"
-                th:text="#{cart.empty}">n/a
-            </h4>
             <form class="form Cart" action="#" method="post">
-                <div class="Cart-product" th:each="book : ${bookCart}">
-                    <div class="Cart-block Cart-block_row">
-                        <div class="Cart-block Cart-block_pict"><a class="Cart-pict" href="#">
-                            <img class="Cart-img" alt="card.jpg"
-                                 th:src="${book.image}"/></a>
-                        </div>
-                        <div class="Cart-block Cart-block_row">
-                            <div class="Cart-block Cart-block_info">
-                                <div class="Cart-author">
-                                    <a href="#"
-                                       th:text="${book.author.getFirstName}+' '+${book.author.getLastName}">n/a</a>
-                                </div>
-                                <div class="Cart-title"><a href="#" th:text="${book.title}">n/a</a>
-                                </div>
-                                <div class="Cart-rating"><span class="Rating"><span class="Rating-stars"><span
-                                        class="Rating-star Rating-star_view">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                            <g>
-                              <g>
-                                <path fill="#ffc000"
-                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                              </g>
-                            </g>
-                          </svg></span><span class="Rating-star Rating-star_view">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                            <g>
-                              <g>
-                                <path fill="#ffc000"
-                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                              </g>
-                            </g>
-                          </svg></span><span class="Rating-star Rating-star_view">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                            <g>
-                              <g>
-                                <path fill="#ffc000"
-                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                              </g>
-                            </g>
-                          </svg></span><span class="Rating-star Rating-star_view">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                            <g>
-                              <g>
-                                <path fill="#ffc000"
-                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                              </g>
-                            </g>
-                          </svg></span><span class="Rating-star Rating-star_view">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                            <g>
-                              <g>
-                                <path fill="#ffc000"
-                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
-                              </g>
-                            </g>
-                          </svg></span></span></span>
-                                </div>
-                                <div class="Cart-buttons">
-                                    <div class="Cart-btn">
-                                        <button class="btn btn_primary btn_outline" data-sendstatus="KEPT"
-                                                data-bookid="[1133]">
-                                            <span class="btn-icon"><img src="/assets/img/icons/heart.svg"
-                                                                        alt="heart.svg"/></span>
-                                            <span class="btn-content"
-                                                  th:text="#{cart.postpone}">n/a
-                                            </span>
-                                        </button>
-                                    </div>
-                                    <div class="Cart-btn">
-                                        <button class="btn btn_danger btn_outline" data-sendstatus="UNLINK"
-                                                th:attr="data-bookid = ${'cart/remove/' + book.slug}">
-                                            <span class="btn-icon"><img src="/assets/img/icons/trash.svg"
-                                                                        alt="trash.svg"/></span>
-                                            <span class="btn-content"
-                                                  th:text="#{cart.delete}">n/a</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="Cart-block Cart-block_price">
-                                <div class="Cart-priceTitle"
-                                     th:text="#{cart.price} + ':'">n/a
-                                </div>
-                                <div class="Cart-price Cart-price_old" th:text="'₽ '+${book.priceOld}">n/a
-                                </div>
-                                <div class="Cart-price" th:text="'₽ '+${book.price}">n/a
-                                </div>
-                                <div class="Cart-sale" th:text="${'-' + book.discount + '%'}">n/a
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div th:replace="fragments/cart_product_fragment.html
+                                        :: CartProductFragment(books=${bookCart}, page='CART')">
                 </div>
-                <div class="Cart-total">
-                    <div class="Cart-block Cart-block_total"
-                         th:if="${not isCartEmpty}">
+                <!--  If there are books in the Cart - calculate the total cost  -->
+                <div class="Cart-total"
+                     th:if="${not isCartEmpty}">
+                    <div class="Cart-block Cart-block_total">
                         <strong class="Cart-title"
                                 th:text="#{cart.total}+':'">n/a
                         </strong>
@@ -134,13 +42,33 @@
                         <span class="Cart-price_old"
                               th:text="${totalPrices.getFirst()} + 'р.'">n/a</span>
                     </div>
-                    <div class="Cart-block"
-                         th:if="${not isCartEmpty}">
+                    <div class="Cart-block">
                         <a class="btn btn_success btn_md" href="/order.html"
                            th:text="#{cart.buy}">n/a
                         </a>
                     </div>
                 </div>
+                <!--  If there are no books in the Cart - suggest popular ones -->
+                <div class="Section"
+                     th:if="${isCartEmpty}">
+                    <div class="Section-header">
+                        <h1 class="Section-title"
+                            th:text="#{cart.empty}">n/a
+                        </h1>
+                    </div>
+                    <div class="Cards Cards_refresh">
+                        <div th:replace="fragments/card_fragment.html
+                        :: CardFragment(books=${popularBooks})">
+                        </div>
+                        <div class="Cards-footer Cards-footer_center">
+                            <a class="btn btn_primary" href="#"
+                               data-refreshshow="popular" data-refreshoffset="0"
+                               data-refreshlimit="6"
+                               th:text="#{search.more}">n/a</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- The end of the carousel of popular books-->
             </form>
         </main>
     </div>
