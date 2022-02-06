@@ -3,6 +3,7 @@ package com.example.bookshop.app.services;
 import com.example.bookshop.app.model.dao.BookRepository;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.web.dto.BookDto;
+import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -146,6 +147,10 @@ public class BookService {
         return Pair.of(price, priceOld);
     }
 
+    public BookRateDto getBookRate(String slug) {
+        return Mapper.INSTANCE.mapBookRateDto(bookRepo.findBookBySlug(slug));
+    }
+
     public LocalDate convertToLocalDate(String date) {
         return Mapper.INSTANCE.convertToLocalDate(date);
     }
@@ -154,10 +159,10 @@ public class BookService {
      * The method updates a specific Cookie
      * after a user tries to add a Book to this Cookie
      *
-     * @param cookieName  - the name of the Cookie to update, for example "postponedBooks"
-     * @param cookieValue - current value cookie, can contain several books at once
+     * @param cookieName  the name of the Cookie to update, for example "postponedBooks"
+     * @param cookieValue current value cookie, can contain several books at once
      *                    for example "book-bqr-bsi/book-ebf-jyu/book-ekp-gdh"
-     * @param slug        - unique identifier for the book being added to the Cookie
+     * @param slug        unique identifier for the book being added to the Cookie
      * @return updated Cookie
      */
     public Cookie getUpdatedCookies(String cookieValue, String cookieName, String slug) {
@@ -176,10 +181,10 @@ public class BookService {
     /**
      * The method removes a book from a specific Cookie
      *
-     * @param cookieName  - the name of the Cookie to update, for example "postponedBooks"
-     * @param cookieValue - current value cookie, can contain several books at once
+     * @param cookieName  the name of the Cookie to update, for example "postponedBooks"
+     * @param cookieValue current value cookie, can contain several books at once
      *                    for example "book-bqr-bsi/book-ebf-jyu/book-ekp-gdh"
-     * @param slug        - unique identifier for the book being removed from the Cookie
+     * @param slug        unique identifier for the book being removed from the Cookie
      */
     public Cookie removeBookFromCookie(String cookieValue, String cookieName, String slug) {
         ArrayList<String> cookieBooks = new ArrayList<>(Arrays.asList(cookieValue.split("/")));

@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -37,5 +38,11 @@ public class User {
 
     @OneToMany(mappedBy="user")
     private List<BookToUser> bookToUsers;
+
+    @OneToMany(mappedBy = "user")
+    private List<BookReview> userReviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<BookRate> userRates = new ArrayList<>();
 
 }

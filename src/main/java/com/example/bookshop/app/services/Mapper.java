@@ -2,11 +2,13 @@ package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.app.model.entity.BookRate;
 import com.example.bookshop.app.model.entity.BookToFile;
 import com.example.bookshop.app.model.entity.FileType;
 import com.example.bookshop.web.dto.AuthorDto;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookFileDto;
+import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.TagDto;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -15,8 +17,11 @@ import org.mapstruct.factory.Mappers;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,6 +33,11 @@ public interface  Mapper {
     @Mapping(target = "priceOld", source =  ".", qualifiedByName = "calculatePriceOld")
     @Mapping(target = "tags", source =  ".", qualifiedByName = "getTags")
     BookDto map(Book book);
+
+    @Mapping(target = "rate", source =  ".", qualifiedByName = "getBookRate")
+    @Mapping(target = "rateDistribution", source =  ".", qualifiedByName = "getRateDistribution")
+    BookRateDto mapBookRateDto(Book book);
+
     List<BookDto> map(List<Book> books);
     AuthorDto map(Author author);
     BookFileDto map(BookToFile file);
@@ -47,6 +57,42 @@ public interface  Mapper {
                     tag.setName(bookToTag.getTag().getName());
                     return tag;
                 }).collect(Collectors.toSet());
+    }
+
+    /**
+     * The method returns the Rating of the Book based on the Users' assessment
+     *
+     * @return an integer from 1 to 5 that represents the rating of the book (rounded up)
+     * if the book has no ratings, returns 5 (maximum rating)
+     */
+    @Named("getBookRate")
+    static Integer getBookRate(Book book) {
+        if (book.getBookRates().isEmpty()) {
+            return 5;
+        } else {
+            double sum = book.getBookRates().stream().mapToDouble(BookRate::getRating).sum();
+            return (int) Math.ceil(sum / book.getBookRates().size());
+        }
+    }
+
+    /**
+     *  The method returns the distribution of User ratings for the Book
+     *
+     *  @return Map<Integer, Integer> which contains the key "Rating" from 1 to 5
+     *  and the value "Count", which shows the number of users who gave this rating
+     */
+    @Named("getRateDistribution")
+    static Map<Integer, Integer> getRateDistribution(Book book) {
+        Map<Integer, Integer> map = new HashMap<>();
+        List<Integer> list = book.getBookRates().stream()
+                .mapToInt(BookRate::getRating)
+                .boxed().collect(Collectors.toList());
+
+        for(int i = 1; i <= 5; i++) {
+            int frequency = Collections.frequency(list, i);
+            map.put(i, frequency);
+        }
+        return map;
     }
 
     default Integer convertToInteger(Double rating){

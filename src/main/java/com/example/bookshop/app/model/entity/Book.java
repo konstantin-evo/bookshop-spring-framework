@@ -73,6 +73,12 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<BookToFile> fileList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "book")
+    private List<BookReview> bookReviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "book")
+    private List<BookRate> bookRates = new ArrayList<>();
+
     @PostPersist
     @PostUpdate
     private void postLoadFunction(){
