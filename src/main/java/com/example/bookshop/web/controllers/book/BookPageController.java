@@ -44,6 +44,7 @@ public class BookPageController {
         //TODO: Refactor after module "8. Security of Spring Applications"
         // User credential should be taken from the session
         model.addAttribute("userRate", rateService.getUserRate(slug, 88));
+        model.addAttribute("reviews", bookService.getBookReviews(slug));
         return "books/slug";
     }
 

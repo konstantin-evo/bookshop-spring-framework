@@ -3,17 +3,20 @@ package com.example.bookshop.app.services;
 import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.app.model.entity.BookRate;
+import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookToFile;
 import com.example.bookshop.app.model.entity.FileType;
 import com.example.bookshop.web.dto.AuthorDto;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookFileDto;
 import com.example.bookshop.web.dto.BookRateDto;
+import com.example.bookshop.web.dto.ReviewDto;
 import com.example.bookshop.web.dto.TagDto;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -22,30 +25,33 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @org.mapstruct.Mapper
-public interface  Mapper {
+public interface Mapper {
 
     Mapper INSTANCE = Mappers.getMapper(Mapper.class);
 
-    @Mapping(target = "priceOld", source =  ".", qualifiedByName = "calculatePriceOld")
-    @Mapping(target = "tags", source =  ".", qualifiedByName = "getTags")
+    @Mapping(target = "priceOld", source = ".", qualifiedByName = "calculatePriceOld")
+    @Mapping(target = "tags", source = ".", qualifiedByName = "getTags")
     BookDto map(Book book);
 
-    @Mapping(target = "rate", source =  ".", qualifiedByName = "getBookRate")
-    @Mapping(target = "rateDistribution", source =  ".", qualifiedByName = "getRateDistribution")
+    @Mapping(target = "rate", source = ".", qualifiedByName = "getBookRate")
+    @Mapping(target = "rateDistribution", source = ".", qualifiedByName = "getRateDistribution")
     BookRateDto mapBookRateDto(Book book);
 
     List<BookDto> map(List<Book> books);
+
     AuthorDto map(Author author);
+
     BookFileDto map(BookToFile file);
 
     @Named("calculatePriceOld")
     static String calculatePriceOld(Book book) {
-        double discount = book.getDiscount()/100;
-        return String.valueOf((int) (book.getPrice()/(1-discount)));
+        double discount = book.getDiscount() / 100;
+        return String.valueOf((int) (book.getPrice() / (1 - discount)));
     }
 
     @Named("getTags")
@@ -76,10 +82,10 @@ public interface  Mapper {
     }
 
     /**
-     *  The method returns the distribution of User ratings for the Book
+     * The method returns the distribution of User ratings for the Book
      *
-     *  @return Map<Integer, Integer> which contains the key "Rating" from 1 to 5
-     *  and the value "Count", which shows the number of users who gave this rating
+     * @return Map<Integer, Integer> which contains the key "Rating" from 1 to 5
+     * and the value "Count", which shows the number of users who gave this rating
      */
     @Named("getRateDistribution")
     static Map<Integer, Integer> getRateDistribution(Book book) {
@@ -88,14 +94,39 @@ public interface  Mapper {
                 .mapToInt(BookRate::getRating)
                 .boxed().collect(Collectors.toList());
 
-        for(int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 5; i++) {
             int frequency = Collections.frequency(list, i);
             map.put(i, frequency);
         }
         return map;
     }
 
-    default Integer convertToInteger(Double rating){
+    default ReviewDto getBookReviews(Book book) {
+
+        List<ReviewDto.Review> reviews = book.getBookRates().stream()
+                .filter(bookRate -> bookRate.getReview() != null)
+                .map(bookRate -> ReviewDto.Review.builder()
+                        .id(bookRate.getReview().getId())
+                        .rate(bookRate.getRating())
+                        .text(bookRate.getReview().getText())
+                        .userName(bookRate.getUser().getName())
+                        .pubDate(new SimpleDateFormat("MM.dd.yyyy HH:mm")
+                                .format(bookRate.getReview().getPubDate()))
+                        .likes(countReviewRate(bookRate.getReview(), 1))
+                        .dislikes(countReviewRate(bookRate.getReview(), -1))
+                        .build()
+                ).collect(Collectors.toList());
+
+        Integer totalReviews = (int) book.getBookRates().stream()
+                .filter(bookRate -> bookRate.getReview() != null).count();
+
+        return ReviewDto.builder()
+                .reviews(reviews)
+                .totalReviews(totalReviews)
+                .build();
+    }
+
+    default Integer convertToInteger(Double rating) {
         return rating.intValue();
     }
 
@@ -124,6 +155,12 @@ public interface  Mapper {
             localDate = LocalDate.parse(stringDate.replace(".", "-"), formatter);
         }
         return localDate;
+    }
+
+    private Integer countReviewRate(BookReview review, Integer value) {
+        return (int) review.getReviewRates().stream()
+                .filter(bookReviewRate -> Objects.equals(bookReviewRate.getRate(), value))
+                .count();
     }
 
 }

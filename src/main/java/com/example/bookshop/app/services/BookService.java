@@ -4,6 +4,7 @@ import com.example.bookshop.app.model.dao.BookRepository;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
+import com.example.bookshop.web.dto.ReviewDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -149,6 +150,10 @@ public class BookService {
 
     public BookRateDto getBookRate(String slug) {
         return Mapper.INSTANCE.mapBookRateDto(bookRepo.findBookBySlug(slug));
+    }
+
+    public ReviewDto getBookReviews(String slug) {
+        return Mapper.INSTANCE.getBookReviews(bookRepo.findBookBySlug(slug));
     }
 
     public LocalDate convertToLocalDate(String date) {
