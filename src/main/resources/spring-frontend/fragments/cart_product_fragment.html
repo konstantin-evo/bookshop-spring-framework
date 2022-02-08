@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<body>
+<div class="Cart-product" th:each="book : ${books}" th:fragment="CartProductFragment (books, page)">
+    <div class="Cart-block Cart-block_row">
+        <div class="Cart-block Cart-block_pict">
+            <a class="Cart-pict"
+               th:href="@{/books/{slug}(slug=${book.slug})}">
+                <img class="Cart-img"
+                     th:src="${book.getImage()}" alt="card.jpg"/>
+            </a>
+        </div>
+        <div class="Cart-block Cart-block_row">
+            <div class="Cart-block Cart-block_info">
+                <div class="Cart-author">
+                    <a href="#"
+                       th:text="${book.author.getFirstName}+' '+${book.author.getLastName}">n/a</a>
+                </div>
+                <div class="Cart-title"><a href="#" th:text="${book.title}">n/a</a>
+                </div>
+                <div class="Cart-rating"><span class="Rating"><span class="Rating-stars"><span
+                        class="Rating-star Rating-star_view">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
+                            <g>
+                              <g>
+                                <path fill="#ffc000"
+                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                              </g>
+                            </g>
+                          </svg></span><span class="Rating-star Rating-star_view">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
+                            <g>
+                              <g>
+                                <path fill="#ffc000"
+                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                              </g>
+                            </g>
+                          </svg></span><span class="Rating-star Rating-star_view">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
+                            <g>
+                              <g>
+                                <path fill="#ffc000"
+                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                              </g>
+                            </g>
+                          </svg></span><span class="Rating-star Rating-star_view">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
+                            <g>
+                              <g>
+                                <path fill="#ffc000"
+                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                              </g>
+                            </g>
+                          </svg></span><span class="Rating-star Rating-star_view">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
+                            <g>
+                              <g>
+                                <path fill="#ffc000"
+                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                              </g>
+                            </g>
+                          </svg></span></span></span>
+                </div>
+                <div class="Cart-buttons">
+                    <!-- The "Buy" or "Postpone" button depends on the page the user is on -->
+                    <div class="Cart-btn"
+                         th:if="${page} == 'CART'">
+                        <button class="btn btn_primary btn_outline"
+                                data-sendstatus="KEPT"
+                                th:attr="data-bookid=${book.slug}">
+                                            <span class="btn-icon">
+                                                <img src="/assets/img/icons/heart.svg"
+                                                     alt="heart.svg"/>
+                                            </span>
+                            <span class="btn-content"
+                                  th:text="#{cart.postpone}">n/a
+                                            </span>
+                        </button>
+                    </div>
+                    <div class="Cart-btn"
+                         th:if="${page} == 'KEPT'">
+                        <button class="btn btn_primary btn_outline" data-sendstatus="CART"
+                                th:attr="data-bookid=${book.slug}">
+                            <span class="btn-icon">
+                                <img src="/assets/img/icons/shopping-basket.svg" alt="shopping-basket.svg"/>
+                            </span>
+                            <span class="btn-content"
+                                  th:text="#{cart.buy}">n/a</span>
+                        </button>
+                    </div>
+                    <!-- End of the "Buy" or "Postpone" button choices -->
+                    <!-- The "Delete" button depends on the page the user is on -->
+                    <div class="Cart-btn">
+                        <button class="btn btn_danger btn_outline" data-sendstatus="UNLINK-CART"
+                                th:attr="data-bookid = ${book.slug}"
+                                th:if="${page} == 'CART'">
+                                            <span class="btn-icon">
+                                                <img src="/assets/img/icons/trash.svg"
+                                                     alt="trash.svg"/>
+                                            </span>
+                            <span class="btn-content"
+                                  th:text="#{cart.delete}">n/a</span>
+                        </button>
+                    </div>
+                    <div class="Cart-btn">
+                        <button class="btn btn_danger btn_outline" data-sendstatus="UNLINK-KEPT"
+                                th:attr="data-bookid = ${book.slug}"
+                                th:if="${page} == 'KEPT'">
+                                            <span class="btn-icon">
+                                                <img src="/assets/img/icons/trash.svg"
+                                                     alt="trash.svg"/>
+                                            </span>
+                            <span class="btn-content"
+                                  th:text="#{cart.delete}">n/a</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="Cart-block Cart-block_price">
+                <div class="Cart-priceTitle"
+                     th:text="#{cart.price} + ':'">n/a
+                </div>
+                <div class="Cart-price Cart-price_old" th:text="'₽ '+${book.priceOld}">n/a
+                </div>
+                <div class="Cart-price" th:text="'₽ '+${book.price}">n/a
+                </div>
+                <div class="Cart-sale" th:text="${'-' + book.discount + '%'}">n/a
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

@@ -14,9 +14,9 @@ import javax.persistence.Table;
 
 @Getter
 @Setter
-@Table(name = "book_file")
+@Table(name = "book2file")
 @Entity
-public class BookFile {
+public class BookToFile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,10 @@ public class BookFile {
     private String path;
 
     @ManyToOne
-    @JoinColumn(name = "type_id", referencedColumnName = "id", unique = true)
-    private BookFileType bookFileType;
+    @JoinColumn(name = "type_id", referencedColumnName = "id")
+    private FileType fileType;
 
+    @ManyToOne
+    @JoinColumn(name = "book_id", referencedColumnName = "id", columnDefinition = "INT NOT NULL")
+    private Book book;
 }

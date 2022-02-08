@@ -24,6 +24,8 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
 
     List<Book> findBooksByPriceIs(Integer price);
 
+    List<Book> findBooksBySlugIn(String[] slugs);
+
     @Query("from Book where isBestseller=1")
     List<Book> findBestsellers();
 
@@ -42,4 +44,5 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
 
     Page<Book> findBookByPubDateIsBetween(Date dateFrom, Date dateTo, Pageable nextPage);
 
+    Book findBookBySlug(String slug);
 }

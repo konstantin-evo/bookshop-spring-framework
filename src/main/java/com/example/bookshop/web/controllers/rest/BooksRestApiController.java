@@ -1,20 +1,26 @@
 package com.example.bookshop.web.controllers.rest;
 
+import com.example.bookshop.app.services.BookReviewService;
 import com.example.bookshop.app.services.BookService;
+import com.example.bookshop.web.dto.ApiResponse;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BooksPageDto;
+import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -23,10 +29,13 @@ import java.util.List;
 public class BooksRestApiController {
 
     private final BookService bookService;
+    private final BookReviewService bookReviewService;
 
     @Autowired
-    public BooksRestApiController(BookService bookService) {
+    public BooksRestApiController(BookService bookService,
+                                  BookReviewService bookReviewService) {
         this.bookService = bookService;
+        this.bookReviewService = bookReviewService;
     }
 
     @GetMapping("/books/by-author")
@@ -37,8 +46,16 @@ public class BooksRestApiController {
 
     @GetMapping("/books/by-title")
     @ApiOperation("get books by title")
-    public ResponseEntity<List<BookDto>> booksByTitle(@RequestParam("title") String title) {
-        return ResponseEntity.ok(bookService.getBooksByTitle(title));
+    public ResponseEntity<ApiResponse<BookDto>> booksByTitle(@RequestParam("title") String title)
+            throws BookstoreApiWrongParameterException {
+        List<BookDto> data = bookService.getBooksByTitle(title);
+        ApiResponse<BookDto> response = new ApiResponse<>(
+                HttpStatus.OK,
+                LocalDateTime.now(),
+                "data size: " + data.size() + " elements",
+                "successful request",
+                data);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/books/by-price")
@@ -121,8 +138,8 @@ public class BooksRestApiController {
     @GetMapping("/books/genre/{id}")
     @ResponseBody
     public BooksPageDto getBooksByGenre(@PathVariable Integer id,
-                                 @RequestParam("offset") Integer offset,
-                                 @RequestParam("limit") Integer limit) {
+                                        @RequestParam("offset") Integer offset,
+                                        @RequestParam("limit") Integer limit) {
         return new BooksPageDto(
                 bookService
                         .getPageOfBooksByGenre(offset, limit, id)
@@ -132,11 +149,32 @@ public class BooksRestApiController {
     @GetMapping("/books/author/{id}")
     @ResponseBody
     public BooksPageDto getBooksByAuthor(@PathVariable Integer id,
-                                        @RequestParam("offset") Integer offset,
-                                        @RequestParam("limit") Integer limit) {
+                                         @RequestParam("offset") Integer offset,
+                                         @RequestParam("limit") Integer limit) {
         return new BooksPageDto(
                 bookService
-                        .getBooksByAuthorId(offset, limit,id)
+                        .getBooksByAuthorId(offset, limit, id)
                         .getContent());
     }
+
+    @GetMapping("/search/{query}")
+    @ResponseBody
+    public BooksPageDto getBooksBySearchQuery(@PathVariable String query,
+                                              @RequestParam("offset") Integer offset,
+                                              @RequestParam("limit") Integer limit) {
+        return new BooksPageDto(
+                bookService
+                        .getPageOfSearchResultBooks(query, offset, limit)
+                        .getContent());
+    }
+
+    @PostMapping("/rate-book-review")
+    @ResponseBody
+    public boolean handleRateBookReview(@RequestParam("value") Integer value,
+                                        @RequestParam("reviewid") Integer reviewId) {
+        //TODO: Refactor after module "8. Security of Spring Applications"
+        // User credential should be taken from the session
+        return bookReviewService.setRateBookReview(reviewId, value, 9);
+    }
+
 }

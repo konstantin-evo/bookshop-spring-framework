@@ -2,11 +2,24 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <body>
 <div class="Card" th:each="book : ${books}" th:fragment="CardFragment (books)">
-    <div class="Card-picture"><a href="#">
-        <img th:src="${book.getImage()}" alt="card.jpg"/></a>
+    <div class="Card-picture">
+        <a th:href="@{/books/{slug}(slug=${book.slug})}">
+            <img th:src="${book.getImage()}" alt="card.jpg"/>
+        </a>
+        <div class="Card-sale"
+             th:if="${book.discount}>0"
+             th:text="${book.discount} + '% ' + #{main.discount}">
+        </div>
+        <div class="Card-ribbon"
+             th:if="${book.isBestseller} == 1">
+                    <span class="Card-ribbonText"
+                          th:text="#{main.bestseller}">n/a</span>
+        </div>
     </div>
     <div class="Card-content">
-        <strong class="Card-title"><a href="#" th:text="${book.title}">n/a</a>
+        <strong class="Card-title">
+            <a th:href="@{/books/{slug}(slug=${book.slug})}"
+               th:text="${book.title}">n/a</a>
         </strong>
         <div class="Card-description"
              th:text="${book.author.getFirstName}+' '+${book.author.getLastName}">n/a

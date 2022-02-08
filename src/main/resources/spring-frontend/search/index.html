@@ -27,11 +27,11 @@
             </h1>
             <div class="Section">
                 <div class="search">
-                    <form class="form form_search" action="#" method="post" data-searchlimit="20"
-                          th:object="${searchWordDto}">
+                    <form class="form form_search" action="#" method="post" data-searchlimit="6"
+                          th:object="${searchWord}">
                         <input class="search-input" id="querypage" name="querypage" type="text"
                                th:placeholder="#{search.placeholder}"
-                               th:value="*{example}"/>
+                               th:value="${searchWord}"/>
                         <button class="search-button" type="submit" name="searchpage" id="searchpage"
                                 th:text="#{topbar.search}">n/a
                         </button>
@@ -44,33 +44,15 @@
                         th:text="#{search.find} + ' '+ ${searchResults.size()}">
                     </h2>
                 </header>
-                <div class="Cards Cards_search Cards_refresh">
-                    <div class="Card" th:each="book: ${searchResults}">
-                        <div class="Card-picture">
-                            <a href="#">
-                                <img alt="card.jpg"
-                                     th:src="${book.image}"/>
-                            </a>
-                        </div>
-                        <div class="Card-content">
-                            <strong class="Card-title"><a href="#"
-                                                          th:text="${book.title}">n/a</a>
-                            </strong>
-                            <div class="Card-description"
-                                 th:text="${book.author.getFirstName}+' '+${book.author.getLastName}">n/a
-                            </div>
-                            <div class="Card-cost">
-                                <span class="Card-priceOld"
-                                      th:text="'₽'+${book.priceOld}">n/a</span>
-                                <span class="Card-price"
-                                      th:text="'₽'+${book.price}">n/a</span>
-                            </div>
-                        </div>
+                <div class="Cards Cards_search">
+                    <div th:replace="fragments/card_fragment.html
+                        :: CardFragment(books=${searchResults})">
                     </div>
                     <div class="Cards-footer Cards-footer_center">
                         <a class="btn btn_primary" href="#"
                            data-refreshshow="search" data-refreshoffset="0"
-                           data-refreshlimit="5" data-refreshquery="Техника"
+                           data-refreshlimit="6"
+                           th:attr="data-refreshquery=${searchWord}"
                            th:text="#{search.more}">n/a</a>
                     </div>
                 </div>

@@ -8,7 +8,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -16,33 +18,25 @@ import java.util.List;
 
 @Getter
 @Setter
-@Table(name = "users")
+@Table(name = "book_review")
 @Entity
-public class User {
+public class BookReview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
-    private String hash;
-
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
-    private Timestamp regTime;
+    private Timestamp pubDate;
 
-    @Column(columnDefinition = "INT NOT NULL DEFAULT 0")
-    private Integer balance;
+    @Column(columnDefinition = "TEXT NOT NULL")
+    private String text;
 
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
-    private String name;
+    @OneToOne
+    @JoinColumn(name = "rate_id", referencedColumnName = "id")
+    private BookRate rate;
 
-    @OneToMany(mappedBy="user")
-    private List<BookToUser> bookToUsers;
-
-    @OneToMany(mappedBy = "user")
-    private List<BookRate> userRates = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "review")
     private List<BookReviewRate> reviewRates = new ArrayList<>();
 
 }
