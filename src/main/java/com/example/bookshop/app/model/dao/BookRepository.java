@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book,Integer> {
+public interface BookRepository extends JpaRepository<Book, Integer> {
 
     List<Book> findBooksByAuthorFirstNameContaining(String authorsFirstName);
 
@@ -31,6 +31,12 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
 
     @Query("from Book where discount = (select max(b.discount) from Book b)")
     List<Book> findBooksWithMaxDiscount();
+
+    @Query("select b from Book b join BookToUser bt on b.id = bt.book.id where bt.type.id = 3 and bt.user.id = :user_id")
+    List<Book> findPaidBooksByUser(@Param("user_id") Integer userId);
+
+    @Query("select b from Book b join BookToUser bt on b.id = bt.book.id where bt.type.id = 4 and bt.user.id = :user_id")
+    List<Book> findArchivedBooksByUser(@Param("user_id") Integer userId);
 
     @Query("select b from Book b join BookToTag bt on b.id = bt.book.id where bt.tag.id = :tag_id")
     Page<Book> findBooksByTag(@Param("tag_id") Integer tagId, Pageable nextPage);

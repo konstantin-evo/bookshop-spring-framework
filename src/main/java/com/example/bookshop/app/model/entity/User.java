@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -21,7 +22,8 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
+    @SequenceGenerator(name = "pk_sequence", sequenceName = "user_id_seq", allocationSize = 1)
     private Integer id;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
@@ -30,13 +32,17 @@ public class User {
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
     private Timestamp regTime;
 
-    @Column(columnDefinition = "INT NOT NULL DEFAULT 0")
+    @Column(name = "balance", columnDefinition = "INTEGER DEFAULT 0")
     private Integer balance;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String name;
 
-    @OneToMany(mappedBy="user")
+    private String email;
+    private String phone;
+    private String password;
+
+    @OneToMany(mappedBy = "user")
     private List<BookToUser> bookToUsers;
 
     @OneToMany(mappedBy = "user")
@@ -44,5 +50,12 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<BookReviewRate> reviewRates = new ArrayList<>();
+
+    public User() {
+        String hash = String.valueOf(this.hashCode());
+        this.hash = "user-" + hash.substring(1, 3) + "-" + hash.substring(4, 6);
+        this.regTime = new Timestamp(System.currentTimeMillis());
+        this.balance = 0;
+    }
 
 }

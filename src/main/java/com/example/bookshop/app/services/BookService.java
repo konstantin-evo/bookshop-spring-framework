@@ -1,6 +1,7 @@
 package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.dao.BookRepository;
+import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
@@ -30,10 +31,12 @@ import java.util.StringJoiner;
 public class BookService {
 
     private final BookRepository bookRepo;
+    private final UserRepository userRepo;
 
     @Autowired
-    public BookService(BookRepository bookRepo) {
+    public BookService(BookRepository bookRepo, UserRepository userRepo) {
         this.bookRepo = bookRepo;
+        this.userRepo = userRepo;
     }
 
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
@@ -102,6 +105,18 @@ public class BookService {
 
     public List<BookDto> getBooksWithPriceBetween(Integer min, Integer max) {
         List<Book> books = bookRepo.findBooksByPriceBetween(min, max);
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getPaidBooks(String userEmail) {
+        Integer userId = userRepo.findUserByEmail(userEmail).getId();
+        List<Book> books = bookRepo.findPaidBooksByUser(userId);
+        return Mapper.INSTANCE.map(books);
+    }
+
+    public List<BookDto> getArchivedBooks(String userEmail) {
+        Integer userId = userRepo.findUserByEmail(userEmail).getId();
+        List<Book> books = bookRepo.findArchivedBooksByUser(userId);
         return Mapper.INSTANCE.map(books);
     }
 

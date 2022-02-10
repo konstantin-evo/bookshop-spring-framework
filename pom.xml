@@ -13,10 +13,13 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>MyBookShopApp</name>
 	<description>Demo project for Spring Boot</description>
+
 	<properties>
 		<org.projectlombok.version>1.18.22</org.projectlombok.version>
 	</properties>
+
 	<dependencies>
+		<!-- Basic dependencies (start) -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -31,9 +34,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-boot-starter</artifactId>
-			<version>3.0.0</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+			<version>2.6.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -41,17 +44,32 @@
 			<version>${org.projectlombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- Basic dependencies (end) -->
+		<!-- Security -->
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity5</artifactId>
+			<version>3.0.4.RELEASE</version>
+		</dependency>
+		<!-- Mapper -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
 			<artifactId>mapstruct</artifactId>
 			<version>1.4.2.Final</version>
 		</dependency>
+		<!-- Downloading/Uploading files -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.11.0</version>
 		</dependency>
-		<!--database-->
+		<!-- OpenAPI generation -->
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-boot-starter</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+		<!-- database (start) -->
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -74,7 +92,7 @@
 			<artifactId>snakeyaml</artifactId>
 			<version>1.30</version>
 		</dependency>
-		<!--database-->
+		<!-- database (end) -->
 	</dependencies>
 
 	<build>

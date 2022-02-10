@@ -5,6 +5,8 @@
     <meta name="description" content="Описание страницы">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+    <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+    <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
     <link th:href="@{/spring-frontend/favicon.ico}" rel="shortcut icon">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous">
     <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous">
@@ -30,18 +32,21 @@
     </div>
     <div class="wrap">
         <main class="Middle-main">
-            <form class="form Login Login_registration" action="#" method="post">
+            <form class="form Login Login_registration" action="#" method="post"
+                  th:object="${registrationForm}" th:action="@{/registration}">
                 <div class="Login-ins">
                     <div class="Login-step">
                         <div class="form-group">
                             <input class="form-input" id="name" name="name" type="text" data-validate="require"
-                                   th:placeholder="#{signup.name}"/>
+                                   th:placeholder="#{signup.name}"
+                                   th:field="*{name}"/>
                         </div>
                         <div class="form-group form-group_row">
                             <div class="form-group">
                                 <input class="form-input form-input_phone" id="phone" name="phone" type="text"
                                        data-mask="+7 (999) 999-99-99" data-validate="require"
-                                       th:placeholder="#{signup.phone}"/>
+                                       th:placeholder="#{signup.phone}"
+                                       th:field="*{phone}"/>
                             </div>
                             <div class="form-group form-group_key">
                                 <input class="form-input form-input_code" id="phoneCode" name="phoneCode" type="text"
@@ -59,7 +64,8 @@
                             <div class="form-group">
                                 <input class="form-input form-input_mail" id="mail" name="mail" type="text"
                                        data-validate="mail require"
-                                       th:placeholder="#{signup.email}"/>
+                                       th:placeholder="#{signup.email}"
+                                       th:field="*{email}"/>
                             </div>
                             <div class="form-group form-group_key">
                                 <input class="form-input form-input_code" id="mailCode" name="mailCode" type="text"
@@ -72,9 +78,15 @@
                                         th:text="#{signup.submit}">n/a
                                 </button>
                             </div>
+                            <div class="form-group">
+                                <input class="form-input form-input_password" id="password" name="password" type="text"
+                                       data-validate="password require"
+                                       th:placeholder="#{signup.password}"
+                                       th:field="*{password}"/>
+                            </div>
                         </div>
                         <div class="form-group form-group_center">
-                            <button class="btn btn_primary form-btn" type="button" name="registration" id="registration"
+                            <button class="btn btn_primary form-btn" type="submit" name="registration" id="registration"
                                     disabled="disabled"
                                     th:text="#{main.signup}">n/a
                             </button>

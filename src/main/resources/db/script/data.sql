@@ -1205,27 +1205,30 @@ insert into users (id, hash, reg_time, balance, name) values (97, 'user-oqm-cot'
 insert into users (id, hash, reg_time, balance, name) values (98, 'user-vuk-txe', '2022-01-22 11:57:05', 3634, 'Manfred Demann');
 insert into users (id, hash, reg_time, balance, name) values (99, 'user-zli-jag', '2022-01-22 11:57:05', 4395, 'Farrah Connachan');
 insert into users (id, hash, reg_time, balance, name) values (100, 'user-jke-apb', '2022-01-22 11:57:05', 316, 'Jacob Cockarill');
+insert into users (id, hash, reg_time, balance, name, email, password, phone) values (101, 'user-fhn-apb', '2022-01-22 11:57:05', 316, 'Jacob Cockarill', 'admin@gmail.com', '$2a$10$9fowRdQbJPNj1/MNjPMwl.pvqz7tgtVGtFqWyO2gpl4cqgxnkvRs2', '+7 (931) 000-00-01');
+
+SELECT setval('user_id_seq', max(id)) FROM users;
 
 insert into book2user (id, time , type_id, book_id, user_id) values (1, '2022-01-24 08:17:22', 2, 161, 63);
 insert into book2user (id, time , type_id, book_id, user_id) values (2, '2022-01-24 08:17:22', 1, 246, 45);
 insert into book2user (id, time , type_id, book_id, user_id) values (3, '2022-01-24 08:17:22', 1, 237, 14);
 insert into book2user (id, time , type_id, book_id, user_id) values (4, '2022-01-24 08:17:22', 4, 101, 93);
-insert into book2user (id, time , type_id, book_id, user_id) values (5, '2022-01-24 08:17:22', 3, 270, 60);
+insert into book2user (id, time , type_id, book_id, user_id) values (5, '2022-01-24 08:17:22', 3, 270, 101);
 insert into book2user (id, time , type_id, book_id, user_id) values (6, '2022-01-24 08:17:22', 4, 220, 64);
 insert into book2user (id, time , type_id, book_id, user_id) values (7, '2022-01-24 08:17:22', 4, 118, 88);
 insert into book2user (id, time , type_id, book_id, user_id) values (8, '2022-01-24 08:17:22', 1, 158, 59);
 insert into book2user (id, time , type_id, book_id, user_id) values (9, '2022-01-24 08:17:22', 1, 121, 67);
-insert into book2user (id, time , type_id, book_id, user_id) values (10, '2022-01-24 08:17:22', 3, 36, 53);
-insert into book2user (id, time , type_id, book_id, user_id) values (11, '2022-01-24 08:17:22', 3, 98, 37);
+insert into book2user (id, time , type_id, book_id, user_id) values (10, '2022-01-24 08:17:22', 3, 36, 101);
+insert into book2user (id, time , type_id, book_id, user_id) values (11, '2022-01-24 08:17:22', 3, 98, 101);
 insert into book2user (id, time , type_id, book_id, user_id) values (12, '2022-01-24 08:17:22', 1, 5, 88);
 insert into book2user (id, time , type_id, book_id, user_id) values (13, '2022-01-24 08:17:22', 1, 279, 14);
-insert into book2user (id, time , type_id, book_id, user_id) values (14, '2022-01-24 08:17:22', 4, 107, 62);
-insert into book2user (id, time , type_id, book_id, user_id) values (15, '2022-01-24 08:17:22', 3, 26, 30);
+insert into book2user (id, time , type_id, book_id, user_id) values (14, '2022-01-24 08:17:22', 4, 107, 101);
+insert into book2user (id, time , type_id, book_id, user_id) values (15, '2022-01-24 08:17:22', 3, 26, 101);
 insert into book2user (id, time , type_id, book_id, user_id) values (16, '2022-01-24 08:17:22', 4, 271, 12);
-insert into book2user (id, time , type_id, book_id, user_id) values (17, '2022-01-24 08:17:22', 3, 298, 9);
+insert into book2user (id, time , type_id, book_id, user_id) values (17, '2022-01-24 08:17:22', 3, 298, 101);
 insert into book2user (id, time , type_id, book_id, user_id) values (18, '2022-01-24 08:17:22', 3, 129, 53);
 insert into book2user (id, time , type_id, book_id, user_id) values (19, '2022-01-24 08:17:22', 1, 110, 78);
-insert into book2user (id, time , type_id, book_id, user_id) values (20, '2022-01-24 08:17:22', 4, 94, 10);
+insert into book2user (id, time , type_id, book_id, user_id) values (20, '2022-01-24 08:17:22', 4, 94, 101);
 insert into book2user (id, time , type_id, book_id, user_id) values (21, '2022-01-24 08:17:22', 2, 285, 86);
 insert into book2user (id, time , type_id, book_id, user_id) values (22, '2022-01-24 08:17:22', 3, 13, 14);
 insert into book2user (id, time , type_id, book_id, user_id) values (23, '2022-01-24 08:17:22', 4, 275, 96);
