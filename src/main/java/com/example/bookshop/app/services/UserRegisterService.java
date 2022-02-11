@@ -1,5 +1,7 @@
 package com.example.bookshop.app.services;
 
+import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
 import com.example.bookshop.app.config.security.UserDetails;
@@ -22,13 +24,20 @@ public class UserRegisterService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JWTUtil jwtUtil;
 
     @Autowired
-    public UserRegisterService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                               AuthenticationManager authenticationManager) {
+    public UserRegisterService(UserRepository userRepository,
+                               PasswordEncoder passwordEncoder,
+                               AuthenticationManager authenticationManager,
+                               UserDetailsService userDetailsService,
+                               JWTUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+        this.jwtUtil = jwtUtil;
     }
 
     @Transient
@@ -52,7 +61,19 @@ public class UserRegisterService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         ContactConfirmationResponse response = new ContactConfirmationResponse();
-        response.setResult(true);
+        response.setResult("true");
+        return response;
+    }
+
+    public ContactConfirmationResponse jwtLogin(ContactConfirmationPayload payload) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payload.getContact(),
+                payload.getCode()));
+        UserDetails userDetails =
+                (UserDetails) userDetailsService.loadUserByUsername(payload.getContact());
+
+        String jwtToken = jwtUtil.generateToken(userDetails);
+        ContactConfirmationResponse response = new ContactConfirmationResponse();
+        response.setResult(jwtToken);
         return response;
     }
 
