@@ -40,17 +40,13 @@ public class UserAuthController {
     @ResponseBody
     public ContactConfirmationResponse handleRequestContactConfirmation(
             @RequestBody ContactConfirmationPayload contactConfirmationPayload) {
-        ContactConfirmationResponse response = new ContactConfirmationResponse();
-        response.setResult("true");
-        return response;
+        return new ContactConfirmationResponse("true");
     }
 
     @PostMapping("/approveContact")
     @ResponseBody
     public ContactConfirmationResponse handleApproveContact(@RequestBody ContactConfirmationPayload payload) {
-        ContactConfirmationResponse response = new ContactConfirmationResponse();
-        response.setResult("true");
-        return response;
+        return new ContactConfirmationResponse("true");
     }
 
     @PostMapping("/registration")

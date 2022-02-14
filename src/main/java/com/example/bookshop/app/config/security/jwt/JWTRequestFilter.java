@@ -27,11 +27,11 @@ public class JWTRequestFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = null;
         String username = null;
-        Cookie[] cookies = httpServletRequest.getCookies();
+        Cookie[] cookies = request.getCookies();
 
         if (cookies != null) {
             for (Cookie cookie : cookies) {
@@ -49,13 +49,13 @@ public class JWTRequestFilter extends OncePerRequestFilter {
                                         userDetails, null, userDetails.getAuthorities());
 
                         authenticationToken.setDetails(
-                                new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
+                                new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
                 }
             }
         }
 
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+        filterChain.doFilter(request, response);
     }
 }

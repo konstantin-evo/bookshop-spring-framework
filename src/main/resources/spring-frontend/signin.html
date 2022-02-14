@@ -108,9 +108,17 @@
                             </button>
                         </div>
                     </div>
-                    <div class="form-group form-group_center"><a class="Login-reg"
-                                                                 th:href="@{/signup}"
-                                                                 th:text="#{main.signup}">n/a</a>
+                    <div class="form-group form-group_center">
+                        <a class="Login-reg"
+                           th:href="@{/signup}"
+                           th:text="#{main.signup}">n/a
+                        </a>
+                    </div>
+                    <div class="form-group form-group_center">
+                        <a class="Login-reg"
+                           th:href="@{/oauth2/authorization/google}"
+                           th:text="#{signin.google}">n/a
+                        </a>
                     </div>
                 </div>
             </form>

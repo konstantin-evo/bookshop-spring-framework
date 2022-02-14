@@ -2,6 +2,7 @@ package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.config.security.UserDetailsService;
 import com.example.bookshop.app.config.security.jwt.JWTUtil;
+import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
 import com.example.bookshop.app.config.security.UserDetails;
@@ -20,6 +21,8 @@ import javax.persistence.Transient;
 
 @Service
 public class UserRegisterService {
+
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -53,36 +56,44 @@ public class UserRegisterService {
         }
     }
 
+    @Transient
+    public UserDetails registerNewUser(CustomOAuth2User oAuth2User) {
+        User user = new User(
+                (String) oAuth2User.getAttributes().get("name"),
+                (String) oAuth2User.getAttributes().get("email"));
+        userRepository.save(user);
+        return new UserDetails(user);
+    }
+
     public ContactConfirmationResponse login(ContactConfirmationPayload payload) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                payload.getContact(), payload.getCode()));
+                new UsernamePasswordAuthenticationToken(payload.getContact(), payload.getCode()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        ContactConfirmationResponse response = new ContactConfirmationResponse();
-        response.setResult("true");
-        return response;
+        return new ContactConfirmationResponse("true");
     }
 
     public ContactConfirmationResponse jwtLogin(ContactConfirmationPayload payload) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(payload.getContact(),
-                payload.getCode()));
-        UserDetails userDetails =
-                (UserDetails) userDetailsService.loadUserByUsername(payload.getContact());
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
+                (payload.getContact(), payload.getCode()));
+
+        UserDetails userDetails = (UserDetails)
+                userDetailsService.loadUserByUsername(payload.getContact());
 
         String jwtToken = jwtUtil.generateToken(userDetails);
-        ContactConfirmationResponse response = new ContactConfirmationResponse();
-        response.setResult(jwtToken);
-        return response;
+
+        return new ContactConfirmationResponse(jwtToken);
     }
 
     public Object getCurrentUser() {
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() != "anonymousUser") {
+        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() != ANONYMOUS_USER) {
             UserDetails userDetails = (UserDetails) SecurityContextHolder
                     .getContext().getAuthentication().getPrincipal();
             return userDetails.getUser();
-        } else return null;
-
+        } else {
+            return null;
+        }
     }
 }

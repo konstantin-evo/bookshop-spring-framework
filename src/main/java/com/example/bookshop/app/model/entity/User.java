@@ -53,9 +53,15 @@ public class User {
 
     public User() {
         String hash = String.valueOf(this.hashCode());
-        this.hash = "user-" + hash.substring(1, 3) + "-" + hash.substring(4, 6);
+        this.hash = "user-" + hash.substring(0, 3) + "-" + hash.substring(4, 7);
         this.regTime = new Timestamp(System.currentTimeMillis());
         this.balance = 0;
+    }
+
+    public User(String name, String email) {
+        this();
+        this.name = name;
+        this.email = email;
     }
 
 }
