@@ -1205,7 +1205,7 @@ insert into users (id, hash, reg_time, balance, name) values (97, 'user-oqm-cot'
 insert into users (id, hash, reg_time, balance, name) values (98, 'user-vuk-txe', '2022-01-22 11:57:05', 3634, 'Manfred Demann');
 insert into users (id, hash, reg_time, balance, name) values (99, 'user-zli-jag', '2022-01-22 11:57:05', 4395, 'Farrah Connachan');
 insert into users (id, hash, reg_time, balance, name) values (100, 'user-jke-apb', '2022-01-22 11:57:05', 316, 'Jacob Cockarill');
-insert into users (id, hash, reg_time, balance, name, email, password, phone) values (101, 'user-fhn-apb', '2022-01-22 11:57:05', 316, 'Jacob Cockarill', 'admin@gmail.com', '$2a$10$9fowRdQbJPNj1/MNjPMwl.pvqz7tgtVGtFqWyO2gpl4cqgxnkvRs2', '+7 (931) 000-00-01');
+insert into users (id, hash, reg_time, balance, name, email, password, phone) values (101, 'user-fhn-apb', '2022-01-22 11:57:05', 316, 'Admin Admin', 'admin@gmail.com', '$2a$10$9fowRdQbJPNj1/MNjPMwl.pvqz7tgtVGtFqWyO2gpl4cqgxnkvRs2', '+7 (931) 000-00-01');
 
 SELECT setval('user_id_seq', max(id)) FROM users;
 

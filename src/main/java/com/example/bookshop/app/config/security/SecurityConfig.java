@@ -1,9 +1,9 @@
 package com.example.bookshop.app.config.security;
 
+import com.example.bookshop.app.config.security.jwt.JWTLogoutHandler;
 import com.example.bookshop.app.config.security.jwt.JWTRequestFilter;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2UserService;
 import com.example.bookshop.app.config.security.oauth.OauthSuccessHandler;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,16 +24,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final CustomOAuth2UserService oauthUserService;
     private final OauthSuccessHandler oauthSuccessHandler;
+    private final JWTLogoutHandler jwtLogoutHandler;
     private final JWTRequestFilter filter;
 
-    @Autowired
     public SecurityConfig(UserDetailsService userDetailsService,
-                          CustomOAuth2UserService customOAuth2UserService,
+                          CustomOAuth2UserService oauthUserService,
                           OauthSuccessHandler oauthSuccessHandler,
+                          JWTLogoutHandler jwtLogoutHandler,
                           JWTRequestFilter filter) {
         this.userDetailsService = userDetailsService;
-        this.oauthUserService = customOAuth2UserService;
+        this.oauthUserService = oauthUserService;
         this.oauthSuccessHandler = oauthSuccessHandler;
+        this.jwtLogoutHandler = jwtLogoutHandler;
         this.filter = filter;
     }
 
@@ -44,16 +46,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/home", "/profile", "/archive").authenticated()
                 .antMatchers("/**").permitAll()
-                .and().formLogin()
-                .loginPage("/signin").failureUrl("/signin")
-                .and().logout().logoutUrl("/logout").logoutSuccessUrl("/signin").deleteCookies("token")
                 .and()
-                .oauth2Login()
-                .defaultSuccessUrl("/home")
-                .userInfoEndpoint()
-                .userService(oauthUserService)
+                    .formLogin()
+                        .loginPage("/signin")
+                        .defaultSuccessUrl("/home")
+                        .failureUrl("/")
                 .and()
-                .successHandler(oauthSuccessHandler);
+                    .logout()
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .deleteCookies("token")
+                        .addLogoutHandler(jwtLogoutHandler)
+                .and()
+                    .oauth2Login()
+                        .defaultSuccessUrl("/home")
+                        .userInfoEndpoint()
+                        .userService(oauthUserService)
+                .and()
+                    .successHandler(oauthSuccessHandler);
 
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
