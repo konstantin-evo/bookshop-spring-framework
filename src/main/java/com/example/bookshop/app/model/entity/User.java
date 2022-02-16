@@ -53,7 +53,7 @@ public class User {
 
     public User() {
         String hash = String.valueOf(this.hashCode());
-        this.hash = "user-" + hash.substring(0, 3) + "-" + hash.substring(4, 7);
+        this.hash = "user-" + hash.substring(0, 2) + "-" + hash.substring(3, 6);
         this.regTime = new Timestamp(System.currentTimeMillis());
         this.balance = 0;
     }

@@ -232,7 +232,7 @@ public class BookService {
         } else {
             cookie = cookie.startsWith("/") ? cookie.substring(1) : cookie;
             cookie = cookie.endsWith("/") ? cookie.substring(0, cookie.length() - 1) : cookie;
-            String[] cookieSlugs = cookie.split("/");
+            List<String> cookieSlugs = List.of(cookie.split("/"));
             return bookRepo.findBooksBySlugIn(cookieSlugs);
         }
     }

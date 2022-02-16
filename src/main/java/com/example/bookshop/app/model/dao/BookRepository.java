@@ -6,12 +6,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Repository
 public interface BookRepository extends JpaRepository<Book, Integer> {
 
     List<Book> findBooksByAuthorFirstNameContaining(String authorsFirstName);
@@ -24,7 +23,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     List<Book> findBooksByPriceIs(Integer price);
 
-    List<Book> findBooksBySlugIn(String[] slugs);
+    List<Book> findBooksBySlugIn(Collection<String> slug);
 
     @Query("from Book where isBestseller=1")
     List<Book> findBestsellers();
