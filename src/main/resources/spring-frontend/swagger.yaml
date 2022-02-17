@@ -329,7 +329,7 @@ paths:
                     schema:
                         $ref: '#/definitions/inline_response_400_3'
                         
-    /rateBook:
+    /api/rate-book:
         post:
             tags:
                 - rateBook
@@ -351,7 +351,7 @@ paths:
                     schema:
                         $ref: '#/definitions/inline_response_400_5'
                         
-    /rateBookReview:
+    /api/rate-book-review:
         post:
             tags:
                 - rateBookReview

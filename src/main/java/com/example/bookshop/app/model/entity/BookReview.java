@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -23,7 +24,9 @@ import java.util.List;
 public class BookReview {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
+    @SequenceGenerator(name = "pk_sequence", sequenceName = "book_review_id_seq", allocationSize = 1)
+    @Column(name = "id", unique = true, nullable = false)
     private Integer id;
 
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
@@ -38,5 +41,15 @@ public class BookReview {
 
     @OneToMany(mappedBy = "review")
     private List<BookReviewRate> reviewRates = new ArrayList<>();
+
+    public BookReview() {
+        this.pubDate = new Timestamp(System.currentTimeMillis());
+    }
+
+    public BookReview(BookRate rate, String text) {
+        this();
+        this.rate = rate;
+        this.text = text;
+    }
 
 }

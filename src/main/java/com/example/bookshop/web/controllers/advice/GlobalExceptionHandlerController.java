@@ -1,8 +1,12 @@
 package com.example.bookshop.web.controllers.advice;
 
 import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.app.model.entity.BookReview;
+import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.dto.ApiResponse;
+import com.example.bookshop.web.exception.BookRateNotFoundException;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
+import com.example.bookshop.web.exception.CustomAuthenticationException;
 import com.example.bookshop.web.exception.EmptySearchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +38,24 @@ public class GlobalExceptionHandlerController {
         return new ResponseEntity<>(new ApiResponse<>(
                 HttpStatus.BAD_REQUEST,
                 "Bad parameter value...",
+                exception),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CustomAuthenticationException.class)
+    public ResponseEntity<ApiResponse<User>> handleCustomAuthenticationException(Exception exception) {
+        return new ResponseEntity<>(new ApiResponse<>(
+                HttpStatus.UNAUTHORIZED,
+                exception.getMessage(),
+                exception),
+                HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(BookRateNotFoundException.class)
+    public ResponseEntity<ApiResponse<BookReview>> handleCustomBookRateNotFoundException(Exception exception) {
+        return new ResponseEntity<>(new ApiResponse<>(
+                HttpStatus.BAD_REQUEST,
+                exception.getMessage(),
                 exception),
                 HttpStatus.BAD_REQUEST);
     }

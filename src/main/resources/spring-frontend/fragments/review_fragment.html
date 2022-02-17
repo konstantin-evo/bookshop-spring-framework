@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://thymeleaf.org">
+<html lang="en" xmlns:th="http://thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <body>
 <div class="Comment" th:fragment="ReviewFragment (review)">
     <div class="Comment-column Comment-column_pict">
@@ -15,17 +15,18 @@
                     <span class="Comment-rating">
                         <span class="Rating Rating_comment">
                             <span class="Rating-stars">
-                        <span th:each="count : ${#numbers.sequence(1, 5)}"
-                              th:class="'Rating-star '+ ${review.rate >= count ? 'Rating-star_view' : ''}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18" viewBox="0 0 19 18">
-                                        <g>
+                                <span th:each="count : ${#numbers.sequence(1, 5)}"
+                                      th:class="'Rating-star '+ ${review.rate >= count ? 'Rating-star_view' : ''}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="19" height="18"
+                                             viewBox="0 0 19 18">
                                             <g>
-                                                <path fill="#ffc000"
-                                                      d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                                                <g>
+                                                    <path fill="#ffc000"
+                                                          d="M9.5 14.925L3.629 18l1.121-6.512L0 6.875l6.564-.95L9.5 0l2.936 5.925 6.564.95-4.75 4.613L15.371 18z"></path>
+                                                </g>
                                             </g>
-                                        </g>
-                                    </svg>
-                        </span>
+                                        </svg>
+                                </span>
                             </span>
                         </span>
                     </span>
@@ -39,12 +40,14 @@
             <p th:text="${review.text}">n/a
             </p>
             <div class="Comment-footer">
-                <div class="Comment-appeal">
+                <!-- Buttons for authorized users (contain an attribute for JS processing) -->
+                <div class="Comment-appeal"
+                     sec:authorize="isAuthenticated()">
                     <button class="btn btn_white btn_like" data-btntype="check" data-check="false"
                             data-btnradio="two2"
                             th:attr="data-likeid=${review.id}">
                         <span class="btn-icon"><img
-                            src="/assets/img/icons/comment/like.svg" alt="like.svg"/></span>
+                                src="/assets/img/icons/comment/like.svg" alt="like.svg"/></span>
                         <span class="btn-content"
                               th:text="${review.likes}">n/a</span>
                     </button>
@@ -52,11 +55,32 @@
                             data-check="false" data-btnradio="two2"
                             th:attr="data-likeid=${review.id}">
                         <span
-                            class="btn-icon"><img src="/assets/img/icons/comment/dislike.svg" alt="dislike.svg"/></span>
+                                class="btn-icon"><img src="/assets/img/icons/comment/dislike.svg"
+                                                      alt="dislike.svg"/></span>
                         <span class="btn-content"
                               th:text="${review.dislikes}">n/a</span>
                     </button>
                 </div>
+                <!-- Buttons for unauthorized users (not contain an attribute for JS processing) -->
+                <div class="Comment-appeal"
+                sec:authorize="isAnonymous()">
+                    <button class="btn btn_white btn_like" data-btntype="check" data-check="false"
+                            data-btnradio="two2">
+                        <span class="btn-icon"><img
+                                src="/assets/img/icons/comment/like.svg" alt="like.svg"/></span>
+                        <span class="btn-content"
+                              th:text="${review.likes}">n/a</span>
+                    </button>
+                    <button class="btn btn_white btn_dislike" data-btntype="check"
+                            data-check="false" data-btnradio="two2">
+                        <span
+                                class="btn-icon"><img src="/assets/img/icons/comment/dislike.svg"
+                                                      alt="dislike.svg"/></span>
+                        <span class="btn-content"
+                              th:text="${review.dislikes}">n/a</span>
+                    </button>
+                </div>
+                <!-- Buttons for unauthorized users (end) -->
             </div>
         </div>
     </div>

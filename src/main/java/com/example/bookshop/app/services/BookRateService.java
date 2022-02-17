@@ -6,13 +6,10 @@ import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.app.model.entity.BookRate;
 import com.example.bookshop.app.model.entity.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -22,7 +19,6 @@ public class BookRateService {
     private final UserRepository userRepository;
     private final BookRepository bookRepo;
 
-    @Autowired
     public BookRateService(BookRateRepository bookRateRepo, UserRepository userRepository, BookRepository bookRepo) {
         this.bookRateRepo = bookRateRepo;
         this.userRepository = userRepository;
@@ -34,30 +30,22 @@ public class BookRateService {
      * If the rating for this book was set earlier, the field is updated
      * If the rating for this book is set to the first, a new record is created in the database
      *
-     * @param userRateJson Book rating value, for example "value=5"
-     * @param userId - Unique user ID
-     * @param slug unique identifier for the book for set new Rating
+     * @param userRate Book rating value, for example "value=5"
+     * @param userId   Unique user ID
+     * @param slug     unique identifier for the book for set new Rating
      */
-    public void setBookRate(String slug, String userRateJson, Integer userId) {
+    public boolean setBookRate(String slug, Integer userRate, Integer userId) {
         Book book = bookRepo.findBookBySlug(slug);
+        //TODO: add custom exception instead of "new User()"
         User user = userRepository.findById(userId).orElse(new User());
-        List<BookRate> list = bookRateRepo.findBookRateByBookAndUser(book, user);
 
-        int userRate = processingJsonRating(userRateJson);
+        BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)
+                .orElse(createBookRate(book, user));
 
-        if (!list.isEmpty()) {
-            list.forEach(bookRate -> {
-                bookRate.setRating(userRate);
-                bookRate.setPubDate(new Date());
-            });
-        } else {
-            BookRate bookRate = BookRate.builder()
-                    .book(book)
-                    .user(user)
-                    .rating(userRate)
-                    .build();
-            bookRateRepo.save(bookRate);
-        }
+        bookRate.setRating(userRate);
+        bookRate.setPubDate(new Date());
+        bookRateRepo.save(bookRate);
+        return true;
     }
 
     /**
@@ -65,22 +53,17 @@ public class BookRateService {
      */
     public Integer getUserRate(String slug, Integer userId) {
         Book book = bookRepo.findBookBySlug(slug);
+        //TODO: add custom exception instead of "new User()"
         User user = userRepository.findById(userId).orElse(new User());
-        List<BookRate> list = bookRateRepo.findBookRateByBookAndUser(book, user);
-        if (!list.isEmpty()) {
-            return list.stream()
-                    .filter(bookRate -> bookRate.getUser().equals(user))
-                    .mapToInt(BookRate::getRating)
-                    .boxed().collect(Collectors.toList())
-                    .get(0);
-        } else {
-            return 0;
-        }
+        BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user).orElse(null);
+        return (bookRate != null) ? bookRate.getRating() : 0;
     }
 
-
-    private Integer processingJsonRating(String userRate) {
-        userRate = userRate.replace ("value=", "");
-        return Integer.valueOf(userRate);
+    private BookRate createBookRate(Book book, User user) {
+        return BookRate.builder()
+                .book(book)
+                .user(user)
+                .build();
     }
+
 }

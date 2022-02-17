@@ -2001,3 +2001,4 @@ insert into book_review_rate (id, rate, review_id, user_id) values (999, 1, 221,
 insert into book_review_rate (id, rate, review_id, user_id) values (1000, -1, 772, 17);
 
 SELECT setval('book_review_rate_id_seq', max(id)) FROM book_review_rate;
+SELECT setval('book_review_id_seq', max(id)) FROM book_review;
