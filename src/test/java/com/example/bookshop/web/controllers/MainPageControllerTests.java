@@ -65,14 +65,4 @@ class MainPageControllerTests {
                 .andExpect(xpath("/html/body/div/div[2]/main/div/div[2]/div[1]/div/form/div/div[1]/div[1]")
                         .string("Admin Admin"));
     }
-
-    //TODO:Modify HTML structure according to standard XML rules to avoid DOMParser Exception
-    // Or check UI with Selenium tests
-    public void testSearchQuery() throws Exception {
-        mockMvc.perform(get("/search/Tale"))
-                .andDo(print())
-                .andExpect(xpath("/html/body/div/div/main/div[2]/div/div[1]/div[2]/strong/a")
-                .string("Shark Tale"));
-
-    }
 }
