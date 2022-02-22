@@ -60,7 +60,7 @@ public class UserAuthController {
     @ResponseBody
     public ContactConfirmationResponse handleLogin(@RequestBody ContactConfirmationPayload payload,
                                                    HttpServletResponse httpServletResponse) {
-        ContactConfirmationResponse loginResponse = userRegisterService.jwtLogin(payload);
+        ContactConfirmationResponse loginResponse = userRegisterService.login(payload);
         Cookie cookie = new Cookie("token", loginResponse.getResult());
         httpServletResponse.addCookie(cookie);
         return loginResponse;

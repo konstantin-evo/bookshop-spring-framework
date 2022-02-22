@@ -10,13 +10,11 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/**
- * Tests are written according to the course materials,
- * in the future it should be replaced with @DataJpaTest
- */
+
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
 class BookRepositoryTest {
@@ -64,6 +62,13 @@ class BookRepositoryTest {
         assertNotNull(bestSellersBooks);
         assertFalse(bestSellersBooks.isEmpty());
         assertThat(bestSellersBooks.size()).isGreaterThan(1);
+    }
+
+    @Test
+    void  testBookRating() {
+        Book book = bookRepository.findBookBySlug("book-bqr-bsi");
+        assertNotNull(book.getRating());
+        assertEquals(book.getRating(), 3.2);
     }
 
 }
