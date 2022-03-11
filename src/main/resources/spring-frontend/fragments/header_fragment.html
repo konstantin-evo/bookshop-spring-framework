@@ -143,30 +143,35 @@
                     <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
+                           th:id="nav-main"
                            th:href="@{/}"
                            th:text="#{topbar.main}">n/a</a>
                     </li>
                     <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/genres')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
+                           th:id="nav-genres"
                            th:href="@{/genres}"
                            th:text="#{topbar.genres}">n/a</a>
                     </li>
                     <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/books/recent')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
+                           th:id="nav-news"
                            th:href="@{/books/recent}"
                            th:text="#{topbar.news}">n/a</a>
                     </li>
                     <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/books/popular')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
+                           th:id="nav-popular"
                            th:href="@{/books/popular}"
                            th:text="#{topbar.popular}">n/a</a>
                     </li>
                     <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/authors')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
+                           th:id="nav-authors"
                            th:href="@{/authors}"
                            th:text="#{topbar.authors}">n/a</a>
                     </li>

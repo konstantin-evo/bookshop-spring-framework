@@ -1,5 +1,6 @@
 package com.example.bookshop.web.selenium;
 
+import com.example.bookshop.web.services.SeleniumUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,26 +17,29 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @TestPropertySource(locations = "/application-test.properties")
-class MainPageSeleniumTests {
+class MainPageTests {
 
     private static ChromeDriver driver;
-    private static MainPage mainPage;
+    private static SeleniumUtils seleniumUtils;
 
     @Value("${base.url}")
-    private String URL;
+    private String BASE_URL;
+
+    @Value("${selenium.pause}")
+    private int WAIT_TIME;
 
     @BeforeAll
     static void setup() {
         System.setProperty("webdriver.chrome.driver", "C:\\chromedriver_win32\\chromedriver.exe");
         System.setProperty("webdriver.chrome.whitelistedIps", "127.0.0.1");
         driver = new ChromeDriver();
-        driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
+        driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
     }
 
     @BeforeEach
     void setUp() {
-        mainPage = new MainPage(driver);
-        ReflectionTestUtils.setField(mainPage, "URL", URL);
+        seleniumUtils = new SeleniumUtils(driver);
+        ReflectionTestUtils.setField(seleniumUtils, "WAIT_TIME", WAIT_TIME);
     }
 
     @AfterAll
@@ -44,20 +48,18 @@ class MainPageSeleniumTests {
     }
 
     @Test
-    public void testMainPageAccess() throws InterruptedException {
-        mainPage.callPage()
+    public void testMainPageAccess() {
+        seleniumUtils.callPageByUrl(BASE_URL)
                 .pause();
 
         assertTrue(driver.getPageSource().contains("BOOKSHOP"));
     }
 
     @Test
-    public void testMainPageSearchByQuery() throws InterruptedException {
-        mainPage.callPage()
-                .pause()
-                .setUpSearchToken("Sudden")
-                .pause()
-                .submit()
+    public void testMainPageSearchByQuery() {
+        seleniumUtils.callPageByUrl(BASE_URL)
+                .setUpSearchTokenById("Sudden", "query")
+                .submitElementById("search")
                 .pause();
 
         assertTrue(driver.getPageSource().contains("Sudden Manhattan"));
