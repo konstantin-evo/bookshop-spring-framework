@@ -37,6 +37,9 @@ public class BookRate {
     @Builder.Default
     private Date pubDate = new Date();
 
+    /**
+     * Rating is a numerical value from 1 to 5
+     */
     @Column(columnDefinition = "SMALLINT NOT NULL")
     private Integer rating;
 

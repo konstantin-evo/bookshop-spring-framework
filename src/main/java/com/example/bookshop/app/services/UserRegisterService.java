@@ -13,7 +13,6 @@ import com.example.bookshop.web.dto.RegistrationFormDto;
 import com.example.bookshop.app.model.entity.User;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,15 +68,6 @@ public class UserRegisterService {
     }
 
     public ContactConfirmationResponse login(ContactConfirmationPayload payload) {
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(payload.getContact(), payload.getCode()));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return new ContactConfirmationResponse("true");
-    }
-
-    public ContactConfirmationResponse jwtLogin(ContactConfirmationPayload payload) {
 
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
                 (payload.getContact(), payload.getCode()));
