@@ -17,6 +17,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junitpioneer.jupiter.RetryingTest;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -140,7 +141,7 @@ public class UserRegisterServiceTest {
         verify(userRepo, never()).save(any(User.class));
     }
 
-    @Test
+    @RetryingTest(maxAttempts = 3)
     void loginSuccessfulTest() {
         UserDetails userDetails = generateUserDetails();
 
@@ -176,10 +177,7 @@ public class UserRegisterServiceTest {
     }
 
     private ContactConfirmationPayload generateContactConfirmationPayload() {
-        ContactConfirmationPayload payload = new ContactConfirmationPayload();
-        payload.setContact(EXISTING_USER_EMAIL);
-        payload.setCode(EXISTING_USER_PASSWORD);
-        return payload;
+        return new ContactConfirmationPayload(EXISTING_USER_EMAIL, EXISTING_USER_PASSWORD);
     }
 
     private UserDetails generateUserDetails() {

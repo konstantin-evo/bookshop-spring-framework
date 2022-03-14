@@ -1,5 +1,6 @@
 package com.example.bookshop.web.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@AllArgsConstructor
 public class ContactConfirmationPayload {
 
     private String contact;
