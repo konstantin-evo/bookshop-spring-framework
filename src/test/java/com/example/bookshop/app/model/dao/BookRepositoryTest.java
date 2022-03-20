@@ -7,19 +7,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
 @SpringBootTest
 @TestPropertySource("/application-test.properties")
 class BookRepositoryTest {
 
     private final BookRepository bookRepository;
+
+    private static final String AUTHOR_TOKEN = "Lizzy";
+    private static final String BOOK_TOKEN = "Fish";
+    private static final String BOOK_SLUG = "book-bqr-bsi";
 
     @Autowired
     public BookRepositoryTest(BookRepository bookRepository) {
@@ -28,31 +30,23 @@ class BookRepositoryTest {
 
     @Test
     void findBooksByAuthorFirstNameContaining() {
-        String token = "Lizzy";
-        List<Book> bookListByAuthorFirstName = bookRepository.findBooksByAuthorFirstNameContaining(token);
+        List<Book> bookListByAuthorFirstName = bookRepository.findBooksByAuthorFirstNameContaining(AUTHOR_TOKEN);
 
         assertNotNull(bookListByAuthorFirstName);
         assertFalse(bookListByAuthorFirstName.isEmpty());
 
-        bookListByAuthorFirstName.forEach(book -> {
-            Logger.getLogger(this.getClass().getSimpleName()).info(book.getTitle());
-            assertThat(book.getAuthor().getFirstName()).contains(token);
-        });
+        bookListByAuthorFirstName.forEach(book -> assertThat(book.getAuthor().getFirstName()).contains(AUTHOR_TOKEN));
 
     }
 
     @Test
     void findBooksByTitleContaining() {
-        String token = "Fish";
-        List<Book> bookListByTitleContaining = bookRepository.findBooksByTitleContaining(token);
+        List<Book> bookListByTitleContaining = bookRepository.findBooksByTitleContaining(BOOK_TOKEN);
 
         assertNotNull(bookListByTitleContaining);
         assertFalse(bookListByTitleContaining.isEmpty());
 
-        bookListByTitleContaining.forEach(book -> {
-            Logger.getLogger(this.getClass().getSimpleName()).info(book.getTitle());
-            assertThat(book.getTitle()).contains(token);
-        });
+        bookListByTitleContaining.forEach(book -> assertThat(book.getTitle()).contains(BOOK_TOKEN));
     }
 
     @Test
@@ -66,7 +60,7 @@ class BookRepositoryTest {
 
     @Test
     void  testBookRating() {
-        Book book = bookRepository.findBookBySlug("book-bqr-bsi");
+        Book book = bookRepository.findBookBySlug(BOOK_SLUG);
         assertNotNull(book.getRating());
         assertEquals(book.getRating(), 3.2);
     }
