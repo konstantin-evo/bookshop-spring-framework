@@ -2,6 +2,7 @@ package com.example.bookshop.web.services;
 
 import com.example.bookshop.app.model.dao.BookToFileRepository;
 import com.example.bookshop.app.model.entity.BookToFile;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,10 +16,10 @@ import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Logger;
 
 
 @Service
+@Log4j2
 public class ResourceStorage {
 
     @Value("${upload.path}")
@@ -42,18 +43,14 @@ public class ResourceStorage {
 
             if(!new File(uploadPath).exists()){
                 Files.createDirectories(Paths.get(uploadPath));
-                Logger.getLogger(this.getClass()
-                        .getSimpleName())
-                        .info("Created image folder in " + uploadPath);
+                log.info("Created image folder in " + uploadPath);
             }
 
             String fileName = slug+"."+ FilenameUtils.getExtension(file.getOriginalFilename());
             Path path = Paths.get(uploadPath, fileName);
             resourceURI = "/book-covers/" + fileName;
             file.transferTo(path); //uploading user file here
-            Logger.getLogger(this.getClass()
-                    .getSimpleName())
-                    .info( "The new cover for book is uploaded. File: " + fileName);
+            log.info( "The new cover for book is uploaded. File: " + fileName);
         }
 
         return resourceURI;

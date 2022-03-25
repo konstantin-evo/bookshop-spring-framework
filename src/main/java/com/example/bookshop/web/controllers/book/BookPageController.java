@@ -5,6 +5,7 @@ import com.example.bookshop.app.services.BookRateService;
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.services.ResourceStorage;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -20,8 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
+@Log4j2
 @Controller
 @RequestMapping("/books")
 public class BookPageController {
@@ -67,13 +68,13 @@ public class BookPageController {
     @GetMapping("/download/{hash}")
     public ResponseEntity<ByteArrayResource> bookFile(@PathVariable("hash") String hash) throws IOException {
         Path path = storage.getBookFilePath(hash);
-        Logger.getLogger(this.getClass().getSimpleName()).info("book file path: " + path);
+        log.info("book file path: " + path);
 
         MediaType mediaType = storage.getBookFileMime(hash);
-        Logger.getLogger(this.getClass().getSimpleName()).info("book file mime type: " + mediaType);
+        log.info("book file mime type: " + mediaType);
 
         byte[] data = storage.getBookFileByteArray(hash);
-        Logger.getLogger(this.getClass().getSimpleName()).info("book file data len: " + data.length);
+        log.info("book file data len: " + data.length);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + path.getFileName().toString())
