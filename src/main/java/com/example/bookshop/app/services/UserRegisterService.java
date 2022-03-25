@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Transient;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class UserRegisterService {
@@ -30,6 +32,8 @@ public class UserRegisterService {
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
+
+    private static final String EMAIL_PATTERN = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
 
     public UserRegisterService(UserRepository userRepo,
                                JwtBlockListRepository jwtBlockListRepo,
@@ -46,14 +50,17 @@ public class UserRegisterService {
     }
 
     @Transient
-    public void registerNewUser(RegistrationFormDto registrationFormDto) {
+    public void registerNewUser(RegistrationFormDto registrationForm) {
 
-        if (userRepo.findUserByEmail(registrationFormDto.getEmail()) == null) {
+        User userByEmail = userRepo.findUserByEmail(registrationForm.getEmail());
+        User userByPhone = userRepo.findUserByPhone(registrationForm.getPhone());
+
+        if (userByEmail == null && userByPhone == null) {
             User user = new User();
-            user.setName(registrationFormDto.getName());
-            user.setEmail(registrationFormDto.getEmail());
-            user.setPhone(registrationFormDto.getPhone());
-            user.setPassword(passwordEncoder.encode(registrationFormDto.getPassword()));
+            user.setName(registrationForm.getName());
+            user.setEmail(registrationForm.getEmail());
+            user.setPhone(registrationForm.getPhone());
+            user.setPassword(passwordEncoder.encode(registrationForm.getPassword()));
             userRepo.save(user);
         }
     }
@@ -69,14 +76,15 @@ public class UserRegisterService {
 
     public ContactConfirmationResponse login(ContactConfirmationPayload payload) {
 
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
-                (payload.getContact(), payload.getCode()));
+        UserDetails userDetails = (UserDetails) userDetailsService
+                .loadUserByUsername(payload.getContact());
 
-        UserDetails userDetails = (UserDetails)
-                userDetailsService.loadUserByUsername(payload.getContact());
+        if (isEmail(payload.getContact())) {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
+                    (payload.getContact(), payload.getCode()));
+        }
 
         String jwtToken = jwtUtil.generateToken(userDetails);
-
         return new ContactConfirmationResponse(jwtToken);
     }
 
@@ -93,5 +101,11 @@ public class UserRegisterService {
         } else {
             return null;
         }
+    }
+
+    private boolean isEmail(String payload) {
+        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+        Matcher matcher = pattern.matcher(payload);
+        return matcher.matches();
     }
 }
