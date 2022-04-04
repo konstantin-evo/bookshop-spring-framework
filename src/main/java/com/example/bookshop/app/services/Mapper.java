@@ -157,7 +157,7 @@ public interface Mapper {
         return localDate;
     }
 
-    private Integer countReviewRate(BookReview review, Integer value) {
+    default Integer countReviewRate(BookReview review, Integer value) {
         return (int) review.getReviewRates().stream()
                 .filter(bookReviewRate -> Objects.equals(bookReviewRate.getRate(), value))
                 .count();

@@ -5,14 +5,15 @@ import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
 import com.example.bookshop.app.model.dao.JwtBlockListRepository;
 import com.example.bookshop.app.model.entity.JwtBlockList;
+import com.example.bookshop.app.model.entity.OneTimeCode;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
 import com.example.bookshop.app.config.security.UserDetails;
 import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.web.dto.RegistrationFormDto;
 import com.example.bookshop.app.model.entity.User;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import com.example.bookshop.web.exception.CustomAuthenticationException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,28 +25,30 @@ import java.util.regex.Pattern;
 @Service
 public class UserRegisterService {
 
-    private static final String ANONYMOUS_USER = "anonymousUser";
-
     private final UserRepository userRepo;
     private final JwtBlockListRepository jwtBlockListRepo;
     private final PasswordEncoder passwordEncoder;
-    private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final OneTimeCodeService oneTimeCodeService;
     private final JWTUtil jwtUtil;
 
+    @Value("${twilio.expire_time_sec}")
+    private int EXPIRE_TIME_SEC;
+
     private static final String EMAIL_PATTERN = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     public UserRegisterService(UserRepository userRepo,
                                JwtBlockListRepository jwtBlockListRepo,
                                PasswordEncoder passwordEncoder,
-                               AuthenticationManager authenticationManager,
                                UserDetailsService userDetailsService,
+                               OneTimeCodeService oneTimeCodeService,
                                JWTUtil jwtUtil) {
         this.userRepo = userRepo;
         this.jwtBlockListRepo = jwtBlockListRepo;
         this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
+        this.oneTimeCodeService = oneTimeCodeService;
         this.jwtUtil = jwtUtil;
     }
 
@@ -74,23 +77,29 @@ public class UserRegisterService {
         return new UserDetails(user);
     }
 
-    public ContactConfirmationResponse login(ContactConfirmationPayload payload) {
+    public ContactConfirmationResponse login(ContactConfirmationPayload payload) throws CustomAuthenticationException {
 
-        UserDetails userDetails = (UserDetails) userDetailsService
-                .loadUserByUsername(payload.getContact());
-
-        if (isEmail(payload.getContact())) {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
-                    (payload.getContact(), payload.getCode()));
+        if (oneTimeCodeService.verifyCode(payload.getCode())) {
+            UserDetails userDetails = (UserDetails) userDetailsService
+                    .loadUserByUsername(payload.getContact());
+            String jwtToken = jwtUtil.generateToken(userDetails);
+            return new ContactConfirmationResponse(jwtToken);
+        } else {
+            throw new CustomAuthenticationException("The code has expired or an incorrect code has been entered");
         }
-
-        String jwtToken = jwtUtil.generateToken(userDetails);
-        return new ContactConfirmationResponse(jwtToken);
     }
 
     public void logout(String token) {
         JwtBlockList jwtBlockList = new JwtBlockList(token);
         jwtBlockListRepo.save(jwtBlockList);
+    }
+
+    public void contactConfirmation(String contact) {
+        String code = isEmail(contact)
+                ? oneTimeCodeService.sendSecretCodeEmail(contact)
+                : oneTimeCodeService.sendSecretCodeSms(contact);
+
+        oneTimeCodeService.saveCode(new OneTimeCode(code, EXPIRE_TIME_SEC));
     }
 
     public Object getCurrentUser() {

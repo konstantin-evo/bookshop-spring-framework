@@ -1,12 +1,11 @@
 package com.example.bookshop.web.controllers.user;
 
-import com.example.bookshop.app.config.security.SmsService;
-import com.example.bookshop.app.model.entity.SmsCode;
+import com.example.bookshop.app.services.OneTimeCodeService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
 import com.example.bookshop.web.dto.RegistrationFormDto;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.bookshop.web.exception.CustomAuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,14 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 public class UserAuthController {
 
     private final UserRegisterService userRegisterService;
-    private final SmsService smsService;
+    private final OneTimeCodeService oneTimeCodeService;
 
-    @Value("${twilio.expire_time_sec}")
-    private int EXPIRE_TIME_SEC;
-
-    public UserAuthController(UserRegisterService userRegisterService, SmsService smsService) {
+    public UserAuthController(UserRegisterService userRegisterService,
+                              OneTimeCodeService oneTimeCodeService) {
         this.userRegisterService = userRegisterService;
-        this.smsService = smsService;
+        this.oneTimeCodeService = oneTimeCodeService;
     }
 
     @GetMapping("/signin")
@@ -46,12 +43,9 @@ public class UserAuthController {
     @ResponseBody
     public ContactConfirmationResponse handleRequestContactConfirmation(
             @RequestBody ContactConfirmationPayload payload) {
-        ContactConfirmationResponse response = new ContactConfirmationResponse(true);
 
-        if (!payload.getContact().contains("@")) {
-            String smsCodeString = smsService.sendSecretCodeSms(payload.getContact());
-            smsService.saveNewCode(new SmsCode(smsCodeString, EXPIRE_TIME_SEC));
-        }
+        ContactConfirmationResponse response = new ContactConfirmationResponse(true);
+        userRegisterService.contactConfirmation(payload.getContact());
 
         return response;
     }
@@ -59,7 +53,7 @@ public class UserAuthController {
     @PostMapping("/approveContact")
     @ResponseBody
     public ContactConfirmationResponse handleApproveContact(@RequestBody ContactConfirmationPayload payload) {
-        return smsService.verifyCode(payload.getCode())
+        return oneTimeCodeService.verifyCode(payload.getCode())
                 ? new ContactConfirmationResponse(true)
                 : new ContactConfirmationResponse();
     }
@@ -74,7 +68,8 @@ public class UserAuthController {
     @PostMapping("/login")
     @ResponseBody
     public ContactConfirmationResponse handleLogin(@RequestBody ContactConfirmationPayload payload,
-                                                   HttpServletResponse httpServletResponse) {
+                                                   HttpServletResponse httpServletResponse)
+            throws CustomAuthenticationException {
         ContactConfirmationResponse loginResponse = userRegisterService.login(payload);
         Cookie cookie = new Cookie("token", loginResponse.getResult());
         httpServletResponse.addCookie(cookie);

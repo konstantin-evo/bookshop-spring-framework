@@ -9,12 +9,12 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "sms_keys")
+@Table(name = "one_time_code")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SmsCode {
+public class OneTimeCode {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,12 @@ public class SmsCode {
     private String code;
     private LocalDateTime expireTime;
 
-    public SmsCode(String code, Integer expireIn) {
+    public OneTimeCode(String code) {
+        this.code = code;
+        this.expireTime = LocalDateTime.now().plusSeconds(60);
+    }
+
+    public OneTimeCode(String code, Integer expireIn) {
         this.code = code;
         this.expireTime = LocalDateTime.now().plusSeconds(expireIn);
     }
