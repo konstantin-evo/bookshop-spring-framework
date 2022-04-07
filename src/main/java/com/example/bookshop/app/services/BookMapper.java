@@ -30,9 +30,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @org.mapstruct.Mapper
-public interface Mapper {
+public interface BookMapper {
 
-    Mapper INSTANCE = Mappers.getMapper(Mapper.class);
+    BookMapper INSTANCE = Mappers.getMapper(BookMapper.class);
 
     @Mapping(target = "priceOld", source = ".", qualifiedByName = "calculatePriceOld")
     @Mapping(target = "tags", source = ".", qualifiedByName = "getTags")
@@ -50,8 +50,12 @@ public interface Mapper {
 
     @Named("calculatePriceOld")
     static String calculatePriceOld(Book book) {
-        double discount = book.getDiscount() / 100;
-        return String.valueOf((int) (book.getPrice() / (1 - discount)));
+        if (book.getDiscount() != null) {
+            double discount = book.getDiscount() / 100;
+            return String.valueOf((int) (book.getPrice() / (1 - discount)));
+        } else {
+            return null;
+        }
     }
 
     @Named("getTags")

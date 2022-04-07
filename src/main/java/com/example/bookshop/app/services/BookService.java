@@ -7,7 +7,6 @@ import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.ReviewDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -33,7 +32,6 @@ public class BookService {
     private final BookRepository bookRepo;
     private final UserRepository userRepo;
 
-    @Autowired
     public BookService(BookRepository bookRepo, UserRepository userRepo) {
         this.bookRepo = bookRepo;
         this.userRepo = userRepo;
@@ -42,7 +40,7 @@ public class BookService {
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findAll(nextPage);
-        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
@@ -51,48 +49,48 @@ public class BookService {
         Date dateToSql = java.sql.Date.valueOf(dateTo);
         Pageable nextPage = PageRequest.of(offset, limit, Sort.by("pubDate").descending());
         Page<Book> books = bookRepo.findBookByPubDateIsBetween(dateFromSql, dateToSql, nextPage);
-        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
     public Page<BookDto> getPageOfSearchResultBooks(String searchWord, Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findBookByTitleContaining(searchWord, nextPage);
-        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
     public Page<BookDto> getPageOfPopularBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit, Sort.by("rating").descending());
         Page<Book> books = bookRepo.findAll(nextPage);
-        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
     public Page<BookDto> getPageOfBooksByTag(Integer offset, Integer limit, Integer id) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findBooksByTag(id, nextPage);
-        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
     public Page<BookDto> getPageOfBooksByGenre(Integer offset, Integer limit, Integer id) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findBooksGenre(id, nextPage);
-        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
     public Page<BookDto> getBooksByAuthorId(Integer offset, Integer limit, Integer id) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findBooksByAuthorId(id, nextPage);
-        List<BookDto> booksDto = Mapper.INSTANCE.map(books.getContent());
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
 
     public List<BookDto> getBooksByAuthorName(String authorName) {
         List<Book> books = bookRepo.findBooksByAuthorFirstNameContaining(authorName);
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getBooksByTitle(String title) throws BookstoreApiWrongParameterException {
@@ -100,52 +98,52 @@ public class BookService {
         if (title.length() <= 1 || books.isEmpty()) {
             throw new BookstoreApiWrongParameterException("Wrong values passed to one or more parameters");
         }
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getBooksWithPriceBetween(Integer min, Integer max) {
         List<Book> books = bookRepo.findBooksByPriceBetween(min, max);
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getPaidBooks(String userEmail) {
         Integer userId = userRepo.findUserByEmail(userEmail).getId();
         List<Book> books = bookRepo.findPaidBooksByUser(userId);
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getArchivedBooks(String userEmail) {
         Integer userId = userRepo.findUserByEmail(userEmail).getId();
         List<Book> books = bookRepo.findArchivedBooksByUser(userId);
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getBooksWithDiscountBetween(Double min, Double max) {
         List<Book> books = bookRepo.findBooksByDiscountBetween(min, max);
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getBooksWithPrice(Integer price) {
         List<Book> books = bookRepo.findBooksByPriceIs(price);
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getBooksWithMaxPrice() {
         List<Book> books = bookRepo.findBooksWithMaxDiscount();
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getBestsellers() {
         List<Book> books = bookRepo.findBestsellers();
-        return Mapper.INSTANCE.map(books);
+        return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getBooksByCookies(String cookie) {
-        return Mapper.INSTANCE.map(findBooksByCookies(cookie));
+        return BookMapper.INSTANCE.map(findBooksByCookies(cookie));
     }
 
     public BookDto getBook(String slug) {
-        return Mapper.INSTANCE.map(bookRepo.findBookBySlug(slug));
+        return BookMapper.INSTANCE.map(bookRepo.findBookBySlug(slug));
     }
 
     public void updateBook(String slug, String path) {
@@ -164,15 +162,15 @@ public class BookService {
     }
 
     public BookRateDto getBookRate(String slug) {
-        return Mapper.INSTANCE.mapBookRateDto(bookRepo.findBookBySlug(slug));
+        return BookMapper.INSTANCE.mapBookRateDto(bookRepo.findBookBySlug(slug));
     }
 
     public ReviewDto getBookReviews(String slug) {
-        return Mapper.INSTANCE.getBookReviews(bookRepo.findBookBySlug(slug));
+        return BookMapper.INSTANCE.getBookReviews(bookRepo.findBookBySlug(slug));
     }
 
     public LocalDate convertToLocalDate(String date) {
-        return Mapper.INSTANCE.convertToLocalDate(date);
+        return BookMapper.INSTANCE.convertToLocalDate(date);
     }
 
     /**

@@ -20,11 +20,11 @@ public class AuthorService {
     }
 
     public AuthorDto getAuthor(Integer id){
-        return Mapper.INSTANCE.map(authorRepo.findById(id).orElse(null));
+        return BookMapper.INSTANCE.map(authorRepo.findById(id).orElse(null));
     }
 
     public List<AuthorDto> getAuthors() {
-        return authorRepo.findAll().stream().map(Mapper.INSTANCE::map)
+        return authorRepo.findAll().stream().map(BookMapper.INSTANCE::map)
                 .collect(Collectors.toList());
     }
 
