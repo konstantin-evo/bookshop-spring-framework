@@ -60,8 +60,8 @@ public class UserAuthController {
 
     @PostMapping("/registration")
     public String handleUserRegistration(RegistrationFormDto registrationFormDto, Model model) {
-        userRegisterService.registerNewUser(registrationFormDto);
-        model.addAttribute("regOk", true);
+        boolean registrationIsOk = userRegisterService.registerNewUser(registrationFormDto);
+        model.addAttribute("regOk", registrationIsOk);
         return "signin";
     }
 

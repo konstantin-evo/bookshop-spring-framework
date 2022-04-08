@@ -75,13 +75,12 @@
                     <div class="Login-step Login-step_hide" data-type="phone">
                         <div class="form-group">
                             <label class="form-label Login-title"
-                                   th:text="#{signin.sms}">n/a
+                                   th:text="#{signin.password}">n/a
                             </label>
                         </div>
                         <div class="form-group form-group_key">
-                            <input class="form-input" id="phonecode" name="phonecode" type="text"
-                                   data-validate="key require" data-mask="999 999"
-                                   th:placeholder="#{signin.code}"/>
+                            <input class="form-input" id="phonecode" name="phonecode" type="password"
+                                   th:placeholder="PASSWORD"/>
                         </div>
                         <div class="form-group form-group_center">
                             <button class="btn btn_primary form-btn" type="button" name="toComeInPhone"

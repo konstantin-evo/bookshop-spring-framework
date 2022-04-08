@@ -36,6 +36,13 @@ public class OneTimeCodeService {
     @Value("${mail.text}")
     private String TEXT_EMAIL;
 
+    /**
+     * The SMS_CODE value is temporarily hardcoded due to the fact that the TWILIO service in free mode does not work stably,
+     * and it is impossible to guarantee the operation of the operation of the service during launch
+     */
+    @Value("${twilio.magic_code}")
+    private String SMS_CODE;
+
     private final OneTimeCodeRepository oneTimeCodeRepository;
     private final JavaMailSender mailSender;
 
@@ -44,6 +51,14 @@ public class OneTimeCodeService {
         this.mailSender = mailSender;
     }
 
+    /**
+     * The method sends SMS to a phone number
+     * temporarily disabled due to support issues with Twilio service
+     *
+     * @param contact - telephone number
+     * @return the generated value of the code
+     */
+    @SuppressWarnings("unused")
     public String sendSecretCodeSms(String contact) {
         Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
         String formattedContact = contact.replaceAll("[()-]]", "");
@@ -70,6 +85,17 @@ public class OneTimeCodeService {
         return generatedCode;
     }
 
+    public void saveCode(OneTimeCode oneTimeCode) {
+        if (oneTimeCodeRepository.findByCode(oneTimeCode.getCode()) == null) {
+            oneTimeCodeRepository.save(oneTimeCode);
+        }
+    }
+
+    public Boolean verifyCode(String code) {
+        OneTimeCode oneTimeCode = oneTimeCodeRepository.findByCode(code);
+        return (code.equals(SMS_CODE)) || (oneTimeCode != null && !oneTimeCode.isExpired());
+    }
+
     private String generateCode() {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
@@ -80,14 +106,4 @@ public class OneTimeCodeService {
         return sb.toString();
     }
 
-    public void saveCode(OneTimeCode oneTimeCode) {
-        if (oneTimeCodeRepository.findByCode(oneTimeCode.getCode()) == null) {
-            oneTimeCodeRepository.save(oneTimeCode);
-        }
-    }
-
-    public Boolean verifyCode(String code) {
-        OneTimeCode oneTimeCode = oneTimeCodeRepository.findByCode(code);
-        return (oneTimeCode != null && !oneTimeCode.isExpired());
-    }
 }
