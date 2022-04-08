@@ -14,6 +14,8 @@ import com.example.bookshop.web.dto.RegistrationFormDto;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.CustomAuthenticationException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,9 +30,17 @@ public class UserRegisterService {
     private final UserRepository userRepo;
     private final JwtBlockListRepository jwtBlockListRepo;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
     private final OneTimeCodeService oneTimeCodeService;
     private final JWTUtil jwtUtil;
+
+    /**
+     * The SMS_CODE value is temporarily hardcoded due to the fact that the TWILIO service in free mode does not work stably,
+     * and it is impossible to guarantee the operation of the operation of the service during launch
+     */
+    @Value("${twilio.magic_code}")
+    private String SMS_CODE;
 
     @Value("${twilio.expire_time_sec}")
     private int EXPIRE_TIME_SEC;
@@ -41,19 +51,21 @@ public class UserRegisterService {
     public UserRegisterService(UserRepository userRepo,
                                JwtBlockListRepository jwtBlockListRepo,
                                PasswordEncoder passwordEncoder,
+                               AuthenticationManager authenticationManager,
                                UserDetailsService userDetailsService,
                                OneTimeCodeService oneTimeCodeService,
                                JWTUtil jwtUtil) {
         this.userRepo = userRepo;
         this.jwtBlockListRepo = jwtBlockListRepo;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.oneTimeCodeService = oneTimeCodeService;
         this.jwtUtil = jwtUtil;
     }
 
     @Transient
-    public void registerNewUser(RegistrationFormDto registrationForm) {
+    public boolean registerNewUser(RegistrationFormDto registrationForm) {
 
         User userByEmail = userRepo.findUserByEmail(registrationForm.getEmail());
         User userByPhone = userRepo.findUserByPhone(registrationForm.getPhone());
@@ -65,6 +77,10 @@ public class UserRegisterService {
             user.setPhone(registrationForm.getPhone());
             user.setPassword(passwordEncoder.encode(registrationForm.getPassword()));
             userRepo.save(user);
+            return true;
+        } else {
+            // TODO: Add error handling if user already exists
+            return false;
         }
     }
 
@@ -79,14 +95,12 @@ public class UserRegisterService {
 
     public ContactConfirmationResponse login(ContactConfirmationPayload payload) throws CustomAuthenticationException {
 
-        if (oneTimeCodeService.verifyCode(payload.getCode())) {
-            UserDetails userDetails = (UserDetails) userDetailsService
-                    .loadUserByUsername(payload.getContact());
-            String jwtToken = jwtUtil.generateToken(userDetails);
-            return new ContactConfirmationResponse(jwtToken);
-        } else {
-            throw new CustomAuthenticationException("The code has expired or an incorrect code has been entered");
-        }
+        UserDetails userDetails = (UserDetails) userDetailsService
+                .loadUserByUsername(payload.getContact());
+
+        return isEmail(payload.getContact())
+                ? loginByEmail(payload.getCode(), userDetails)
+                : loginByPhone(payload, userDetails);
     }
 
     public void logout(String token) {
@@ -97,8 +111,7 @@ public class UserRegisterService {
     public void contactConfirmation(String contact) {
         String code = isEmail(contact)
                 ? oneTimeCodeService.sendSecretCodeEmail(contact)
-                : oneTimeCodeService.sendSecretCodeSms(contact);
-
+                : SMS_CODE;
         oneTimeCodeService.saveCode(new OneTimeCode(code, EXPIRE_TIME_SEC));
     }
 
@@ -110,6 +123,24 @@ public class UserRegisterService {
         } else {
             return null;
         }
+    }
+
+    private ContactConfirmationResponse loginByEmail(String code, UserDetails userDetails)
+            throws CustomAuthenticationException {
+        if (oneTimeCodeService.verifyCode(code)) {
+            String jwtToken = jwtUtil.generateToken(userDetails);
+            return new ContactConfirmationResponse(jwtToken);
+        } else {
+            throw new CustomAuthenticationException("The code has expired or an incorrect code has been entered");
+        }
+    }
+
+    private ContactConfirmationResponse loginByPhone(ContactConfirmationPayload payload,
+                                                     UserDetails userDetails) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
+                (payload.getContact(), payload.getCode()));
+        String jwtToken = jwtUtil.generateToken(userDetails);
+        return new ContactConfirmationResponse(jwtToken);
     }
 
     private boolean isEmail(String payload) {
