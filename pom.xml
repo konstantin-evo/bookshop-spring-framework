@@ -11,9 +11,9 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>MyBookShopApp</artifactId>
+    <artifactId>my-bookshop-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>MyBookShopApp</name>
+    <name>my-bookshop-app</name>
     <description>Demo project for Spring Boot</description>
 
     <properties>
@@ -192,6 +192,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

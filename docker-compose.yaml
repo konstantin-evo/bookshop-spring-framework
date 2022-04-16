@@ -1,0 +1,56 @@
+version: '3.5'
+
+services:
+
+  app:
+    image: 'konstantinevo/bookshop:latest'
+    build:
+      context: .
+    container_name: bookshop-app
+    depends_on:
+      - db-api
+      - admin-api
+    ports:
+      - '8080:8080'
+    networks:
+      - proxynet
+    environment:
+      - SPRING.BOOT.ADMIN.CLIENT.URL=http://admin-api:8081
+      - SPRING.BOOT.ADMIN.CLIENT.INSTANCE.SERVICE-URL=http://app:8080/
+      - SPRING.BOOT.ADMIN.CLIENT.INSTANCE.HEALTH-URL=http://app:8080/actuator/health
+      - SPRING.BOOT.ADMIN.CLIENT.INSTANCE.MANAGEMENT-URL=http://app:8080/actuator
+      - SPRING.DATASOURCE.URL=jdbc:postgresql://db-api:5432/bookshop
+      - SPRING.DATASOURCE.USERNAME=postgres
+      - SPRING.DATASOURCE.PASSWORD=postgres
+
+  db-api:
+    image: 'postgres:13.1-alpine'
+    container_name: db-api
+    networks:
+      - proxynet
+    ports:
+      - '5432:5432'
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=bookshop
+    healthcheck:
+      test: [ 'CMD-SHELL', 'pg_isready -U postgres' ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  admin-api:
+    image: 'konstantinevo/bookshop-admin:1.0.0'
+    container_name: 'bookshop-admin'
+    hostname: 'admin'
+    ports:
+      - '8081:8081'
+    networks:
+      - proxynet
+
+networks:
+  proxynet:
+    name: bookshop_network
