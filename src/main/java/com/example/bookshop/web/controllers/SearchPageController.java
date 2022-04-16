@@ -37,12 +37,12 @@ public class SearchPageController {
         model.addAttribute("searchWord", searchWord);
         model.addAttribute("searchResults", googleService
                 .getPageOfSearchResult(searchWord, OFFSET, LIMIT));
-        return "/search/index";
+        return "search/index";
     }
 
     @GetMapping(value = {"/search"})
     public String getSearchPage() {
-        return "/search/index";
+        return "search/index";
     }
 
 }
