@@ -13,6 +13,7 @@ import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.web.dto.RegistrationFormDto;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.CustomAuthenticationException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class UserRegisterService {
 
     private final UserRepository userRepo;
@@ -45,24 +47,8 @@ public class UserRegisterService {
     @Value("${twilio.expire_time_sec}")
     private int EXPIRE_TIME_SEC;
 
-    private static final String EMAIL_PATTERN = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    private static final String EMAIL_PATTERN = "[A-Za-z\\d._%+-]+@[A-Za-z\\d.-]+\\.[A-Za-z]{2,4}";
     private static final String ANONYMOUS_USER = "anonymousUser";
-
-    public UserRegisterService(UserRepository userRepo,
-                               JwtBlockListRepository jwtBlockListRepo,
-                               PasswordEncoder passwordEncoder,
-                               AuthenticationManager authenticationManager,
-                               UserDetailsService userDetailsService,
-                               OneTimeCodeService oneTimeCodeService,
-                               JWTUtil jwtUtil) {
-        this.userRepo = userRepo;
-        this.jwtBlockListRepo = jwtBlockListRepo;
-        this.passwordEncoder = passwordEncoder;
-        this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
-        this.oneTimeCodeService = oneTimeCodeService;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Transient
     public boolean registerNewUser(RegistrationFormDto registrationForm) {
