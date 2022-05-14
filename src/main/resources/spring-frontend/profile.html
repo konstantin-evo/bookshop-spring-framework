@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="/assets/css/fonts.min.css?v=45744385"/>
     <link rel="stylesheet" href="/assets/css/basic.min.css?v=45744385"/>
     <link rel="stylesheet" href="/assets/css/extra.min.css?v=45744385"/>
-    <!--[if lt IE 9]>
-    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+    <link rel="stylesheet" href="/assets/css/jquery.css"/>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <script src="/assets/js/scripts.min.js?v=45744385"></script>
     <script src="/assets/js/local.js"></script>
 </head>
@@ -35,25 +35,28 @@
             </h2>
             <div class="Tabs Tabs_default">
                 <div class="Tabs-links">
-                    <a class="Tabs-link Tabs-link_ACTIVE" href="#basic"
-                       th:text="#{profile.basic}">n/a</a>
-                    <a class="Tabs-link" href="#transactions"
-                       th:text="#{profile.transaction}">n/a</a>
-                    <a class="Tabs-link" href="#topup"
-                       th:text="#{profile.account}">n/a</a>
+                    <a class="Tabs-link Tabs-link_ACTIVE" id="basic_button" href="#"
+                       th:text="#{profile.basic}">n/a
+                    </a>
+                    <a class="Tabs-link" id="transactions_button" href="#"
+                       th:text="#{profile.transaction}">n/a
+                    </a>
+                    <a class="Tabs-link" id="topup_button" href="#"
+                       th:text="#{profile.account}">n/a
+                    </a>
                 </div>
                 <div class="Tabs-wrap">
-                    <div class="Tabs-block" id="basic">
+                    <div class="Tabs-block" style="visibility:visible">
                         <div class="Profile">
-                            <form class="form Profile-form" action="#" method="post">
+                            <form class="form Profile-form" id="profileForm"
+                                  action="/profile" method="post">
                                 <div class="row">
                                     <div class="row-block">
                                         <div class="form-group">
                                             <label class="form-label" for="name">Имя
                                             </label>
                                             <input class="form-input" id="name" name="name" type="text"
-                                                   th:value="${currentUser.name}"
-                                                   value="Михаил"/>
+                                                   th:value="${currentUser.name}"/>
                                         </div>
                                         <div class="form-group">
                                             <label class="form-label" for="mail">E-mail
@@ -77,8 +80,6 @@
                                                 </button>
                                             </div>
                                         </div>
-                                    </div>
-                                    <div class="row-block">
                                         <div class="form-group">
                                             <label class="form-label" for="password"
                                                    th:text="#{profile.password}">n/a
@@ -96,15 +97,13 @@
                                         </div>
                                         <div class="form-group">
                                             <div class="Profile-btn">
-                                                <button class="btn btn_danger" type="button"
+                                                <button class="btn btn_danger" type="button" id="passwordClear"
                                                         th:text="#{profile.password.cancel}">n/a
                                                 </button>
-                                                <button class="btn btn_primary" type="submit"
+                                                <button class="btn btn_primary" type="submit" id="profileSubmit"
+                                                        style="margin-right: auto"
                                                         th:text="#{profile.password.save}">n/a
                                                 </button>
-                                            </div>
-                                            <div class="Profile-success"
-                                                 th:text="#{profile.password.save.successful}">n/a
                                             </div>
                                         </div>
                                     </div>
@@ -112,17 +111,17 @@
                             </form>
                         </div>
                     </div>
-                    <div class="Tabs-block" id="transactions">
+                    <div class="Tabs-block" style="display: none">
                         <div class="Transactions">
                             <div class="tableWrap">
                                 <table class="table table_noMargin">
                                     <thead>
                                     <tr>
-                                        <th>Дата и время
+                                        <th th:text="#{profile.transaction.date}">n/a
                                         </th>
-                                        <th>Сумма
+                                        <th th:text="#{profile.transaction.amount}">n/a
                                         </th>
-                                        <th>Описание
+                                        <th th:text="#{profile.transaction.info}">n/a
                                         </th>
                                     </tr>
                                     </thead>
@@ -170,23 +169,26 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="Transactions-footer Transactions-footer_center"><a
-                                    class="btn btn_primary Transactions-get" href="#" data-transactionoffset="4"
-                                    data-transactionlimit="10" data-transactionsort="asc">Показать еще</a>
+                            <div class="Transactions-footer Transactions-footer_center">
+                                <a class="btn btn_primary Transactions-get" href="#"
+                                   data-transactionoffset="4" data-transactionlimit="10" data-transactionsort="asc"
+                                   th:text="#{search.more}">n/a</a>
                             </div>
                         </div>
                     </div>
-                    <div class="Tabs-block" id="topup">
+                    <div class="Tabs-block" style="display: none">
                         <form class="form Topup" action="#" method="post" data-sendHash="34534535">
                             <div class="Topup-wrap">
-                                <strong class="Topup-title">Введите сумму, на которую хотите пополнить свой счет:
+                                <strong class="Topup-title"
+                                        th:text="#{profile.transaction.replenish}">n/a
                                 </strong>
                                 <div class="form-group form-group_row Topup-group">
-                                    <input class="form-input" id="sum" name="sum" type="text"/><span>рублей</span>
+                                    <input class="form-input" id="sum" name="sum" type="text"/><span>₽</span>
                                 </div>
                                 <div class="form-group">
                                     <div class="Topup-btn">
-                                        <button class="btn btn_primary">Пополнить
+                                        <button class="btn btn_primary"
+                                                th:text="#{profile.account}">n/a
                                         </button>
                                     </div>
                                 </div>
@@ -200,5 +202,8 @@
 </div>
 <footer th:replace="~{fragments/footer_fragment :: footFragment}"></footer>
 <script src="/assets/plg/jQuery/jquery-3.5.1.min.js"></script>
+<script src="/assets/plg/jQuery/jquery.validate.js"></script>
+<script src="/assets/js/changeprofile.js"></script>
+<script src="/assets/js/showprofile.js"></script>
 </body>
 </html>

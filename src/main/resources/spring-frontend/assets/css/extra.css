@@ -2831,8 +2831,8 @@
 .Profile-success {
   color: #2aa73a;
   display: block;
-  margin-top: 20px;
-  text-align: right;
+  margin: 5px;
+  text-align: center;
 }
 .Profile-img {
   max-height: 100%;
