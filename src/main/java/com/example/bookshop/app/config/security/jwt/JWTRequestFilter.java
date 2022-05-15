@@ -2,6 +2,7 @@ package com.example.bookshop.app.config.security.jwt;
 
 import com.example.bookshop.app.config.security.UserDetails;
 import com.example.bookshop.app.config.security.UserDetailsService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -14,18 +15,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * When a request goes through the filter chain,
+ * JWTRequestFilter is executed only once for a given request
+ * to check User Authentication
+ */
 @Component
+@RequiredArgsConstructor
 public class JWTRequestFilter extends OncePerRequestFilter {
 
     private final static String JWT_COOKIE_NAME = "token";
 
     private final UserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
-
-    public JWTRequestFilter(UserDetailsService userDetailsService, JWTUtil jwtUtil) {
-        this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -37,7 +39,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
             String username = jwtUtil.extractUsername(token);
             UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(username);
 
-            if (jwtUtil.validateToken(token, userDetails)) {
+            if (jwtUtil.isTokenValid(token, userDetails)) {
                 setAuthentication(request, userDetails);
             }
         }
