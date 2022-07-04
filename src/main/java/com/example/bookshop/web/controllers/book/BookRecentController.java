@@ -2,7 +2,7 @@ package com.example.bookshop.web.controllers.book;
 
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.web.dto.BookDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,6 +14,7 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/books")
+@RequiredArgsConstructor
 public class BookRecentController {
 
     private final BookService bookService;
@@ -25,11 +26,6 @@ public class BookRecentController {
     @Value("${default.recentmonth}")
     private int DEFAULT_RECENT_MONTH;
 
-    @Autowired
-    public BookRecentController(BookService bookService) {
-        this.bookService = bookService;
-    }
-
     @GetMapping("/recent")
     public String recentPage(Model model) {
         model.addAttribute("recentBooks", recentBooks());
@@ -37,8 +33,8 @@ public class BookRecentController {
     }
 
     private List<BookDto> recentBooks() {
-        LocalDate dateTo = LocalDate.now();
-        LocalDate dateFrom = LocalDate.now().minusMonths(DEFAULT_RECENT_MONTH);
+        LocalDate dateTo = LocalDate.of(2021, 12, 31);
+        LocalDate dateFrom = dateTo.minusMonths(DEFAULT_RECENT_MONTH);
         return bookService
                 .getPageOfRecentBooks(dateFrom, dateTo, OFFSET, LIMIT)
                 .getContent();

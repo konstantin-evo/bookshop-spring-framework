@@ -1,7 +1,7 @@
 package com.example.bookshop.web.controllers.book;
 
 import com.example.bookshop.app.services.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/books")
+@RequiredArgsConstructor
 public class BookPopularController {
 
     private final BookService bookService;
@@ -18,11 +19,6 @@ public class BookPopularController {
     private int OFFSET;
     @Value("${default.limit}")
     private int LIMIT;
-
-    @Autowired
-    public BookPopularController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
     @GetMapping("/popular")
     public String popularPage(Model model) {
