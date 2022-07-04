@@ -5,6 +5,7 @@ import com.example.bookshop.app.services.BookRateService;
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.services.ResourceStorage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
@@ -25,21 +26,13 @@ import java.nio.file.Path;
 @Log4j2
 @Controller
 @RequestMapping("/books")
+@RequiredArgsConstructor
 public class BookPageController {
 
     private final BookService bookService;
     private final BookRateService rateService;
     private final UserRegisterService userRegisterService;
     private final ResourceStorage storage;
-
-    public BookPageController(BookService bookService, BookRateService rateService,
-                              UserRegisterService userRegisterService,
-                              ResourceStorage storage) {
-        this.bookService = bookService;
-        this.rateService = rateService;
-        this.userRegisterService = userRegisterService;
-        this.storage = storage;
-    }
 
     @GetMapping("/{slug}")
     public String mainBookPage(@PathVariable String slug, Model model) {

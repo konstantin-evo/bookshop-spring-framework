@@ -3,7 +3,7 @@ package com.example.bookshop.web.controllers.advice;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.app.services.UserRegisterService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -12,17 +12,11 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 
 @ControllerAdvice
 @SessionAttributes("testBook")
+@RequiredArgsConstructor
 public class GlobalAttributeController {
 
     private final BookService bookService;
     private final UserRegisterService userRegisterService;
-
-    @Autowired
-    public GlobalAttributeController(BookService bookService,
-                                     UserRegisterService userRegisterService) {
-        this.bookService = bookService;
-        this.userRegisterService = userRegisterService;
-    }
 
     @ModelAttribute("searchWord")
     public String searchWord() {

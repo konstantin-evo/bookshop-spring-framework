@@ -4,7 +4,7 @@ import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.app.services.TagService;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.TagDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import java.time.LocalDate;
 import java.util.List;
 
-
 @Controller
+@RequiredArgsConstructor
 public class MainPageController {
 
     private final BookService bookService;
@@ -27,10 +27,12 @@ public class MainPageController {
     @Value("${default.recentmonth}")
     private int DEFAULT_RECENT_MONTH;
 
-    @Autowired
-    public MainPageController(BookService bookService, TagService tagService) {
-        this.bookService = bookService;
-        this.tagService = tagService;
+    private final LocalDate dateTo = LocalDate.of(2021, 12, 31);
+    private final LocalDate dateFrom = dateTo.minusMonths(DEFAULT_RECENT_MONTH);
+
+    @GetMapping("/")
+    public String mainPage() {
+        return "index";
     }
 
     @ModelAttribute("recommendedBooks")
@@ -42,8 +44,6 @@ public class MainPageController {
 
     @ModelAttribute("recentBooks")
     public List<BookDto> recentBooks() {
-        LocalDate dateTo = LocalDate.now();
-        LocalDate dateFrom = dateTo.minusMonths(DEFAULT_RECENT_MONTH);
         return bookService
                 .getPageOfRecentBooks(dateFrom, dateTo, OFFSET, LIMIT)
                 .getContent();
@@ -58,22 +58,17 @@ public class MainPageController {
 
     @ModelAttribute("from")
     public LocalDate dateFrom() {
-        return LocalDate.now().minusMonths(DEFAULT_RECENT_MONTH);
+        return dateFrom;
     }
 
     @ModelAttribute("to")
     public LocalDate dateTo() {
-        return LocalDate.now();
+        return dateTo;
     }
 
     @ModelAttribute("tags")
     public List<TagDto> tags(){
         return tagService.getTagsData();
-    }
-
-    @GetMapping("/")
-    public String mainPage() {
-        return "index";
     }
 
 }
