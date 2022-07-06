@@ -8,11 +8,7 @@ import com.example.bookshop.web.dto.ProfileResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,9 +17,20 @@ public class UserProfilePageController {
     private final UserRegisterService userRegisterService;
     private final ChangeProfileService changeProfileService;
 
+    @ModelAttribute("currentUser")
+    public User searchWord() {
+        return (User) userRegisterService.getCurrentUser();
+    }
+
     @GetMapping("/profile")
-    public String handleProfile(Model model) {
-        model.addAttribute("currentUser", userRegisterService.getCurrentUser());
+    public String handleProfile() {
+        return "profile";
+    }
+
+    @PostMapping(value = "/profile")
+    public String handleTopUpAccount(String sum) {
+        User user = (User) userRegisterService.getCurrentUser();
+        changeProfileService.topUpAccount(Integer.valueOf(sum), user);
         return "profile";
     }
 

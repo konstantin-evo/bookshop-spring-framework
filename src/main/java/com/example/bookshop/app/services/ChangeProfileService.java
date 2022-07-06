@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.util.Pair;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Transient;
 import java.util.HashMap;
@@ -25,6 +26,12 @@ public class ChangeProfileService {
     public ProfileResponseDto changeProfileInfo(ProfileDto profile, User user) {
         Pair<Boolean, Map<String, String>> changeInformation = changePassword(profile, user);
         return new ProfileResponseDto(changeInformation.getFirst(), changeInformation.getSecond());
+    }
+
+    @Transactional
+    public void topUpAccount(Integer sum, User user) {
+        int id = user.getId();
+        userRepo.updateBalance(sum, id);
     }
 
     /**
