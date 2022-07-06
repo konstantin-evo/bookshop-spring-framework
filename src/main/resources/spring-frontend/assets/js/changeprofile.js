@@ -12,6 +12,7 @@ $(document).ready(function () {
     // function to validate the amount by which the user's balance will be replenished
     $('#topUpSubmit').click(function (e) {
         e.preventDefault();
+        clearPreviousResponseInfo()
         if (validateTopUp()) {
             sendTopUpData()
         }
