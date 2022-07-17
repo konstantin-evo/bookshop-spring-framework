@@ -4,6 +4,7 @@ import com.example.bookshop.app.config.security.jwt.JWTLogoutHandler;
 import com.example.bookshop.app.config.security.jwt.JWTRequestFilter;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2UserService;
 import com.example.bookshop.app.config.security.oauth.OauthSuccessHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
@@ -25,24 +27,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JWTLogoutHandler jwtLogoutHandler;
     private final JWTRequestFilter filter;
 
-    public SecurityConfig(UserDetailsService userDetailsService,
-                          CustomOAuth2UserService oauthUserService,
-                          OauthSuccessHandler oauthSuccessHandler,
-                          JWTLogoutHandler jwtLogoutHandler,
-                          JWTRequestFilter filter) {
-        this.userDetailsService = userDetailsService;
-        this.oauthUserService = oauthUserService;
-        this.oauthSuccessHandler = oauthSuccessHandler;
-        this.jwtLogoutHandler = jwtLogoutHandler;
-        this.filter = filter;
-    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/home", "/profile", "/archive").authenticated()
+                .antMatchers("/home", "/profile", "/archive", "books/order").authenticated()
                 .antMatchers("/**").permitAll()
                 .and()
                     .formLogin()

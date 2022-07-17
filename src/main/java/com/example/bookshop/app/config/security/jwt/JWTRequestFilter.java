@@ -2,6 +2,7 @@ package com.example.bookshop.app.config.security.jwt;
 
 import com.example.bookshop.app.config.security.UserDetails;
 import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
