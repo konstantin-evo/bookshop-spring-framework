@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <title th:text="#{cart.name}">n/a</title>
     <meta name="description" content="Описание страницы">
@@ -42,10 +42,21 @@
                         <span class="Cart-price_old"
                               th:text="${totalPrices.getFirst()} + 'р.'">n/a</span>
                     </div>
+
+                    <!--  If the user is authenticated the balance and the "Buy" button are shown  -->
+                    <div class="Cart-block Cart-block_total"
+                         sec:authorize="isAuthenticated()">
+                        <strong class="Cart-title"
+                                th:text="#{cart.balance}+':'">n/a
+                        </strong>
+                        <span class="Cart-price"
+                              th:text="${userBalance} + 'р.'">n/a</span>
+                    </div>
                     <div class="Cart-block">
-                        <a class="btn btn_success btn_md" href="/order.html"
-                           th:text="#{cart.buy}">n/a
-                        </a>
+                        <button class="btn btn_primary" id="orderBook"
+                                th:text="#{cart.buy}"
+                                sec:authorize="isAuthenticated()">n/a
+                        </button>
                     </div>
                 </div>
                 <!--  If there are no books in the Cart - suggest popular ones -->
@@ -75,5 +86,6 @@
 </div>
 <footer th:replace="~{fragments/footer_fragment :: footFragment}"></footer>
 <script src="/assets/plg/jQuery/jquery-3.5.1.min.js"></script>
+<script src="/assets/js/orderbook.js"></script>
 </body>
 </html>

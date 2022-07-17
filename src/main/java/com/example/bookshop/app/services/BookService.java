@@ -1,41 +1,38 @@
 package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.dao.BookRepository;
+import com.example.bookshop.app.model.dao.BookToUserRepository;
+import com.example.bookshop.app.model.dao.BookToUserTypeRepository;
 import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.app.model.entity.BookToUser;
+import com.example.bookshop.app.model.entity.BookToUserType;
+import com.example.bookshop.app.model.entity.User;
+import com.example.bookshop.app.model.entity.enumuration.BookToUserEnum;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.ReviewDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import com.example.bookshop.web.services.CookieUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.StringJoiner;
+import java.util.*;
 
 @Service
 @Transactional
+@RequiredArgsConstructor
 public class BookService {
 
     private final BookRepository bookRepo;
+    private final BookToUserRepository bookToUserRepo;
     private final UserRepository userRepo;
-
-    public BookService(BookRepository bookRepo, UserRepository userRepo) {
-        this.bookRepo = bookRepo;
-        this.userRepo = userRepo;
-    }
+    private final BookToUserTypeRepository typeRepo;
 
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
@@ -49,13 +46,6 @@ public class BookService {
         Date dateToSql = java.sql.Date.valueOf(dateTo);
         Pageable nextPage = PageRequest.of(offset, limit, Sort.by("pubDate").descending());
         Page<Book> books = bookRepo.findBookByPubDateIsBetween(dateFromSql, dateToSql, nextPage);
-        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
-        return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
-    }
-
-    public Page<BookDto> getPageOfSearchResultBooks(String searchWord, Integer offset, Integer limit) {
-        Pageable nextPage = PageRequest.of(offset, limit);
-        Page<Book> books = bookRepo.findBookByTitleContaining(searchWord, nextPage);
         List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
@@ -174,53 +164,42 @@ public class BookService {
     }
 
     /**
-     * The method updates a specific Cookie
-     * after a user tries to add a Book to this Cookie
+     * Method adds books to book purchased by the user and clears the corresponding Cookies
+     * if the user has sufficient funds
      *
-     * @param cookieName  the name of the Cookie to update, for example "postponedBooks"
-     * @param cookieValue current value cookie, can contain several books at once
-     *                    for example "book-bqr-bsi/book-ebf-jyu/book-ekp-gdh"
-     * @param slug        unique identifier for the book being added to the Cookie
-     * @return updated Cookie
+     * @param cookie   - current value cookie, can contain several books at once
+     * @param user     - current session user
+     * @param response - the response object is where the servlet can write updated Cookie information
+     * @return true if the operation was successful and books are added to the books purchased by the user
      */
-    public Cookie getUpdatedCookies(String cookieValue, String cookieName, String slug) {
-        Cookie cookie = new Cookie(cookieName, cookieValue);
-        cookie.setPath("/");
-        if (cookieValue == null || cookieValue.equals("")) {
-            cookie.setValue(slug);
-        } else if (!cookieValue.contains(slug)) {
-            StringJoiner stringJoiner = new StringJoiner("/");
-            stringJoiner.add(cookieValue).add(slug);
-            cookie.setValue(stringJoiner.toString());
-        }
-        return cookie;
-    }
+    public boolean orderBooks(String cookie, User user, HttpServletResponse response) {
 
-    /**
-     * The method removes a book from a specific Cookie
-     *
-     * @param cookieName  the name of the Cookie to update, for example "postponedBooks"
-     * @param cookieValue current value cookie, can contain several books at once
-     *                    for example "book-bqr-bsi/book-ebf-jyu/book-ekp-gdh"
-     * @param slug        unique identifier for the book being removed from the Cookie
-     */
-    public Cookie removeBookFromCookie(String cookieValue, String cookieName, String slug) {
-        ArrayList<String> cookieBooks = new ArrayList<>(Arrays.asList(cookieValue.split("/")));
-        cookieBooks.remove(slug);
-        Cookie cookie = new Cookie(cookieName, String.join("/", cookieBooks));
-        cookie.setPath("/");
-        return cookie;
-    }
+        List<Book> books = findBooksByCookies(cookie);
+        int totalPrice = books.stream().mapToInt(Book::getPrice).sum();
+        int userBalance = userRepo.getBalance(user.getId());
 
-    /**
-     * Util method that allows to determine if the current Cookie value is empty or not
-     * Used to define attributes such as "isCartEmpty", etc.
-     */
-    public boolean getBooleanAttribute(String cookieValue) {
-        if (cookieValue == null || cookieValue.equals("")) {
+        if (userBalance >= totalPrice) {
+            books.forEach(book -> orderBook(book, user));
+            CookieUtil.clearCookieByName(response, "cartContents");
             return true;
         } else {
-            return (findBooksByCookies(cookieValue).isEmpty());
+            return false;
+        }
+    }
+
+    /**
+     * The method checks if the book was previously purchased by the user.\
+     * If not, the book is saved as purchased and the user's balance is updated.
+     */
+    private void orderBook(Book book, User user) {
+
+        BookToUserType paid = typeRepo.findByCode(BookToUserEnum.PAID);
+        boolean isBookAlreadyPaid = bookToUserRepo.existsBookToUserByBookAndUserAndType(book, user, paid);
+
+        if (!isBookAlreadyPaid) {
+            BookToUser bookToUser = new BookToUser(user, book, paid);
+            bookToUserRepo.save(bookToUser);
+            userRepo.updateBalance(-book.getPrice(), user.getId());
         }
     }
 

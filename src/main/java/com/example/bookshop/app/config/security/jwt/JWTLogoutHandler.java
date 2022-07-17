@@ -1,6 +1,7 @@
 package com.example.bookshop.app.config.security.jwt;
 
 import com.example.bookshop.app.services.UserRegisterService;
+import com.example.bookshop.web.services.CookieUtil;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
