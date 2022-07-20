@@ -1,14 +1,9 @@
 package com.example.bookshop.app.services;
 
-import com.example.bookshop.app.model.dao.BookRepository;
-import com.example.bookshop.app.model.dao.BookToUserRepository;
-import com.example.bookshop.app.model.dao.BookToUserTypeRepository;
-import com.example.bookshop.app.model.dao.UserRepository;
-import com.example.bookshop.app.model.entity.Book;
-import com.example.bookshop.app.model.entity.BookToUser;
-import com.example.bookshop.app.model.entity.BookToUserType;
-import com.example.bookshop.app.model.entity.User;
+import com.example.bookshop.app.model.dao.*;
+import com.example.bookshop.app.model.entity.*;
 import com.example.bookshop.app.model.entity.enumuration.BookToUserEnum;
+import com.example.bookshop.app.model.entity.enumuration.TransactionInfo;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.ReviewDto;
@@ -33,6 +28,7 @@ public class BookService {
     private final BookToUserRepository bookToUserRepo;
     private final UserRepository userRepo;
     private final BookToUserTypeRepository typeRepo;
+    private final TransactionRepository transactionRepo;
 
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
@@ -179,7 +175,7 @@ public class BookService {
         int userBalance = userRepo.getBalance(user.getId());
 
         if (userBalance >= totalPrice) {
-            books.forEach(book -> orderBook(book, user));
+            books.forEach(book -> buyBookByUser(book, user));
             CookieUtil.clearCookieByName(response, "cartContents");
             return true;
         } else {
@@ -191,7 +187,7 @@ public class BookService {
      * The method checks if the book was previously purchased by the user.\
      * If not, the book is saved as purchased and the user's balance is updated.
      */
-    private void orderBook(Book book, User user) {
+    public void buyBookByUser(Book book, User user) {
 
         BookToUserType paid = typeRepo.findByCode(BookToUserEnum.PAID);
         boolean isBookAlreadyPaid = bookToUserRepo.existsBookToUserByBookAndUserAndType(book, user, paid);
@@ -200,6 +196,10 @@ public class BookService {
             BookToUser bookToUser = new BookToUser(user, book, paid);
             bookToUserRepo.save(bookToUser);
             userRepo.updateBalance(-book.getPrice(), user.getId());
+
+            // TODO: Fix the TransactionAspect to take this part out of the business logic in BookService
+            Transaction transaction = new Transaction(-book.getPrice(), TransactionInfo.BUY_BOOK.getValue(), user, book.getId());
+            transactionRepo.save(transaction);
         }
     }
 
