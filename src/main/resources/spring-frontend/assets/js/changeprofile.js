@@ -18,6 +18,16 @@ $(document).ready(function () {
         }
     });
 
+    // function to load next page of transactions
+    $('#transactionMore').click(function (e) {
+        e.preventDefault();
+        let $this = $(this);
+        let limit = $this.data('transactionlimit');
+        let offset = $this.data('transactionoffset');
+        getTransitionPage(offset, limit);
+        $this.attr("data-transactionoffset", offset + limit);
+    });
+
     // function for interactive display of information on the "Profile" page
     $(".Tabs-link").click(function () {
         $(".Tabs-link").removeClass("Tabs-link_ACTIVE");
@@ -78,6 +88,33 @@ function sendTopUpData() {
             $('#sum').val('');
             $('<div class="Profile-success">Your account has been successfully funded</div>')
                 .insertBefore('.Topup-btn').first();
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            console.log(errorThrown);
+        }
+    });
+}
+
+function getTransitionPage(offset, limit) {
+    const newOffset = offset + 1;
+    $.get({
+        url: '/transactions?offset=' + newOffset + '&limit=' + limit,
+        success: function (result) {
+            if (result.count > 0) {
+                let table = document.getElementById("transactionsTable");
+                result.transactions.forEach(function (transaction) {
+                    let row = table.insertRow(-1);
+                    let cellDate = row.insertCell();
+                    let cellAmount = row.insertCell();
+                    let cellDescription = row.insertCell();
+                    cellDate.innerHTML = transaction.time;
+                    cellAmount.innerHTML = transaction.value;
+                    cellDescription.innerHTML = transaction.description;
+                });
+                if (result.count < limit) {
+                    $('#transactionMore').hide();
+                }
+            }
         },
         error: function (jqXhr, textStatus, errorThrown) {
             console.log(errorThrown);
