@@ -2,17 +2,18 @@ package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.dao.OneTimeCodeRepository;
 import com.example.bookshop.app.model.entity.OneTimeCode;
+import com.example.bookshop.web.services.SimpleMailSender;
 import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class OneTimeCodeService {
 
     @Value("${twilio.account_sid}")
@@ -44,12 +45,7 @@ public class OneTimeCodeService {
     private String SMS_CODE;
 
     private final OneTimeCodeRepository oneTimeCodeRepository;
-    private final JavaMailSender mailSender;
-
-    public OneTimeCodeService(OneTimeCodeRepository oneTimeCodeRepository, JavaMailSender mailSender) {
-        this.oneTimeCodeRepository = oneTimeCodeRepository;
-        this.mailSender = mailSender;
-    }
+    private final SimpleMailSender mailSender;
 
     /**
      * The method sends SMS to a phone number
@@ -72,16 +68,8 @@ public class OneTimeCodeService {
     }
 
     public String sendSecretCodeEmail(String contact) {
-
         String generatedCode = generateCode();
-
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(BOOKSTORE_EMAIL);
-        message.setTo(contact);
-        message.setSubject(SUBJECT_EMAIL);
-        message.setText(TEXT_EMAIL + generatedCode);
-        mailSender.send(message);
-
+        mailSender.send(SUBJECT_EMAIL, TEXT_EMAIL + generatedCode, BOOKSTORE_EMAIL, contact);
         return generatedCode;
     }
 
@@ -96,6 +84,10 @@ public class OneTimeCodeService {
         return (code.equals(SMS_CODE)) || (oneTimeCode != null && !oneTimeCode.isExpired());
     }
 
+    /**
+     * The method generates a random numeric value in the format "XXX XXX"
+     * For example, "158 927"
+     */
     private String generateCode() {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();

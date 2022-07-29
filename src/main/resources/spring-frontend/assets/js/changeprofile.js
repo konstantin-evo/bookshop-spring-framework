@@ -66,7 +66,7 @@ function sendProfileData() {
             let parentDiv = $('#profileSubmit').parent();
 
             if (result.validated) {
-                $('<div class="Profile-success">Profile data changed successfully</div>')
+                $('<div class="Profile-success">Please check your email to confirm changes!</div>')
                     .insertAfter(parentDiv);
             } else {
                 $.each(result.errorMessages, function (key, value) {
@@ -80,7 +80,7 @@ function sendProfileData() {
 
 function sendTopUpData() {
     $.post({
-        url: '/profile',
+        url: '/topUp',
         dataType: 'text',
         contentType: 'application/x-www-form-urlencoded',
         data: $('#topUpForm').serialize(),

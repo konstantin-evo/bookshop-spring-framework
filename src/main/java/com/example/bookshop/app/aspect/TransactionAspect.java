@@ -24,7 +24,7 @@ public class TransactionAspect {
     private static final String TOP_UP_BALANCE = TransactionInfo.TOPUP.getValue();
     private static final String ORDER_BOOK = TransactionInfo.BUY_BOOK.getValue();
 
-    @Pointcut(value = "execution(public * com.example.bookshop.app.services.ChangeProfileService.topUpAccount(..))"
+    @Pointcut(value = "execution(public * com.example.bookshop.app.services.UserProfileService.topUpAccount(..))"
             + "&& args(sum, user, ..)", argNames = "sum, user")
     public void topUpAccount(Integer sum, User user) {
     }

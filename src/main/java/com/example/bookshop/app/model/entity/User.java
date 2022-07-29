@@ -54,6 +54,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Transaction> transactions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user")
+    private List<ProfileChanges> profileChanges = new ArrayList<>();
+
     public User() {
         String hash = String.valueOf(this.hashCode());
         this.hash = "user-" + hash.substring(0, 2) + "-" + hash.substring(3, 6);

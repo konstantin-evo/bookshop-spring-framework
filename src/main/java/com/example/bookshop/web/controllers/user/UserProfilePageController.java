@@ -1,8 +1,8 @@
 package com.example.bookshop.web.controllers.user;
 
 import com.example.bookshop.app.model.entity.User;
-import com.example.bookshop.app.services.ChangeProfileService;
 import com.example.bookshop.app.services.TransactionService;
+import com.example.bookshop.app.services.UserProfileService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.ProfileDto;
 import com.example.bookshop.web.dto.ProfileResponseDto;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserProfilePageController {
 
     private final UserRegisterService userRegisterService;
-    private final ChangeProfileService changeProfileService;
+    private final UserProfileService changeProfileService;
     private final TransactionService transactionService;
 
     @Value("${default.offset}")
@@ -41,7 +41,7 @@ public class UserProfilePageController {
         return "profile";
     }
 
-    @PostMapping(value = "/profile")
+    @PostMapping(value = "/topUp")
     public String handleTopUpAccount(String sum) {
         User user = (User) userRegisterService.getCurrentUser();
         changeProfileService.topUpAccount(Integer.valueOf(sum), user);
@@ -55,6 +55,16 @@ public class UserProfilePageController {
         return changeProfileService.changeProfileInfo(profileInfo, user);
     }
 
+    @GetMapping("/profile/confirmChanges")
+    public String confirmRegistration(@RequestParam("token") String token) {
+        changeProfileService.confirmProfileChanges(token);
+        return "redirect:/profile";
+    }
+
+    /**
+     * The controller is used to retrieve the user's Transaction History page.
+     * Used to display the page correctly with JS
+     */
     @GetMapping("/transactions")
     @ResponseBody
     public TransactionPageDto getTransactionPage(@RequestParam("offset") Integer offset, @RequestParam("limit") Integer limit) {

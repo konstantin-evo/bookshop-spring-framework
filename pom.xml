@@ -12,7 +12,7 @@
 
     <groupId>com.example</groupId>
     <artifactId>my-bookshop-app</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>my-bookshop-app</name>
     <description>Demo project for Spring Boot</description>
 
