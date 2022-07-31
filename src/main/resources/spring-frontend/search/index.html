@@ -25,19 +25,6 @@
         <main class="Middle-main">
             <h1 class="Middle-title" th:text="#{topbar.search}">n/a
             </h1>
-            <div class="Section">
-                <div class="search">
-                    <form class="form form_search" action="#" method="post" data-searchlimit="6"
-                          th:object="${searchWord}">
-                        <input class="search-input" id="querypage" name="querypage" type="text"
-                               th:placeholder="#{search.placeholder}"
-                               th:value="${searchWord}"/>
-                        <button class="search-button" type="submit" name="searchpage" id="searchpage"
-                                th:text="#{topbar.search}">n/a
-                        </button>
-                    </form>
-                </div>
-            </div>
             <div class="Section Section_close">
                 <header class="Section-header">
                     <h2 class="Section-title Middle-searchHeader"
@@ -45,7 +32,7 @@
                     </h2>
                 </header>
                 <div class="Cards Cards_search">
-                    <div th:replace="fragments/card_fragment.html
+                    <div th:replace="fragments/card_google_fragment.html
                         :: CardFragment(books=${searchResults})">
                     </div>
                     <div class="Cards-footer Cards-footer_center">

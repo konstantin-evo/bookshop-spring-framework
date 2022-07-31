@@ -1,0 +1,13 @@
+/* this css class is used to format errors using jQuery Validator plugin */
+
+div.error, label.error {
+    color: #b50000;
+    font-size: 1rem;
+    display: block;
+    margin-top: 5px;
+}
+input.error, textarea.error {
+    border: 1px dashed #b50000;
+    font-weight: 300;
+    color: #b50000;
+}

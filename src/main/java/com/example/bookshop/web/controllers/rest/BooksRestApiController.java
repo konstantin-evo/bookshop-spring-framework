@@ -1,8 +1,10 @@
 package com.example.bookshop.web.controllers.rest;
 
 import com.example.bookshop.app.services.BookService;
+import com.example.bookshop.app.services.GoogleApiService;
 import com.example.bookshop.web.dto.ApiResponse;
 import com.example.bookshop.web.dto.BookDto;
+import com.example.bookshop.web.dto.BooksPageGoogleDto;
 import com.example.bookshop.web.dto.BooksPageDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import io.swagger.annotations.Api;
@@ -26,9 +28,11 @@ import java.util.List;
 public class BooksRestApiController {
 
     private final BookService bookService;
+    private final GoogleApiService googleService;
 
-    public BooksRestApiController(BookService bookService) {
+    public BooksRestApiController(BookService bookService, GoogleApiService googleService) {
         this.bookService = bookService;
+        this.googleService = googleService;
     }
 
     @GetMapping("/books/by-author")
@@ -150,15 +154,13 @@ public class BooksRestApiController {
                         .getContent());
     }
 
-    @GetMapping("/search/{query}")
+    @GetMapping("/search/{searchWord}")
     @ResponseBody
-    public BooksPageDto getBooksBySearchQuery(@PathVariable String query,
-                                              @RequestParam("offset") Integer offset,
-                                              @RequestParam("limit") Integer limit) {
-        return new BooksPageDto(
-                bookService
-                        .getPageOfSearchResultBooks(query, offset, limit)
-                        .getContent());
+    public BooksPageGoogleDto getBooksBySearchQuery(@PathVariable String searchWord,
+                                                    @RequestParam("offset") Integer offset,
+                                                    @RequestParam("limit") Integer limit) {
+        return new BooksPageGoogleDto(googleService
+                .getPageOfSearchResult(searchWord, offset, limit));
     }
 
 }

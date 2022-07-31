@@ -1,5 +1,7 @@
 package com.example.bookshop.web.controllers;
 
+import com.example.bookshop.app.services.OneTimeCodeService;
+import com.example.bookshop.app.model.entity.OneTimeCode;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
@@ -32,18 +34,22 @@ class UserAuthControllerTest {
 
     private final MockMvc mockMvc;
     private final UserRegisterService userRegisterService;
+    private final OneTimeCodeService oneTimeCodeService;
 
     private static final String USER_REGISTER_PAYLOAD = "name=resourceOrderId&phone=%2B7+%28931%29+351-84-01&phoneCode=111+111&email=konstantin180692%40gmail.com&mailCode=000+000&password=111111";
     private static final String USER_EMAIL = "admin@gmail.com";
     private static final String USER_PHONE = "+7 (931) 000-00-01";
-    private static final String USER_CODE = "111 111";
+    private static final String EMAIL_CODE = "111 111";
+    private static final String PHONE_CODE = "222 222";
     private static final String COOKIE_JWT_NAME = "token";
 
     @Autowired
     public UserAuthControllerTest(MockMvc mockMvc,
-                                  UserRegisterService userRegisterService) {
+                                  UserRegisterService userRegisterService,
+                                  OneTimeCodeService oneTimeCodeService) {
         this.mockMvc = mockMvc;
         this.userRegisterService = userRegisterService;
+        this.oneTimeCodeService = oneTimeCodeService;
     }
 
     @Test
@@ -108,11 +114,13 @@ class UserAuthControllerTest {
     }
 
     private ContactConfirmationPayload generateContactConfirmationEmail() {
-        return new ContactConfirmationPayload(USER_EMAIL, USER_CODE);
+        oneTimeCodeService.saveCode(new OneTimeCode(EMAIL_CODE));
+        return new ContactConfirmationPayload(USER_EMAIL, EMAIL_CODE);
     }
 
     private ContactConfirmationPayload generateContactConfirmationPhone() {
-        return new ContactConfirmationPayload(USER_PHONE, USER_CODE);
+        oneTimeCodeService.saveCode(new OneTimeCode(PHONE_CODE));
+        return new ContactConfirmationPayload(USER_PHONE, EMAIL_CODE);
     }
 
 }

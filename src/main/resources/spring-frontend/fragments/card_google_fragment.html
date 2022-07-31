@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://thymeleaf.org">
+<body>
+<div class="Card" th:each="book : ${books}" th:fragment="CardFragment (books)">
+    <div class="Card-picture">
+        <a th:href="${book.getLink()}">
+            <img th:src="${book.getImage()}" alt="card.jpg"/>
+        </a>
+    </div>
+    <div class="Card-content">
+        <strong class="Card-title">
+            <a th:href="${book.getLink()}"
+               th:text="${book.title}">n/a</a>
+        </strong>
+        <div class="Card-description"
+             th:text="${book.author}">n/a
+        </div>
+        <div class="Card-cost">
+            <span class="Card-price" th:text="'₽'+${book.price}">n/a</span>
+        </div>
+    </div>
+</div>
+</body>
+</html>

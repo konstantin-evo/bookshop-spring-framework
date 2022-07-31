@@ -25,7 +25,9 @@
              th:text="${book.author.getFirstName}+' '+${book.author.getLastName}">n/a
         </div>
         <div class="Card-cost">
-            <span class="Card-priceOld" th:text="'₽'+${book.priceOld}">n/a</span>
+            <span class="Card-priceOld"
+                  th:if="${book.priceOld != null}"
+                  th:text="'₽'+${book.priceOld}">n/a</span>
             <span class="Card-price" th:text="'₽'+${book.price}">n/a</span>
         </div>
     </div>

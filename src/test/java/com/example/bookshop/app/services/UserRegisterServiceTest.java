@@ -10,6 +10,7 @@ import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
 import com.example.bookshop.web.dto.RegistrationFormDto;
+import com.example.bookshop.web.exception.CustomAuthenticationException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.hamcrest.CoreMatchers;
@@ -25,7 +26,6 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,7 +68,7 @@ public class UserRegisterServiceTest {
     private final static String REGISTER_USER_PHONE = "+79030000000";
     private final static String EXISTING_USER_NAME = "Admin Admin";
     private final static String EXISTING_USER_EMAIL = "admin@gmail.com";
-    private final static String EXISTING_USER_PASSWORD = "111 111";
+    private final static String ONE_TIME_CODE = "111 111";
     private final static String EXCEPTION_MESSAGE = "user not found doh!";
 
     @Mock
@@ -78,9 +78,9 @@ public class UserRegisterServiceTest {
     @Mock
     UserDetailsService userDetailsService;
     @Mock
-    AuthenticationManager authenticationManager;
-    @Mock
     JwtBlockListRepository jwtBlockListRepository;
+    @Mock
+    OneTimeCodeService oneTimeCodeService;
     @Spy
     JWTUtil jwtUtil = new JWTUtil(jwtBlockListRepository);
 
@@ -142,10 +142,10 @@ public class UserRegisterServiceTest {
     }
 
     @RetryingTest(maxAttempts = 3)
-    void loginSuccessfulTest() {
+    void loginSuccessfulTest() throws CustomAuthenticationException {
         UserDetails userDetails = generateUserDetails();
 
-        when(authenticationManager.authenticate(any())).thenReturn(any());
+        when(oneTimeCodeService.verifyCode(any())).thenReturn(true);
         when(userDetailsService.loadUserByUsername(contactConfirmation.getContact()))
                 .thenReturn(userDetails);
 
@@ -157,7 +157,7 @@ public class UserRegisterServiceTest {
 
     @Test
     void loginFailedIfUserNotExistTest() {
-        when(authenticationManager.authenticate(any())).thenReturn(any());
+        when(oneTimeCodeService.verifyCode(any())).thenReturn(true);
         when(userDetailsService.loadUserByUsername(EXISTING_USER_EMAIL))
                 .thenThrow(new UsernameNotFoundException(EXCEPTION_MESSAGE));
 
@@ -177,7 +177,7 @@ public class UserRegisterServiceTest {
     }
 
     private ContactConfirmationPayload generateContactConfirmationPayload() {
-        return new ContactConfirmationPayload(EXISTING_USER_EMAIL, EXISTING_USER_PASSWORD);
+        return new ContactConfirmationPayload(EXISTING_USER_EMAIL, ONE_TIME_CODE);
     }
 
     private UserDetails generateUserDetails() {

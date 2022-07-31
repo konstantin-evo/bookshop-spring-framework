@@ -1,10 +1,11 @@
 package com.example.bookshop.web.controllers.user;
 
+import com.example.bookshop.app.services.OneTimeCodeService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
 import com.example.bookshop.web.dto.RegistrationFormDto;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.bookshop.web.exception.CustomAuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 public class UserAuthController {
 
     private final UserRegisterService userRegisterService;
+    private final OneTimeCodeService oneTimeCodeService;
 
-    @Autowired
-    public UserAuthController(UserRegisterService userRegisterService) {
+    public UserAuthController(UserRegisterService userRegisterService,
+                              OneTimeCodeService oneTimeCodeService) {
         this.userRegisterService = userRegisterService;
+        this.oneTimeCodeService = oneTimeCodeService;
     }
 
     @GetMapping("/signin")
@@ -39,27 +42,34 @@ public class UserAuthController {
     @PostMapping("/requestContactConfirmation")
     @ResponseBody
     public ContactConfirmationResponse handleRequestContactConfirmation(
-            @RequestBody ContactConfirmationPayload contactConfirmationPayload) {
-        return new ContactConfirmationResponse("true");
+            @RequestBody ContactConfirmationPayload payload) {
+
+        ContactConfirmationResponse response = new ContactConfirmationResponse(true);
+        userRegisterService.contactConfirmation(payload.getContact());
+
+        return response;
     }
 
     @PostMapping("/approveContact")
     @ResponseBody
     public ContactConfirmationResponse handleApproveContact(@RequestBody ContactConfirmationPayload payload) {
-        return new ContactConfirmationResponse("true");
+        return oneTimeCodeService.verifyCode(payload.getCode())
+                ? new ContactConfirmationResponse(true)
+                : new ContactConfirmationResponse();
     }
 
     @PostMapping("/registration")
     public String handleUserRegistration(RegistrationFormDto registrationFormDto, Model model) {
-        userRegisterService.registerNewUser(registrationFormDto);
-        model.addAttribute("regOk", true);
+        boolean registrationIsOk = userRegisterService.registerNewUser(registrationFormDto);
+        model.addAttribute("regOk", registrationIsOk);
         return "signin";
     }
 
     @PostMapping("/login")
     @ResponseBody
     public ContactConfirmationResponse handleLogin(@RequestBody ContactConfirmationPayload payload,
-                                                   HttpServletResponse httpServletResponse) {
+                                                   HttpServletResponse httpServletResponse)
+            throws CustomAuthenticationException {
         ContactConfirmationResponse loginResponse = userRegisterService.login(payload);
         Cookie cookie = new Cookie("token", loginResponse.getResult());
         httpServletResponse.addCookie(cookie);
