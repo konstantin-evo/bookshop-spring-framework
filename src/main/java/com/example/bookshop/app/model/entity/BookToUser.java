@@ -15,7 +15,9 @@ import java.sql.Timestamp;
 public class BookToUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
+    @SequenceGenerator(name = "pk_sequence", sequenceName = "book2user_id_seq", allocationSize = 1)
+    @Column(name = "id", unique = true, nullable = false)
     private Integer id;
 
     @Column(columnDefinition = "TIMESTAMP NOT NULL")

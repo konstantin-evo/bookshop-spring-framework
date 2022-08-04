@@ -10,6 +10,7 @@ import com.example.bookshop.web.dto.ReviewDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.*;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,12 @@ public class BookService {
     private final BookToUserTypeRepository typeRepo;
     private final TransactionRepository transactionRepo;
 
+    @Value("${book.coefficient.paid}")
+    private double BOOK_COEFFICIENT_PAID;
+
+    @Value("${book.coefficient.viewed}")
+    private double BOOK_COEFFICIENT_VIEWED;
+
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findAll(nextPage);
@@ -49,6 +56,14 @@ public class BookService {
     public Page<BookDto> getPageOfPopularBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit, Sort.by("rating").descending());
         Page<Book> books = bookRepo.findAll(nextPage);
+        List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
+        return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
+    }
+
+    public Page<BookDto> getPageOfViewedBooks(User user, Integer offset, Integer limit) {
+        Pageable nextPage = PageRequest.of(offset, limit);
+        BookToUserType viewed = typeRepo.findByCode(BookToUserEnum.VIEWED);
+        Page<Book> books = bookToUserRepo.findByUserAndType(user, viewed, nextPage).map(BookToUser::getBook);
         List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
@@ -195,12 +210,26 @@ public class BookService {
         if (!isBookAlreadyPaid) {
             BookToUser bookToUser = new BookToUser(user, book, paid);
             bookToUserRepo.save(bookToUser);
+            bookRepo.updateRating(BOOK_COEFFICIENT_PAID, book.getId());
             userRepo.updateBalance(-book.getPrice(), user.getId());
 
             // TODO: Fix the TransactionAspect to take this part out of the business logic in BookService
             Transaction transaction = new Transaction(-book.getPrice(), TransactionInfo.BUY_BOOK.getValue(), user, book.getId());
             transactionRepo.save(transaction);
         }
+    }
+
+    public void viewBookByUser(User user, String slug) {
+        Book book = bookRepo.findBookBySlug(slug);
+        BookToUserType viewed = typeRepo.findByCode(BookToUserEnum.VIEWED);
+        boolean isBookAlreadyViewed = bookToUserRepo.existsBookToUserByBookAndUserAndType(book, user, viewed);
+
+        if (!isBookAlreadyViewed) {
+            BookToUser viewedBook = new BookToUser(user, book, viewed);
+            bookToUserRepo.save(viewedBook);
+            bookRepo.updateRating(BOOK_COEFFICIENT_VIEWED, book.getId());
+        }
+
     }
 
     private List<Book> findBooksByCookies(String cookie) {

@@ -4,6 +4,7 @@ import com.example.bookshop.app.model.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -50,4 +51,8 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     Page<Book> findBookByPubDateIsBetween(Date dateFrom, Date dateTo, Pageable nextPage);
 
     Book findBookBySlug(String slug);
+
+    @Modifying
+    @Query("update Book b set b.rating = b.rating + :amount where b.id = :book_id")
+    void updateRating(@Param("amount") Double amount, @Param("book_id") Integer id);
 }

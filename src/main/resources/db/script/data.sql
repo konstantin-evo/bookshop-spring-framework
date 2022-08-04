@@ -1100,11 +1100,6 @@ insert into books (id, pub_date, is_bestseller, slug, title, image, description,
 insert into books (id, pub_date, is_bestseller, slug, title, image, description, price, discount, author_id) values (999, '10/30/2001', 1, 'book-dyl-jmr', 'Kill Your Darlings', 'http://dummyimage.com/200x300.png/ff4444/ffffff', 'Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Donec pharetra, magna vestibulum aliquet ultrices, erat tortor sollicitudin mi, sit amet lobortis sapien sapien non mi. Integer ac neque. Duis bibendum. Morbi non quam nec dui luctus rutrum. Nulla tellus. In sagittis dui vel nisl. Duis ac nibh. Fusce lacus purus, aliquet at, feugiat non, pretium quis, lectus.', 1634, 24, 12);
 insert into books (id, pub_date, is_bestseller, slug, title, image, description, price, discount, author_id) values (1000, '10/12/2005', 1, 'book-dyz-znk', 'Replacement Killers, The', 'http://dummyimage.com/200x300.png/cc0000/ffffff', 'In hac habitasse platea dictumst. Etiam faucibus cursus urna. Ut tellus.', 1015, 26, 16);
 
-insert into book2user_type (id, code, name) values (1, 'CART', '� �������');
-insert into book2user_type (id, code, name) values (2, 'KEPT', '��������');
-insert into book2user_type (id, code, name) values (3, 'PAID', '�������');
-insert into book2user_type (id, code, name) values (4, 'ARCHIVED', '� ������');
-
 insert into users (id, hash, reg_time, balance, name) values (1, 'user-vcd-the', '2022-01-22 11:57:05', 2407, 'Jillene Ramsell');
 insert into users (id, hash, reg_time, balance, name) values (2, 'user-iqp-fxa', '2022-01-22 11:57:05', 320, 'Lyda Jakoviljevic');
 insert into users (id, hash, reg_time, balance, name) values (3, 'user-pvd-uok', '2022-01-22 11:57:05', 1915, 'Lark Jee');

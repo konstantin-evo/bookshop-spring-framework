@@ -29,9 +29,6 @@ public class BookToUserType {
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private BookToUserEnum code;
 
-    @Column(columnDefinition = "VARCHAR(255) NOT NULL")
-    private String name;
-
     @OneToMany(mappedBy="type")
     private List<BookToUser> bookToUsers;
 }

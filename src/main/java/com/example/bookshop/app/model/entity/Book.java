@@ -3,28 +3,39 @@ package com.example.bookshop.app.model.entity;
 import com.example.bookshop.app.model.entity.enumuration.BookToUserEnum;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 
 @Getter
 @Setter
 @Table(name = "books")
 @Entity
 public class Book {
+
+    @Value("${book.coefficient.paid}")
+    @Transient
+    private double BOOK_COEFFICIENT_PAID;
+
+    @Value("${book.coefficient.viewed}")
+    @Transient
+    private double BOOK_COEFFICIENT_VIEWED;
+
+    @Value("${book.coefficient.cart}")
+    @Transient
+    private double BOOK_COEFFICIENT_CART;
+
+    @Value("${book.coefficient.kept}")
+    @Transient
+    private double BOOK_COEFFICIENT_KEPT;
+
+    @Value("${book.time.popular.month}")
+    @Transient
+    private int TIME_OF_RELEVANCE;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,13 +72,13 @@ public class Book {
     @JoinColumn(name = "author_id", referencedColumnName = "id")
     private Author author;
 
-    @OneToMany(mappedBy="book")
+    @OneToMany(mappedBy = "book")
     private List<BookToUser> bookToUsers;
 
-    @OneToMany(mappedBy="book")
+    @OneToMany(mappedBy = "book")
     private List<BookToGenre> bookToGenre;
 
-    @OneToMany(mappedBy="book")
+    @OneToMany(mappedBy = "book")
     private List<BookToTag> bookToTag;
 
     @OneToMany(mappedBy = "book")
@@ -77,8 +88,7 @@ public class Book {
     private List<BookRate> bookRates = new ArrayList<>();
 
     @PostPersist
-    @PostUpdate
-    private void postLoadFunction(){
+    private void postLoadFunction() {
         long cart = this.bookToUsers.stream()
                 .filter(bookToUser -> bookToUser.getType().getCode().equals(BookToUserEnum.CART))
                 .count();
@@ -88,7 +98,12 @@ public class Book {
         long kept = this.bookToUsers.stream()
                 .filter(bookToUser -> bookToUser.getType().getCode().equals(BookToUserEnum.KEPT))
                 .count();
-        this.rating = paid + 0.7 * cart + 0.4 * kept;
+        long viewed = this.bookToUsers.stream()
+                .filter(bookToUser -> (bookToUser.getType().getCode().equals(BookToUserEnum.VIEWED))
+                        & bookToUser.getTime().toLocalDateTime().isAfter(LocalDateTime.now().minusMonths(TIME_OF_RELEVANCE)))
+                .count();
+
+        this.rating = BOOK_COEFFICIENT_PAID * paid + BOOK_COEFFICIENT_CART * cart + BOOK_COEFFICIENT_KEPT * kept + BOOK_COEFFICIENT_VIEWED * viewed;
     }
 
 }

@@ -169,6 +169,14 @@
                            th:text="#{topbar.popular}">n/a</a>
                     </li>
                     <li class="menu-item"
+                        sec:authorize="isAuthenticated()"
+                        th:class="(${#httpServletRequest.requestURI}=='/books/viewed')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-popular"
+                           th:href="@{/books/viewed}"
+                           th:text="#{topbar.viewed}">n/a</a>
+                    </li>
+                    <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/authors')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
                            th:id="nav-authors"

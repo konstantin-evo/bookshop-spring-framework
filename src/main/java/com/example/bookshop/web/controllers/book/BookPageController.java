@@ -45,6 +45,7 @@ public class BookPageController {
 
         if (user != null) {
             model.addAttribute("userRate", rateService.getUserRate(slug, user.getId()));
+            bookService.viewBookByUser(user, slug);
         }
 
         return "books/slug";
