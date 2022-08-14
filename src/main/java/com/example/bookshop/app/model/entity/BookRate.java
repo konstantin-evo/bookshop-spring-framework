@@ -39,6 +39,8 @@ public class BookRate {
 
     /**
      * Rating is a numerical value from 1 to 5
+     * Calculated as the average of all user ratings for a given book,
+     * which can also range from 1 to 5 (rounded to a whole number)
      */
     @Column(columnDefinition = "SMALLINT NOT NULL")
     private Integer rating;

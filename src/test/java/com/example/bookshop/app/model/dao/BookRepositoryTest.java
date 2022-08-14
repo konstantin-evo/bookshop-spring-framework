@@ -59,10 +59,10 @@ class BookRepositoryTest {
     }
 
     @Test
-    void  testBookRating() {
+    void testBookPopularity() {
         Book book = bookRepository.findBookBySlug(BOOK_SLUG);
-        assertNotNull(book.getRating());
-        assertEquals(book.getRating(), 3.2);
+        assertNotNull(book.getPopularity());
+        assertEquals(book.getPopularity(), 3.2);
     }
 
 }

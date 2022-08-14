@@ -1,7 +1,15 @@
 package com.example.bookshop.app.services;
 
-import com.example.bookshop.app.model.dao.*;
-import com.example.bookshop.app.model.entity.*;
+import com.example.bookshop.app.model.dao.BookRepository;
+import com.example.bookshop.app.model.dao.BookToUserRepository;
+import com.example.bookshop.app.model.dao.BookToUserTypeRepository;
+import com.example.bookshop.app.model.dao.TransactionRepository;
+import com.example.bookshop.app.model.dao.UserRepository;
+import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.app.model.entity.BookToUser;
+import com.example.bookshop.app.model.entity.BookToUserType;
+import com.example.bookshop.app.model.entity.Transaction;
+import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.model.entity.enumuration.BookToUserEnum;
 import com.example.bookshop.app.model.entity.enumuration.TransactionInfo;
 import com.example.bookshop.web.dto.BookDto;
@@ -11,7 +19,11 @@ import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,12 +43,6 @@ public class BookService {
     private final BookToUserTypeRepository typeRepo;
     private final TransactionRepository transactionRepo;
 
-    @Value("${book.coefficient.paid}")
-    private double BOOK_COEFFICIENT_PAID;
-
-    @Value("${book.coefficient.viewed}")
-    private double BOOK_COEFFICIENT_VIEWED;
-
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
         Page<Book> books = bookRepo.findAll(nextPage);
@@ -54,7 +60,7 @@ public class BookService {
     }
 
     public Page<BookDto> getPageOfPopularBooks(Integer offset, Integer limit) {
-        Pageable nextPage = PageRequest.of(offset, limit, Sort.by("rating").descending());
+        Pageable nextPage = PageRequest.of(offset, limit, Sort.by("popularity").descending());
         Page<Book> books = bookRepo.findAll(nextPage);
         List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
@@ -210,7 +216,6 @@ public class BookService {
         if (!isBookAlreadyPaid) {
             BookToUser bookToUser = new BookToUser(user, book, paid);
             bookToUserRepo.save(bookToUser);
-            bookRepo.updateRating(BOOK_COEFFICIENT_PAID, book.getId());
             userRepo.updateBalance(-book.getPrice(), user.getId());
 
             // TODO: Fix the TransactionAspect to take this part out of the business logic in BookService
@@ -227,7 +232,6 @@ public class BookService {
         if (!isBookAlreadyViewed) {
             BookToUser viewedBook = new BookToUser(user, book, viewed);
             bookToUserRepo.save(viewedBook);
-            bookRepo.updateRating(BOOK_COEFFICIENT_VIEWED, book.getId());
         }
 
     }

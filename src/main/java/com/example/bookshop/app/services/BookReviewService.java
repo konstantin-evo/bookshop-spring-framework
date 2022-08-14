@@ -11,11 +11,14 @@ import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookReviewRate;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.BookRateNotFoundException;
+import com.example.bookshop.web.exception.UserNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
 @Service
+@RequiredArgsConstructor
 public class BookReviewService {
 
     private final static String ERROR_MESSAGE = "No rating found for this review. Please rate the book first.";
@@ -25,17 +28,6 @@ public class BookReviewService {
     private final BookRateRepository bookRateRepo;
     private final BookRepository bookRepo;
     private final UserRepository userRepo;
-
-    public BookReviewService(BookReviewRateRepository reviewRateRepo,
-                             BookReviewRepository reviewRepo,
-                             BookRateRepository bookRateRepo, BookRepository bookRepo,
-                             UserRepository userRepo) {
-        this.reviewRateRepo = reviewRateRepo;
-        this.reviewRepo = reviewRepo;
-        this.bookRateRepo = bookRateRepo;
-        this.bookRepo = bookRepo;
-        this.userRepo = userRepo;
-    }
 
     /**
      * The method updates the "Like", "Dislike" counter for a specific review
@@ -79,8 +71,9 @@ public class BookReviewService {
      */
     public boolean saveBookReview(String slug, String text, Integer userId) throws BookRateNotFoundException {
         Book book = bookRepo.findBookBySlug(slug);
-        //TODO: add custom exception instead of "new User()"
-        User user = userRepo.findById(userId).orElse(new User());
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)
                 .orElseThrow(() -> new BookRateNotFoundException(ERROR_MESSAGE));
 

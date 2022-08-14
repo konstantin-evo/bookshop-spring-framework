@@ -53,6 +53,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     Book findBookBySlug(String slug);
 
     @Modifying
-    @Query("update Book b set b.rating = b.rating + :amount where b.id = :book_id")
-    void updateRating(@Param("amount") Double amount, @Param("book_id") Integer id);
+    @Query("update Book b set b.popularity = b.popularity + :amount where b.id = :book_id")
+    void updatePopularity(@Param("amount") Double amount, @Param("book_id") Integer id);
 }

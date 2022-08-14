@@ -9,10 +9,20 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.sql.Timestamp;
 
 public interface BookToUserRepository extends JpaRepository<BookToUser, Integer> {
 
+    /*
+    Method counts the number of all books that bought, kept, viewed or in user's cart
+     */
     long countByBookAndTypeCode(Book book, BookToUserEnum userEnum);
+
+    /*
+    Method counts the number of all books that bought, kept, viewed or in user's cart after a specific date
+    For example, only books from the last six months can be considered as viewed
+    */
+    long countByBookAndTypeCodeAndTimeAfter(Book book, BookToUserEnum userEnum, Timestamp time);
 
     boolean existsBookToUserByBookAndUserAndType(Book book, User user, BookToUserType type);
 
