@@ -4,6 +4,7 @@ import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
@@ -18,17 +19,13 @@ public class UserDetailsService implements org.springframework.security.core.use
     private static final String EMAIL_PATTERN = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
 
     @Override
-    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String contact) throws UserNotFoundException {
+    public UserDetails loadUserByUsername(String contact) throws UserNotFoundException {
 
-        boolean isEmail = isEmail(contact);
+        User user = isEmail(contact)
+                ? userRepository.findUserByEmail(contact).orElseThrow(() -> new UserNotFoundException(contact, true))
+                : userRepository.findUserByPhone(contact).orElseThrow(() -> new UserNotFoundException(contact, false));
 
-        User user = isEmail ? userRepository.findUserByEmail(contact) : userRepository.findUserByPhone(contact);
-
-        if (user != null) {
-            return new UserDetails(user);
-        } else {
-            throw new UserNotFoundException(contact, isEmail);
-        }
+        return new BookshopUserDetails(user);
     }
 
     private boolean isEmail(String payload) {

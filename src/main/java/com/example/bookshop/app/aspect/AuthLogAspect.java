@@ -1,6 +1,6 @@
 package com.example.bookshop.app.aspect;
 
-import com.example.bookshop.app.config.security.UserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
 import com.example.bookshop.app.config.security.UserDetailsService;
 import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
@@ -48,14 +48,13 @@ public class AuthLogAspect {
     }
 
     @Before(value = "loginByPassword(payload)", argNames = "payload")
-    public void loginStart(ContactConfirmationPayload payload) throws Throwable {
-
-        UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(payload.getContact());
+    public void loginStart(ContactConfirmationPayload payload) {
+        BookshopUserDetails userDetails = (BookshopUserDetails) userDetailsService.loadUserByUsername(payload.getContact());
         log.info("The user (email = {}) is trying to login by login/password", userDetails.getUsername());
     }
 
     @Before(value = "loginByOauth(authentication)", argNames = "authentication")
-    public void loginStart(Authentication authentication) throws Throwable {
+    public void loginStart(Authentication authentication) {
 
         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
         username = oauthUser.getEmail();

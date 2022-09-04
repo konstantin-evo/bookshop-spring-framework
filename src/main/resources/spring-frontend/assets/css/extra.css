@@ -4103,7 +4103,7 @@ img {
 }
 .Tabs_default .Tabs-link {
   height: 40px;
-  min-width: auto;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -8,11 +8,12 @@ import com.example.bookshop.app.model.entity.JwtBlockList;
 import com.example.bookshop.app.model.entity.OneTimeCode;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
-import com.example.bookshop.app.config.security.UserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
 import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.web.dto.RegistrationFormDto;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.CustomAuthenticationException;
+import com.example.bookshop.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -53,8 +54,10 @@ public class UserRegisterService {
     @Transient
     public boolean registerNewUser(RegistrationFormDto registrationForm) {
 
-        User userByEmail = userRepo.findUserByEmail(registrationForm.getEmail());
-        User userByPhone = userRepo.findUserByPhone(registrationForm.getPhone());
+        User userByEmail = userRepo.findUserByEmail(registrationForm.getEmail())
+                .orElseThrow(() -> new UserNotFoundException(registrationForm.getEmail(), true));
+        User userByPhone = userRepo.findUserByPhone(registrationForm.getPhone())
+                .orElseThrow(() -> new UserNotFoundException(registrationForm.getPhone(), false));
 
         if (userByEmail == null && userByPhone == null) {
             User user = new User();
@@ -71,17 +74,17 @@ public class UserRegisterService {
     }
 
     @Transient
-    public UserDetails registerNewUser(CustomOAuth2User oAuth2User) {
+    public BookshopUserDetails registerNewUser(CustomOAuth2User oAuth2User) {
         User user = new User(
                 (String) oAuth2User.getAttributes().get("name"),
                 (String) oAuth2User.getAttributes().get("email"));
         userRepo.save(user);
-        return new UserDetails(user);
+        return new BookshopUserDetails(user);
     }
 
     public ContactConfirmationResponse login(ContactConfirmationPayload payload) throws CustomAuthenticationException {
 
-        UserDetails userDetails = (UserDetails) userDetailsService
+        BookshopUserDetails userDetails = (BookshopUserDetails) userDetailsService
                 .loadUserByUsername(payload.getContact());
 
         return isEmail(payload.getContact())
@@ -103,7 +106,7 @@ public class UserRegisterService {
 
     public Object getCurrentUser() {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() != ANONYMOUS_USER) {
-            UserDetails userDetails = (UserDetails) SecurityContextHolder
+            BookshopUserDetails userDetails = (BookshopUserDetails) SecurityContextHolder
                     .getContext().getAuthentication().getPrincipal();
             return userDetails.getUser();
         } else {
@@ -111,7 +114,7 @@ public class UserRegisterService {
         }
     }
 
-    private ContactConfirmationResponse loginByEmail(String code, UserDetails userDetails)
+    private ContactConfirmationResponse loginByEmail(String code, BookshopUserDetails userDetails)
             throws CustomAuthenticationException {
         if (oneTimeCodeService.verifyCode(code)) {
             String jwtToken = jwtUtil.generateToken(userDetails);
@@ -122,7 +125,7 @@ public class UserRegisterService {
     }
 
     private ContactConfirmationResponse loginByPhone(ContactConfirmationPayload payload,
-                                                     UserDetails userDetails) {
+                                                     BookshopUserDetails userDetails) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
                 (payload.getContact(), payload.getCode()));
         String jwtToken = jwtUtil.generateToken(userDetails);

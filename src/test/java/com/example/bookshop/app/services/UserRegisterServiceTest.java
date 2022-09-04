@@ -1,6 +1,6 @@
 package com.example.bookshop.app.services;
 
-import com.example.bookshop.app.config.security.UserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
 import com.example.bookshop.app.config.security.UserDetailsService;
 import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
@@ -39,6 +39,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -123,31 +124,31 @@ public class UserRegisterServiceTest {
 
     @Test
     void registerNewUserByOAuth2Test() {
-        UserDetails userDetails = service.registerNewUser(oAuth2User);
+        BookshopUserDetails bookshopUserDetails = service.registerNewUser(oAuth2User);
 
         verify(userRepo, Mockito.times(1))
                 .save(any(User.class));
 
-        assertEquals(userDetails.getUser().getName(),
+        assertEquals(bookshopUserDetails.getUser().getName(),
                 oAuth2User.getAttributes().get("name"));
-        assertEquals(userDetails.getUser().getEmail(),
+        assertEquals(bookshopUserDetails.getUser().getEmail(),
                 oAuth2User.getAttributes().get("email"));
     }
 
     @Test
     void registerNewUserFailTest() {
-        when(userRepo.findUserByEmail(registrationForm.getEmail())).thenReturn(new User());
+        when(userRepo.findUserByEmail(registrationForm.getEmail())).thenReturn(Optional.of(new User()));
         service.registerNewUser(registrationForm);
         verify(userRepo, never()).save(any(User.class));
     }
 
     @RetryingTest(maxAttempts = 3)
     void loginSuccessfulTest() throws CustomAuthenticationException {
-        UserDetails userDetails = generateUserDetails();
+        BookshopUserDetails bookshopUserDetails = generateUserDetails();
 
         when(oneTimeCodeService.verifyCode(any())).thenReturn(true);
         when(userDetailsService.loadUserByUsername(contactConfirmation.getContact()))
-                .thenReturn(userDetails);
+                .thenReturn(bookshopUserDetails);
 
         ContactConfirmationResponse response = service.login(contactConfirmation);
 
@@ -163,7 +164,7 @@ public class UserRegisterServiceTest {
 
         Exception exception = assertThrows(UsernameNotFoundException.class, () -> service.login(contactConfirmation));
 
-        verify(jwtUtil, never()).generateToken(any(UserDetails.class));
+        verify(jwtUtil, never()).generateToken(any(BookshopUserDetails.class));
         assertEquals(exception.getMessage(), EXCEPTION_MESSAGE);
     }
 
@@ -180,9 +181,9 @@ public class UserRegisterServiceTest {
         return new ContactConfirmationPayload(EXISTING_USER_EMAIL, ONE_TIME_CODE);
     }
 
-    private UserDetails generateUserDetails() {
+    private BookshopUserDetails generateUserDetails() {
         User user = new User(EXISTING_USER_NAME, EXISTING_USER_EMAIL);
-        return new UserDetails(user);
+        return new BookshopUserDetails(user);
     }
 
     private String generateExpectedToken() {

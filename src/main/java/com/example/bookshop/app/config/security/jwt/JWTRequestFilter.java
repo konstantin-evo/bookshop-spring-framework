@@ -1,6 +1,6 @@
 package com.example.bookshop.app.config.security.jwt;
 
-import com.example.bookshop.app.config.security.UserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
 import com.example.bookshop.app.config.security.UserDetailsService;
 import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String username = jwtUtil.extractUsername(token);
-            UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(username);
+            BookshopUserDetails userDetails = (BookshopUserDetails) userDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.isTokenValid(token, userDetails)) {
                 setAuthentication(request, userDetails);
@@ -48,7 +48,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void setAuthentication(HttpServletRequest request, UserDetails userDetails) {
+    private void setAuthentication(HttpServletRequest request, BookshopUserDetails userDetails) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
 

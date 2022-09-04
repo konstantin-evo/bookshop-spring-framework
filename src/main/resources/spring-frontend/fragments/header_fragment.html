@@ -183,6 +183,14 @@
                            th:href="@{/authors}"
                            th:text="#{topbar.authors}">n/a</a>
                     </li>
+                    <li class="menu-item"
+                        sec:authorize="hasAuthority('ADMIN')"
+                        th:class="(${#httpServletRequest.requestURI}=='/admin')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-admin"
+                           th:href="@{/admin}"
+                           th:text="#{topbar.admin}">n/a</a>
+                    </li>
                 </ul>
             </nav>
         </div>

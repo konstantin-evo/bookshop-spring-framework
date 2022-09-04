@@ -16,9 +16,9 @@ import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.ReviewDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
+import com.example.bookshop.web.exception.UserNotFoundException;
 import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @Service
 @Transactional
@@ -114,14 +116,14 @@ public class BookService {
     }
 
     public List<BookDto> getPaidBooks(String userEmail) {
-        Integer userId = userRepo.findUserByEmail(userEmail).getId();
-        List<Book> books = bookRepo.findPaidBooksByUser(userId);
+        User user = userRepo.findUserByEmail(userEmail).orElseThrow(() -> new UserNotFoundException(userEmail, true));
+        List<Book> books = bookRepo.findPaidBooksByUser(user.getId());
         return BookMapper.INSTANCE.map(books);
     }
 
     public List<BookDto> getArchivedBooks(String userEmail) {
-        Integer userId = userRepo.findUserByEmail(userEmail).getId();
-        List<Book> books = bookRepo.findArchivedBooksByUser(userId);
+        User user = userRepo.findUserByEmail(userEmail).orElseThrow(() -> new UserNotFoundException(userEmail, true));
+        List<Book> books = bookRepo.findArchivedBooksByUser(user.getId());
         return BookMapper.INSTANCE.map(books);
     }
 

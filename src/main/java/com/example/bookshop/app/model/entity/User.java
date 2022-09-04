@@ -3,17 +3,24 @@ package com.example.bookshop.app.model.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -56,6 +63,13 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<ProfileChanges> profileChanges = new ArrayList<>();
+
+    @ManyToMany(cascade= CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user2role",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
+    private Set<Role> roles = new HashSet<>();
 
     public User() {
         String hash = String.valueOf(this.hashCode());

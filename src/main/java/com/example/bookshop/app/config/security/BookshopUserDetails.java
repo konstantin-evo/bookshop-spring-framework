@@ -1,25 +1,29 @@
 package com.example.bookshop.app.config.security;
 
+import com.example.bookshop.app.model.entity.Role;
 import com.example.bookshop.app.model.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
-public class UserDetails implements org.springframework.security.core.userdetails.UserDetails {
+@Getter
+@AllArgsConstructor
+public class BookshopUserDetails implements UserDetails {
 
-    @Getter
     private final User user;
-
-    public UserDetails(User user) {
-        this.user = user;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        Set<Role> userRoles = user.getRoles();
+        Collection<GrantedAuthority> authorities = new ArrayList<>(userRoles.size());
+        userRoles.forEach(role -> authorities.add(new SimpleGrantedAuthority(role.getName())));
+        return authorities;
     }
 
     @Override
