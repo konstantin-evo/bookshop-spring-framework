@@ -5,7 +5,7 @@ import com.example.bookshop.app.services.TransactionService;
 import com.example.bookshop.app.services.UserProfileService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.ProfileDto;
-import com.example.bookshop.web.dto.ProfileResponseDto;
+import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.dto.TransactionPageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,7 +50,7 @@ public class UserProfilePageController {
 
     @PostMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ProfileResponseDto handleChangeProfile(@RequestBody ProfileDto profileInfo) {
+    public ValidatedResponseDto handleChangeProfile(@RequestBody ProfileDto profileInfo) {
         User user = (User) userRegisterService.getCurrentUser();
         return changeProfileService.changeProfileInfo(profileInfo, user);
     }

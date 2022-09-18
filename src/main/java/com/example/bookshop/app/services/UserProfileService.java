@@ -7,7 +7,7 @@ import com.example.bookshop.app.model.entity.ProfileChanges;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.model.entity.VerificationToken;
 import com.example.bookshop.web.dto.ProfileDto;
-import com.example.bookshop.web.dto.ProfileResponseDto;
+import com.example.bookshop.web.dto.ValidatedResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class UserProfileService {
 
     // TODO: At the moment, changing profile information only supports changing the password
     //  - need to implement validation and changes for each field
-    public ProfileResponseDto changeProfileInfo(ProfileDto profile, User user) {
+    public ValidatedResponseDto changeProfileInfo(ProfileDto profile, User user) {
         return saveTempProfileInfo(profile, user);
     }
 
@@ -71,23 +71,23 @@ public class UserProfileService {
      * 2. Map<String, String> contains error information (if any)
      */
     @Transient
-    private ProfileResponseDto saveTempProfileInfo(ProfileDto profile, User user) {
+    private ValidatedResponseDto saveTempProfileInfo(ProfileDto profile, User user) {
 
         Map<String, String> errors = new HashMap<>();
 
         if (passwordEncoder.matches(profile.getPassword(), user.getPassword())) {
             errors.put("Password", "The password must not be the same as the previous one.");
-            return new ProfileResponseDto(false, errors);
+            return new ValidatedResponseDto(false, errors);
         }
 
         if (profile.getPassword().equals(profile.getPasswordReply())) {
             String encryptedPassword = passwordEncoder.encode(profile.getPassword());
             ProfileChanges profileChanges = UserProfileMapper.INSTANCE.map(profile, user, encryptedPassword);
             profileChangesRepo.save(profileChanges);
-            return new ProfileResponseDto(true, errors);
+            return new ValidatedResponseDto(true, errors);
         } else {
             errors.put("Password", "Unfortunately, the password was not saved.");
-            return new ProfileResponseDto(false, errors);
+            return new ValidatedResponseDto(false, errors);
         }
     }
 

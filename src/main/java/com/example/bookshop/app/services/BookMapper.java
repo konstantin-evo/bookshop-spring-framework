@@ -7,6 +7,7 @@ import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookToFile;
 import com.example.bookshop.app.model.entity.FileType;
 import com.example.bookshop.web.dto.AuthorDto;
+import com.example.bookshop.web.dto.BookCreateDto;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookFileDto;
 import com.example.bookshop.web.dto.BookRateDto;
@@ -37,6 +38,9 @@ public interface BookMapper {
     @Mapping(target = "priceOld", source = ".", qualifiedByName = "calculatePriceOld")
     @Mapping(target = "tags", source = ".", qualifiedByName = "getTags")
     BookDto map(Book book);
+
+    @Mapping(target = "author", ignore = true)
+    Book map(BookCreateDto bookDto);
 
     @Mapping(target = "rate", source = ".", qualifiedByName = "getBookRate")
     @Mapping(target = "rateDistribution", source = ".", qualifiedByName = "getRateDistribution")

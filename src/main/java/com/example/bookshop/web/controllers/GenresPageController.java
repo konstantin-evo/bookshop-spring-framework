@@ -2,6 +2,7 @@ package com.example.bookshop.web.controllers;
 
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.app.services.GenreService;
+import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,7 +33,7 @@ public class GenresPageController {
     public String genreSlugPage(@PathVariable Integer id,
                                 @RequestParam( value = "offset", defaultValue = "0") Integer offset,
                                 @RequestParam(value = "limit", defaultValue = "6") Integer limit,
-                                Model model){
+                                Model model) throws BookshopEntityNotFoundException {
         model.addAttribute("books", bookService
                 .getPageOfBooksByGenre(offset, limit, id)
                 .getContent());

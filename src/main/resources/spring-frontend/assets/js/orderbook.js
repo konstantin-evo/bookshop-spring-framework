@@ -5,7 +5,7 @@ $(document).ready(function () {
         $.post({
             url: '/books/order',
             success: function (result) {
-                if (result.balanceEnough) {
+                if (result.validated) {
                     $('.Cart-product').remove();
                     $('.Cart-total').remove();
                     $('<div class="Section"><div class="Section-header"><h1 class="Section-title">Books purchased - enjoy the reading!</h1></div></div>')

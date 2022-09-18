@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,13 +24,15 @@ import java.util.List;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
+    @SequenceGenerator(name = "pk_sequence", sequenceName = "book_id_seq", allocationSize = 1)
     private Integer id;
 
     @Column(columnDefinition = "DATE NOT NULL")
     private Date pubDate;
 
-    @Column(columnDefinition = "SMALLINT NOT NULL")
+    // if isBestseller = 1 so the book is considered to be bestseller
+    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 0")
     private Integer isBestseller;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
@@ -75,5 +78,11 @@ public class Book {
 
     @OneToMany(mappedBy = "book")
     private List<BookRate> bookRates = new ArrayList<>();
+
+    // The "Popularity" parameters is calculated later,
+    // by default they are zero
+    public Book() {
+        this.popularity = 0.0;
+    }
 
 }
