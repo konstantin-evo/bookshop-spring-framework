@@ -8,7 +8,7 @@ public class BookshopEntityNotFoundException extends EntityNotFoundException {
         super("The " + entityName + " not found. id: " + id);
     }
 
-    public BookshopEntityNotFoundException(String value, String entityName) {
-        super("The " + entityName + " not found. value: " + value);
+    public BookshopEntityNotFoundException(String value, String field, String entityName) {
+        super("The " + entityName + " not found by filed: " + field + " with value: " + value);
     }
 }

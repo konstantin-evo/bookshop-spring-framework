@@ -5,8 +5,24 @@ $(document).ready(function () {
         e.preventDefault();
         clearPreviousResponseInfo()
         if (validateBook()) {
-            let data = getFormData($form);
             sendBookData()
+        }
+    });
+
+    // function for interactive display of information on the "Admin" page
+    $(".Tabs-link").click(function () {
+        $(".Tabs-link").removeClass("Tabs-link_ACTIVE");
+        $(this).addClass("Tabs-link_ACTIVE");
+        $(".Tabs-block").hide();
+
+        let id = $(this).attr('id');
+
+        switch (id) {
+            case "book_create":
+                $("#createBookForm").closest('.Tabs-block').show();
+                break;
+            default:
+                $(".Topup-wrap").closest('.Tabs-block').show();
         }
     });
 
@@ -17,7 +33,7 @@ function sendBookData() {
     let data = getFormData($form);
 
     $.post({
-        url: '/book',
+        url: '/api/books',
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(data),

@@ -15,6 +15,7 @@ import com.example.bookshop.app.model.entity.enumuration.TransactionInfo;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.ReviewDto;
+import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import com.example.bookshop.web.exception.UserNotFoundException;
 import com.example.bookshop.web.services.CookieUtil;
@@ -152,11 +153,13 @@ public class BookService {
     }
 
     public BookDto getBook(String slug) {
-        return BookMapper.INSTANCE.map(bookRepo.findBookBySlug(slug));
+        return BookMapper.INSTANCE.map(bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug)));
     }
 
     public void updateBook(String slug, String path) {
-        Book book = bookRepo.findBookBySlug(slug);
+        Book book = bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         book.setImage(path);
         bookRepo.save(book);
     }
@@ -171,11 +174,13 @@ public class BookService {
     }
 
     public BookRateDto getBookRate(String slug) {
-        return BookMapper.INSTANCE.mapBookRateDto(bookRepo.findBookBySlug(slug));
+        return BookMapper.INSTANCE.mapBookRateDto(bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug)));
     }
 
     public ReviewDto getBookReviews(String slug) {
-        return BookMapper.INSTANCE.getBookReviews(bookRepo.findBookBySlug(slug));
+        return BookMapper.INSTANCE.getBookReviews(bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug)));
     }
 
     public LocalDate convertToLocalDate(String date) {
@@ -227,7 +232,8 @@ public class BookService {
     }
 
     public void viewBookByUser(User user, String slug) {
-        Book book = bookRepo.findBookBySlug(slug);
+        Book book = bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         BookToUserType viewed = typeRepo.findByCode(BookToUserEnum.VIEWED);
         boolean isBookAlreadyViewed = bookToUserRepo.existsBookToUserByBookAndUserAndType(book, user, viewed);
 

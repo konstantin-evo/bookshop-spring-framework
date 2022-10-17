@@ -36,7 +36,7 @@ public class AdminService {
         if (isDtoCorrect(bookDto, response)) {
             Book book = BookMapper.INSTANCE.map(bookDto);
             Author author = authorService.getAuthor(bookDto.getAuthor())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException("Author", bookDto.getAuthor()));
+                    .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Full Name", bookDto.getAuthor()));
 
             book.setAuthor(author);
             book.setSlug(generateSlug());
@@ -44,9 +44,12 @@ public class AdminService {
             bookRepo.save(book);
 
             Genre genre = genreRepo.getGenreByName(bookDto.getGenre())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException("Genre", bookDto.getGenre()));
+                    .orElseThrow(() -> new BookshopEntityNotFoundException(Genre.class.getSimpleName(), "Name", bookDto.getGenre()));
             bookToGenreRepo.save(new BookToGenre(book, genre));
-            tagService.setTagsToBook(bookDto.getTags(), book);
+
+            if (!bookDto.getTags().isEmpty()) {
+                tagService.setTagsToBook(bookDto.getTags(), book);
+            }
         }
 
         return response;
@@ -67,7 +70,7 @@ public class AdminService {
             response.getErrorMessages().put("Genre", "Genre not found in database");
         }
 
-        boolean isTagsCorrect = tagService.areTagsExist(bookDto.getTags());
+        boolean isTagsCorrect = bookDto.getTags().isEmpty() || tagService.areTagsExist(bookDto.getTags());
 
         if (!isTagsCorrect) {
             response.setValidated(false);

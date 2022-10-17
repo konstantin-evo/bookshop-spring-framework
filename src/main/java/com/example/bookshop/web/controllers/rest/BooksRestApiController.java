@@ -1,18 +1,25 @@
 package com.example.bookshop.web.controllers.rest;
 
+import com.example.bookshop.app.services.AdminService;
 import com.example.bookshop.app.services.BookService;
 import com.example.bookshop.app.services.GoogleApiService;
 import com.example.bookshop.web.dto.ApiResponse;
+import com.example.bookshop.web.dto.BookCreateDto;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BooksPageGoogleDto;
 import com.example.bookshop.web.dto.BooksPageDto;
+import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -25,15 +32,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @Api(value = "book data api")
+@RequiredArgsConstructor
 public class BooksRestApiController {
 
     private final BookService bookService;
+    private final AdminService adminService;
     private final GoogleApiService googleService;
-
-    public BooksRestApiController(BookService bookService, GoogleApiService googleService) {
-        this.bookService = bookService;
-        this.googleService = googleService;
-    }
 
     @GetMapping("/books/by-author")
     @ApiOperation("operation to get book list of bookshop by passed author first name")
@@ -161,6 +165,12 @@ public class BooksRestApiController {
                                                     @RequestParam("limit") Integer limit) {
         return new BooksPageGoogleDto(googleService
                 .getPageOfSearchResult(searchWord, offset, limit));
+    }
+
+    @PostMapping(value = "/books", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ValidatedResponseDto createBook(@RequestBody BookCreateDto bookDto) {
+        return adminService.createBook(bookDto);
     }
 
 }

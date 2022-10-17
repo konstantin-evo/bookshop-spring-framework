@@ -7,6 +7,7 @@ import com.example.bookshop.app.config.security.oauth.OauthSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,7 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/home", "/profile", "/archive", "books/order", "/books/viewed").authenticated()
-                .antMatchers("/admin").hasAuthority("ADMIN")
+                .antMatchers("/admin/**").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.POST,"api/books").hasAuthority("ADMIN")
                 .antMatchers("/**").permitAll()
                 .and()
                   .exceptionHandling().accessDeniedPage("/")

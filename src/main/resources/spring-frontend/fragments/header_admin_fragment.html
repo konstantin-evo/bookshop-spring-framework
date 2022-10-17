@@ -141,55 +141,40 @@
             <nav class="menuModal" id="navigate">
                 <ul class="menu menu_main">
                     <li class="menu-item"
+                        th:class="(${#httpServletRequest.requestURI}=='/admin/book')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-adm-book"
+                           th:href="@{/admin/book}"
+                           th:text="#{topbar.admin.book}">n/a</a>
+                    </li>
+                    <li class="menu-item"
+                        th:class="(${#httpServletRequest.requestURI}=='/admin/author')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-adm-author"
+                           th:href="@{/admin/author}"
+                           th:text="#{topbar.admin.author}">n/a</a>
+                    </li>
+                    <li class="menu-item"
+                        th:class="(${#httpServletRequest.requestURI}=='/admin/review')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-adm-review"
+                           th:href="@{/admin/review}"
+                           th:text="#{topbar.admin.review}">n/a</a>
+                    </li>
+                    <li class="menu-item"
+                        sec:authorize="isAuthenticated()"
+                        th:class="(${#httpServletRequest.requestURI}=='/admin/user')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-adm-user"
+                           th:href="@{/admin/user}"
+                           th:text="#{topbar.admin.user}">n/a</a>
+                    </li>
+                    <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
                            th:id="nav-main"
                            th:href="@{/}"
-                           th:text="#{topbar.main}">n/a</a>
-                    </li>
-                    <li class="menu-item"
-                        th:class="(${#httpServletRequest.requestURI}=='/genres')?'menu-item menu-item_ACTIVE':'menu-item'">
-                        <a class="menu-link"
-                           th:id="nav-genres"
-                           th:href="@{/genres}"
-                           th:text="#{topbar.genres}">n/a</a>
-                    </li>
-                    <li class="menu-item"
-                        th:class="(${#httpServletRequest.requestURI}=='/books/recent')?'menu-item menu-item_ACTIVE':'menu-item'">
-                        <a class="menu-link"
-                           th:id="nav-news"
-                           th:href="@{/books/recent}"
-                           th:text="#{topbar.news}">n/a</a>
-                    </li>
-                    <li class="menu-item"
-                        th:class="(${#httpServletRequest.requestURI}=='/books/popular')?'menu-item menu-item_ACTIVE':'menu-item'">
-                        <a class="menu-link"
-                           th:id="nav-popular"
-                           th:href="@{/books/popular}"
-                           th:text="#{topbar.popular}">n/a</a>
-                    </li>
-                    <li class="menu-item"
-                        sec:authorize="isAuthenticated()"
-                        th:class="(${#httpServletRequest.requestURI}=='/books/viewed')?'menu-item menu-item_ACTIVE':'menu-item'">
-                        <a class="menu-link"
-                           th:id="nav-popular"
-                           th:href="@{/books/viewed}"
-                           th:text="#{topbar.viewed}">n/a</a>
-                    </li>
-                    <li class="menu-item"
-                        th:class="(${#httpServletRequest.requestURI}=='/authors')?'menu-item menu-item_ACTIVE':'menu-item'">
-                        <a class="menu-link"
-                           th:id="nav-authors"
-                           th:href="@{/authors}"
-                           th:text="#{topbar.authors}">n/a</a>
-                    </li>
-                    <li class="menu-item"
-                        sec:authorize="hasAuthority('ADMIN')"
-                        th:class="(${#httpServletRequest.requestURI}=='/admin')?'menu-item menu-item_ACTIVE':'menu-item'">
-                        <a class="menu-link"
-                           th:id="nav-admin"
-                           th:href="@{/admin/book}"
-                           th:text="#{topbar.admin}">n/a</a>
+                           th:text="#{topbar.admin.bookshop}">n/a</a>
                     </li>
                 </ul>
             </nav>

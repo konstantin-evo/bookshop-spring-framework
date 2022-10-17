@@ -11,6 +11,7 @@ import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookReviewRate;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.BookRateNotFoundException;
+import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import com.example.bookshop.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -70,8 +71,8 @@ public class BookReviewService {
      *                                   if Rate is absent, the Exception is returned (relevant for API)
      */
     public boolean saveBookReview(String slug, String text, Integer userId) throws BookRateNotFoundException {
-        Book book = bookRepo.findBookBySlug(slug);
-
+        Book book = bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)

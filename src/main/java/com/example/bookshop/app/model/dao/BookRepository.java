@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Integer> {
 
@@ -50,7 +51,7 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     Page<Book> findBookByPubDateIsBetween(Date dateFrom, Date dateTo, Pageable nextPage);
 
-    Book findBookBySlug(String slug);
+    Optional<Book> findBookBySlug(String slug);
 
     boolean existsBySlug(String slug);
 

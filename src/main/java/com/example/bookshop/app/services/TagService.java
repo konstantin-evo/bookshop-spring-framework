@@ -36,7 +36,7 @@ public class TagService {
         List<String> tagNames = getListOfTags(tagsDto);
         for (String tagName : tagNames) {
             Tag tag = tagRepo.getTagByName(tagName.toLowerCase().trim())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException(tagName, "tag"));
+                    .orElseThrow(() -> new BookshopEntityNotFoundException(Tag.class.getSimpleName(), "Name", tagName));
             bookToTagRepo.save(new BookToTag(book, tag));
         }
     }

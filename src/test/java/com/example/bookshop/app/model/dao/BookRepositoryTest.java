@@ -1,6 +1,7 @@
 package com.example.bookshop.app.model.dao;
 
 import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -60,7 +61,8 @@ class BookRepositoryTest {
 
     @Test
     void testBookPopularity() {
-        Book book = bookRepository.findBookBySlug(BOOK_SLUG);
+        Book book = bookRepository.findBookBySlug(BOOK_SLUG)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", BOOK_SLUG));
         assertNotNull(book.getPopularity());
         assertEquals(book.getPopularity(), 3.2);
     }

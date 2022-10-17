@@ -17,7 +17,7 @@
     <script src="/assets/js/scripts.min.js?v=45744385"></script>
 </head>
 <body class="Site">
-<header th:replace="~{fragments/header_fragment :: headFragment}"></header>
+<header th:replace="~{fragments/header_admin_fragment :: headFragment}"></header>
 <div class="Middle">
     <div class="Middle-top">
         <div class="wrap">
@@ -30,17 +30,17 @@
         <main class="Middle-main">
             <div class="Tabs Tabs_default">
                 <div class="Tabs-links">
-                    <a class="Tabs-link Tabs-link_ACTIVE" href="#"
-                       th:text="#{admin.book}">n/a
+                    <a class="Tabs-link Tabs-link_ACTIVE" href="#" id="book_create"
+                       th:text="#{admin.book.nav.add}">n/a
                     </a>
-                    <a class="Tabs-link" href="#"
-                       th:text="#{admin.author}">n/a
+                    <a class="Tabs-link" href="#" id="book_edit"
+                       th:text="#{admin.book.nav.edit}">n/a
                     </a>
-                    <a class="Tabs-link" href="#"
-                       th:text="#{admin.review}">n/a
+                    <a class="Tabs-link" href="#" id="book_cover"
+                       th:text="#{admin.book.nav.cover}">n/a
                     </a>
-                    <a class="Tabs-link" href="#"
-                       th:text="#{admin.user}">n/a
+                    <a class="Tabs-link" href="#" id="book_remove"
+                       th:text="#{admin.book.nav.delete}">n/a
                     </a>
                 </div>
                 <div class="Tabs-wrap">

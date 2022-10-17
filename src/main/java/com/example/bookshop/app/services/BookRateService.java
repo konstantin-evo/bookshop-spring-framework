@@ -6,6 +6,7 @@ import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.app.model.entity.BookRate;
 import com.example.bookshop.app.model.entity.User;
+import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import com.example.bookshop.web.exception.UserNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,8 @@ public class BookRateService {
      * @param slug     unique identifier for the book for set new Rating
      */
     public boolean setBookRate(String slug, Integer userRate, Integer userId) {
-        Book book = bookRepo.findBookBySlug(slug);
+        Book book = bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)
@@ -52,7 +54,8 @@ public class BookRateService {
      * Returns the book rating for the specific user
      */
     public Integer getUserRate(String slug, Integer userId) {
-        Book book = bookRepo.findBookBySlug(slug);
+        Book book = bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user).orElse(null);
