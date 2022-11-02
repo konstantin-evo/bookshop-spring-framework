@@ -36,6 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/home", "/profile", "/archive", "books/order", "/books/viewed").authenticated()
                 .antMatchers("/admin/**").hasAuthority("ADMIN")
                 .antMatchers(HttpMethod.POST,"api/books").hasAuthority("ADMIN")
+                .antMatchers(HttpMethod.DELETE,"api/books/**").hasAuthority("ADMIN")
                 .antMatchers("/**").permitAll()
                 .and()
                   .exceptionHandling().accessDeniedPage("/")

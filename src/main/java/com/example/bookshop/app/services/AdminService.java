@@ -13,8 +13,10 @@ import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -53,6 +55,20 @@ public class AdminService {
         }
 
         return response;
+    }
+
+    @Transactional
+    public ValidatedResponseDto deleteBook(String slug) {
+        Map<String, String> errors = new HashMap<>();
+        Optional<Book> book = bookRepo.findBookBySlug(slug);
+
+        if (book.isPresent()) {
+            bookRepo.updateIsActive(0, book.get().getId());
+            return new ValidatedResponseDto(true, errors);
+        } else {
+            errors.put("Book", "The book with slug \"" + slug + "\" is not found.");
+            return new ValidatedResponseDto(false, errors);
+        }
     }
 
     private boolean isDtoCorrect(BookCreateDto bookDto, ValidatedResponseDto response) {

@@ -5,7 +5,16 @@ $(document).ready(function () {
         e.preventDefault();
         clearPreviousResponseInfo()
         if (validateBook()) {
-            sendBookData()
+            sendCreateBookRequest()
+        }
+    });
+
+    // function to validate Slug input and send the data on success
+    $('#deleteBookSubmit').click(function (e) {
+        e.preventDefault();
+        clearPreviousResponseInfo()
+        if (validateSlug()) {
+            sendDeleteBookRequest()
         }
     });
 
@@ -21,6 +30,9 @@ $(document).ready(function () {
             case "book_create":
                 $("#createBookForm").closest('.Tabs-block').show();
                 break;
+            case "book_remove":
+                $("#deleteBookForm").closest('.Tabs-block').show();
+                break;
             default:
                 $(".Topup-wrap").closest('.Tabs-block').show();
         }
@@ -28,7 +40,7 @@ $(document).ready(function () {
 
 });
 
-function sendBookData() {
+function sendCreateBookRequest() {
     let $form = $('#createBookForm');
     let data = getFormData($form);
 
@@ -43,6 +55,28 @@ function sendBookData() {
 
             if (result.validated) {
                 $('<div class="Profile-success">Book successfully saved</div>')
+                    .insertAfter(parentDiv);
+            } else {
+                $.each(result.errorMessages, function (key, value) {
+                    $('<div class="error"><span>' + value + '</span></div>')
+                        .insertAfter(parentDiv);
+                });
+            }
+        }
+    })
+}
+
+function sendDeleteBookRequest() {
+    let slug = $('#slugDelete').val();
+    $.ajax({
+        url: '/api/books/' + slug,
+        type: 'DELETE',
+        success: function (result) {
+
+            let parentDiv = $('#deleteBookSubmit').parent();
+
+            if (result.validated) {
+                $('<div class="Profile-success">Book successfully deleted</div>')
                     .insertAfter(parentDiv);
             } else {
                 $.each(result.errorMessages, function (key, value) {
@@ -72,6 +106,19 @@ function validateBook() {
                 digits: true,
                 min: 0,
                 max: 100
+            }
+        }
+    });
+    return !!validator.form();
+}
+
+function validateSlug() {
+    let validator = $("#deleteBookForm").validate({
+        rules: {
+            slugDelete: {
+                required: true,
+                minlength: 3,
+                maxlength: 12
             }
         }
     });

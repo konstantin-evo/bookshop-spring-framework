@@ -137,7 +137,10 @@
                         <div class="ProductCard-text">
                             <p th:text="${book.description}"></p>
                         </div>
-                        <div class="ProductCard-cart">
+
+                        <!-- Start Buttons for buying, postponing, downloading and archiving the book -->
+                        <!-- This block is only visible if the book is not deleted (isActive = 1) -->
+                        <div class="ProductCard-cart" th:if="${book.isActive == 1}">
                             <div class="ProductCard-cartElement">
                                 <button class="btn btn_primary btn_outline" data-sendstatus="KEPT"
                                         th:attr="data-bookid=${book.slug}"
@@ -166,7 +169,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="ProductCard-cart">
+                        <div class="ProductCard-cart" th:if="${book.isActive == 1}">
                             <div class="ProductCard-cartElement">
                                 <a class="btn btn_primary btn_outline" href="#">
                                     <span class="btn-icon">
@@ -187,6 +190,8 @@
                                 </button>
                             </div>
                         </div>
+                        <!-- End Buttons for buying, postponing, downloading and archiving the book -->
+
                         <div id="download-popup">
                             <p th:text="#{book.download.link}">n/a</p>
                             <div th:each="bookFile : ${book.fileList}">

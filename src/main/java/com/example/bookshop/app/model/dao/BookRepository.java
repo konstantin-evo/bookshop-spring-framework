@@ -30,6 +30,11 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     @Query("from Book where isBestseller=1")
     List<Book> findBestsellers();
 
+    @Query(value = "SELECT * FROM BOOKS WHERE IS_ACTIVE = 1",
+            countQuery = "SELECT count(*) FROM BOOKS WHERE IS_ACTIVE = 1",
+            nativeQuery = true)
+    Page<Book> findActualBooks(Pageable pageable);
+
     @Query("from Book where discount = (select max(b.discount) from Book b)")
     List<Book> findBooksWithMaxDiscount();
 
@@ -47,8 +52,6 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     Page<Book> findBooksByAuthorId(Integer id, Pageable nextPage);
 
-    Page<Book> findBookByTitleContaining(String bookTitle, Pageable nextPage);
-
     Page<Book> findBookByPubDateIsBetween(Date dateFrom, Date dateTo, Pageable nextPage);
 
     Optional<Book> findBookBySlug(String slug);
@@ -58,4 +61,8 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     @Modifying
     @Query("update Book b set b.popularity = b.popularity + :amount where b.id = :book_id")
     void updatePopularity(@Param("amount") Double amount, @Param("book_id") Integer id);
+
+    @Modifying
+    @Query("update Book b set b.isActive = :isActive where b.id = :id")
+    void updateIsActive(@Param("isActive") Integer isActive, @Param("id") Integer id);
 }

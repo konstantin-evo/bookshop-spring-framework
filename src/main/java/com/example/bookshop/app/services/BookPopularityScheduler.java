@@ -52,7 +52,7 @@ public class BookPopularityScheduler {
     @Transactional
     public void calculateBooksPopularity() {
         Pageable nextPage = PageRequest.of(CURRENT_UPDATING_PAGE, NUMBER_OF_BOOKS_TO_UPDATE);
-        Page<Book> books = bookRepo.findAll(nextPage);
+        Page<Book> books = bookRepo.findActualBooks(nextPage);
         int totalPages = books.getTotalPages();
 
         if (totalPages > CURRENT_UPDATING_PAGE) {

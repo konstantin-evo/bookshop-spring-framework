@@ -15,6 +15,7 @@ import com.example.bookshop.app.model.entity.enumuration.TransactionInfo;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.ReviewDto;
+import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
 import com.example.bookshop.web.exception.UserNotFoundException;
@@ -33,7 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -48,7 +51,7 @@ public class BookService {
 
     public Page<BookDto> getPageOfRecommendedBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit);
-        Page<Book> books = bookRepo.findAll(nextPage);
+        Page<Book> books = bookRepo.findActualBooks(nextPage);
         List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
@@ -64,7 +67,7 @@ public class BookService {
 
     public Page<BookDto> getPageOfPopularBooks(Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit, Sort.by("popularity").descending());
-        Page<Book> books = bookRepo.findAll(nextPage);
+        Page<Book> books = bookRepo.findActualBooks(nextPage);
         List<BookDto> booksDto = BookMapper.INSTANCE.map(books.getContent());
         return new PageImpl<>(booksDto, nextPage, books.getTotalElements());
     }
@@ -188,27 +191,35 @@ public class BookService {
     }
 
     /**
-     * Method adds books to book purchased by the user and clears the corresponding Cookies
-     * if the user has sufficient funds
+     * Method checks that books are available for purchase:
+     * - they are actual
+     * - the user has sufficient funds
+     * and adds to the books purchased by the user if the conditions are fulfilled
      *
-     * @param cookie   - current value cookie, can contain several books at once
-     * @param user     - current session user
-     * @param response - the response object is where the servlet can write updated Cookie information
-     * @return true if the operation was successful and books are added to the books purchased by the user
+     * @param cookie              - current value cookie, can contain several books at once
+     * @param user                - current session user
+     * @param httpServletResponse - the response object is where the servlet can write updated Cookie information
+     * @return ValidatedResponseDto Dto object used to interact with Front-End to display errors
      */
-    public boolean orderBooks(String cookie, User user, HttpServletResponse response) {
+    public ValidatedResponseDto orderBooks(String cookie, User user, HttpServletResponse httpServletResponse) {
+        Map<String, String> errors = new HashMap<>();
+        ValidatedResponseDto response = new ValidatedResponseDto(true, errors);
 
         List<Book> books = findBooksByCookies(cookie);
+        removeNotActualBook(response, books, cookie, httpServletResponse);
+
         int totalPrice = books.stream().mapToInt(Book::getPrice).sum();
         int userBalance = userRepo.getBalance(user.getId());
 
         if (userBalance >= totalPrice) {
             books.forEach(book -> buyBookByUser(book, user));
-            CookieUtil.clearCookieByName(response, "cartContents");
-            return true;
+            CookieUtil.clearCookieByName(httpServletResponse, "cartContents");
+            return new ValidatedResponseDto(true, errors);
         } else {
-            return false;
+            errors.put("Balance", "The balance is insufficient to buy books.");
+            response.setValidated(false);
         }
+        return response;
     }
 
     /**
@@ -242,6 +253,16 @@ public class BookService {
             bookToUserRepo.save(viewedBook);
         }
 
+    }
+
+    private void removeNotActualBook(ValidatedResponseDto response, List<Book> books, String cookie, HttpServletResponse httpServletResponse) {
+        books.forEach(book -> {
+            if (book.getIsActive() == 0) {
+                response.getErrorMessages().put(book.getTitle(), "The book is not available for sale and has been removed from your shopping basket.");
+                CookieUtil.removeBookFromCookie(cookie, "cartContents", book.getSlug(), httpServletResponse);
+                response.setValidated(false);
+            }
+        });
     }
 
     private List<Book> findBooksByCookies(String cookie) {

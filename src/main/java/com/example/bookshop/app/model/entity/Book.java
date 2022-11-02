@@ -35,6 +35,10 @@ public class Book {
     @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 0")
     private Integer isBestseller;
 
+    // if isActive = 1 so the book is considered to be active (possible to possibly buy)
+    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 1")
+    private Integer isActive;
+
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String slug;
 
@@ -83,6 +87,7 @@ public class Book {
     // by default they are zero
     public Book() {
         this.popularity = 0.0;
+        this.isActive = 1;
     }
 
 }

@@ -71,8 +71,7 @@ public class CartPageController {
     public ValidatedResponseDto handleOrderBook(@CookieValue(name = "cartContents", required = false) String cartContents,
                                                 HttpServletResponse response) {
         User user = (User) userRegisterService.getCurrentUser();
-        boolean isBooksSuccessfullyBought = bookService.orderBooks(cartContents, user, response);
-        return new ValidatedResponseDto(isBooksSuccessfullyBought, null);
+        return bookService.orderBooks(cartContents, user, response);
     }
 
     @PostMapping("/changeBookStatus/cart/remove/{slug}")

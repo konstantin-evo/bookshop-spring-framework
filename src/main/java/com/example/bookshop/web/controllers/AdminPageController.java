@@ -1,6 +1,5 @@
 package com.example.bookshop.web.controllers;
 
-import com.example.bookshop.app.services.AdminService;
 import com.example.bookshop.app.services.GenreService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;

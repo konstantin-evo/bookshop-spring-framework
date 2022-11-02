@@ -11,8 +11,10 @@ $(document).ready(function () {
                     $('<div class="Section"><div class="Section-header"><h1 class="Section-title">Books purchased - enjoy the reading!</h1></div></div>')
                         .insertAfter('.Cart').first();
                 } else {
-                    $('<div class="Cart-block Cart-block_total"><strong class="Cart-title">The balance is insufficient to buy books.</strong></div>')
-                        .insertAfter('.Cart').first();
+                    $.each(result.errorMessages, function (key, value) {
+                        $('<div class="Cart-block Cart-block_total"><strong class="Cart-title">' + value + '</strong></div>')
+                            .insertAfter('.Cart').first();
+                    });
                 }
             },
             error: function (jqXhr, textStatus, errorThrown) {
@@ -20,5 +22,4 @@ $(document).ready(function () {
             }
         });
     });
-
 })
