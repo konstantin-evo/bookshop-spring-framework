@@ -10,6 +10,7 @@ import com.example.bookshop.web.dto.BooksPageGoogleDto;
 import com.example.bookshop.web.dto.BooksPageDto;
 import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
+import com.example.bookshop.web.services.ResourceStorage;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,6 +42,7 @@ public class BooksRestApiController {
     private final BookService bookService;
     private final AdminService adminService;
     private final GoogleApiService googleService;
+    private final ResourceStorage storage;
 
     @GetMapping("/books/by-author")
     @ApiOperation("operation to get book list of bookshop by passed author first name")
@@ -126,6 +130,12 @@ public class BooksRestApiController {
                         .getContent());
     }
 
+    @GetMapping("/books/{slug}")
+    @ResponseBody
+    public BookDto getBooksByTag(@PathVariable String slug) {
+        return bookService.getBook(slug);
+    }
+
     @GetMapping("/books/tags/{id}")
     @ResponseBody
     public BooksPageDto getBooksByTag(@PathVariable Integer id,
@@ -178,6 +188,15 @@ public class BooksRestApiController {
     @ResponseBody
     public ValidatedResponseDto deleteBook(@PathVariable String slug) {
         return adminService.deleteBook(slug);
+    }
+
+    @PostMapping("/books/{slug}/img/save")
+    @ResponseBody
+    public ValidatedResponseDto saveNewBookImage(@RequestParam("file") MultipartFile file,
+                                                 @PathVariable("slug") String slug) throws IOException {
+        String path = storage.saveNewBookCover(file, slug);
+        bookService.updateBook(slug, path);
+        return new ValidatedResponseDto(true, null);
     }
 
 }

@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 
@@ -58,6 +61,26 @@ public class GlobalExceptionHandlerController {
     @ExceptionHandler(BookRateNotFoundException.class)
     public ResponseEntity<ApiResponse<BookReview>> handleCustomBookRateNotFoundException(Exception e) {
         log.error("BookRateNotFoundException has occurred. {}", e.getLocalizedMessage());
+        return new ResponseEntity<>(new ApiResponse<>(
+                HttpStatus.BAD_REQUEST,
+                e.getMessage(),
+                e),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiResponse<MultipartFile>> handleMultipartException(MultipartException e) {
+        log.error("MultipartException has occurred. {}", e.getLocalizedMessage());
+        return new ResponseEntity<>(new ApiResponse<>(
+                HttpStatus.BAD_REQUEST,
+                e.getMessage(),
+                e),
+                HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    public ResponseEntity<ApiResponse<MultipartFile>> handleMissingServletRequestPartException(MissingServletRequestPartException e) {
+        log.error("MissingServletRequestPartException has occurred. {}", e.getLocalizedMessage());
         return new ResponseEntity<>(new ApiResponse<>(
                 HttpStatus.BAD_REQUEST,
                 e.getMessage(),

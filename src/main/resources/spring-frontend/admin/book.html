@@ -149,6 +149,32 @@
 
                     <!-- Form to change the book cover -->
                     <div class="Tabs-block" style="display: none">
+                        <div class="Profile">
+                            <form class="form Profile-form" id="uploadBookCoverForm">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group form-group_row">
+                                            <input class="form-input" id="slugUploadCover" name="slugUploadCover"
+                                                   type="text"
+                                                   th:placeholder="#{admin.book.slug.cover}"/>
+                                            <label for="fileUploadCover" class="form-input form-input_phone">
+                                                Upload the file
+                                            </label>
+                                            <input class="form-input" id="fileUploadCover" type="file" name="file"
+                                                   hidden/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Profile-btn">
+                                        <button class="btn btn_primary" type="button" id="uploadBookCoverSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
 
                     <!-- Book deletion form (not active for purchase, etc.) -->
