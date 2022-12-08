@@ -72,7 +72,7 @@ public class BookReviewService {
      */
     public boolean saveBookReview(String slug, String text, Integer userId) throws BookRateNotFoundException {
         Book book = bookRepo.findBookBySlug(slug)
-                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The Book is not found", Book.class.getSimpleName(), "Slug", slug));
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)

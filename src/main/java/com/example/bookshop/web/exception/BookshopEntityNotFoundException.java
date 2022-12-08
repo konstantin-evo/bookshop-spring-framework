@@ -1,14 +1,23 @@
 package com.example.bookshop.web.exception;
 
+import lombok.Getter;
+
 import javax.persistence.EntityNotFoundException;
 
+@Getter
 public class BookshopEntityNotFoundException extends EntityNotFoundException {
 
-    public BookshopEntityNotFoundException(Integer id, String entityName) {
-        super("The " + entityName + " not found. id: " + id);
+    private String entityName;
+    private String message;
+
+    public BookshopEntityNotFoundException(String message) {
+        super(message);
     }
 
-    public BookshopEntityNotFoundException(String value, String field, String entityName) {
-        super("The " + entityName + " not found by filed: " + field + " with value: " + value);
+    public BookshopEntityNotFoundException(String message, String entityName, String parameter, String value) {
+        super(message);
+        this.entityName = entityName;
+        this.message = "The " + entityName + " not found by parameter \"" + parameter + "\" with value \""
+                + value + "\" .";
     }
 }

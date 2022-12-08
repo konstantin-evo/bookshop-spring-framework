@@ -29,14 +29,15 @@ public class TagService {
     }
 
     public TagDto getTag(Integer id) {
-        return convertToDto(tagRepo.findById(id).orElseThrow(() -> new BookshopEntityNotFoundException(id, "Tag")));
+        return convertToDto(tagRepo.findById(id)
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The tag is not found", Tag.class.getSimpleName(), "id", id.toString())));
     }
 
     public void setTagsToBook(String tagsDto, Book book) {
         List<String> tagNames = getListOfTags(tagsDto);
         for (String tagName : tagNames) {
-            Tag tag = tagRepo.getTagByName(tagName.toLowerCase().trim())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException(Tag.class.getSimpleName(), "Name", tagName));
+            Tag tag = tagRepo.getTagByName(tagName.toLowerCase().trim()).orElseThrow(
+                    () -> new BookshopEntityNotFoundException("The Tag is not found", Tag.class.getSimpleName(), "Name", tagName));
             bookToTagRepo.save(new BookToTag(book, tag));
         }
     }

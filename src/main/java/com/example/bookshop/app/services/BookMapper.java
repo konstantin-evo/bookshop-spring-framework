@@ -14,6 +14,7 @@ import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.ReviewDto;
 import com.example.bookshop.web.dto.TagDto;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -45,6 +46,9 @@ public interface BookMapper {
     @Mapping(target = "rate", source = ".", qualifiedByName = "getBookRate")
     @Mapping(target = "rateDistribution", source = ".", qualifiedByName = "getRateDistribution")
     BookRateDto mapBookRateDto(Book book);
+
+    @Mapping(target = "author", ignore = true)
+    void updateBook(BookCreateDto bookDto, @MappingTarget Book book);
 
     List<BookDto> map(List<Book> books);
 

@@ -132,7 +132,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <div class="Profile-btn">
+                                    <div class="Admin-btn">
                                         <button class="btn btn_primary" type="submit" id="createBookSubmit"
                                                 style="margin: 1%"
                                                 th:text="#{admin.book.submit}">n/a
@@ -145,6 +145,110 @@
 
                     <!-- Form for editing a book -->
                     <div class="Tabs-block" style="display: none">
+                        <!-- Before editing the book, you should upload the data using Book Slug -->
+                        <!-- Form to upload data - start -->
+                        <div class="Profile">
+                            <form class="form Profile-form" id="uploadBookDataToEdit">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group">
+                                            <label class="form-label" for="slugEdit"
+                                                   th:text="#{admin.book.slug}">n/a
+                                            </label>
+                                            <input class="form-input" id="slugEdit" name="slugEdit" type="text"
+                                                   th:placeholder="#{admin.book.slug.edit}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Admin-btn">
+                                        <button class="btn btn_primary" type="button" id="uploadBookDataSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Form to upload data - end -->
+                        <!-- By default, all fields are not available for editing (disabled) -->
+                        <div class="Profile">
+                            <form class="form Profile-form" id="editBookForm"
+                                  action="/book" method="post" style="display: none">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookTitle"
+                                                   th:text="#{admin.book.title}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookTitle" name="bookTitle" type="text"
+                                                   disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookAuthor"
+                                                   th:text="#{admin.book.author}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookAuthor" name="bookAuthor" type="text"
+                                                   disabled
+                                                   th:placeholder="#{admin.book.author.placeholder}"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookDescription"
+                                                   th:text="#{admin.book.description}">n/a
+                                            </label>
+                                            <textarea class="form-input" id="bookDescription" name="bookDescription"
+                                                      cols="40" disabled
+                                                      rows="5"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookPubDate"
+                                                   th:text="#{admin.book.date}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookPubDate" name="bookPubDate" type="date"
+                                                   disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookPrice"
+                                                   th:text="#{admin.book.price}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookPrice" name="bookPrice" type="text"
+                                                   disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookDiscount"
+                                                   th:text="#{admin.book.discount}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookDiscount" name="bookDiscount" type="text"
+                                                   value="0" disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="isBookBestseller"
+                                                   th:text="#{admin.book.bestseller}">n/a
+                                            </label>
+                                            <select class="form-input" id="isBookBestseller" name="isBookBestseller"
+                                                    disabled>
+                                                <option value="" th:text="#{admin.book.bestseller.input}">n/a</option>
+                                                <option th:value="1"
+                                                        th:text="Yes">
+                                                </option>
+                                                <option th:value="0"
+                                                        th:text="No">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Admin-btn">
+                                        <button class="btn btn_primary" type="submit" id="editBookSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
                     </div>
 
                     <!-- Form to change the book cover -->
@@ -166,7 +270,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <div class="Profile-btn">
+                                    <div class="Admin-btn">
                                         <button class="btn btn_primary" type="button" id="uploadBookCoverSubmit"
                                                 style="margin: 1%"
                                                 th:text="#{admin.book.submit}">n/a
@@ -193,7 +297,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <div class="Profile-btn">
+                                    <div class="Admin-btn">
                                         <button class="btn btn_primary" type="button" id="deleteBookSubmit"
                                                 style="margin: 1%"
                                                 th:text="#{admin.book.submit}">n/a

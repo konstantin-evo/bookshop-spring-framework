@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -38,7 +37,7 @@ public class AdminService {
         if (isDtoCorrect(bookDto, response)) {
             Book book = BookMapper.INSTANCE.map(bookDto);
             Author author = authorService.getAuthor(bookDto.getAuthor())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Full Name", bookDto.getAuthor()));
+                    .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
 
             book.setAuthor(author);
             book.setSlug(generateSlug());
@@ -46,7 +45,8 @@ public class AdminService {
             bookRepo.save(book);
 
             Genre genre = genreRepo.getGenreByName(bookDto.getGenre())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException(Genre.class.getSimpleName(), "Name", bookDto.getGenre()));
+                    .orElseThrow(() -> new BookshopEntityNotFoundException("The genre is not found", Genre.class.getSimpleName(), "Name", bookDto.getGenre()));
+
             bookToGenreRepo.save(new BookToGenre(book, genre));
 
             if (!bookDto.getTags().isEmpty()) {
@@ -58,17 +58,25 @@ public class AdminService {
     }
 
     @Transactional
-    public ValidatedResponseDto deleteBook(String slug) {
-        Map<String, String> errors = new HashMap<>();
-        Optional<Book> book = bookRepo.findBookBySlug(slug);
+    public ValidatedResponseDto editBook(BookCreateDto bookDto, String slug) {
+        Book book = bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The book is not found", Book.class.getSimpleName(), "Slug", slug));
 
-        if (book.isPresent()) {
-            bookRepo.updateIsActive(0, book.get().getId());
-            return new ValidatedResponseDto(true, errors);
-        } else {
-            errors.put("Book", "The book with slug \"" + slug + "\" is not found.");
-            return new ValidatedResponseDto(false, errors);
-        }
+        Author author = authorService.getAuthor(bookDto.getAuthor())
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
+
+        BookMapper.INSTANCE.updateBook(bookDto, book);
+        book.setAuthor(author);
+        bookRepo.save(book);
+        return new ValidatedResponseDto(true, new HashMap<>());
+    }
+
+    @Transactional
+    public ValidatedResponseDto deleteBook(String slug) {
+        Book book = bookRepo.findBookBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The book is not found", Book.class.getSimpleName(), "Slug", slug));
+        bookRepo.updateIsActive(0, book.getId());
+        return new ValidatedResponseDto(true, new HashMap<>());
     }
 
     private boolean isDtoCorrect(BookCreateDto bookDto, ValidatedResponseDto response) {

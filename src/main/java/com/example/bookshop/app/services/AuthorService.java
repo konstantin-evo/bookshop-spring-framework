@@ -20,7 +20,7 @@ public class AuthorService {
 
     public AuthorDto getAuthor(Integer id) {
         return BookMapper.INSTANCE.map(authorRepo.findById(id)
-                .orElseThrow(() -> new BookshopEntityNotFoundException(id, "Author")));
+                        .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "id", id.toString())));
     }
 
     public Optional<Author> getAuthor(String fullName) {

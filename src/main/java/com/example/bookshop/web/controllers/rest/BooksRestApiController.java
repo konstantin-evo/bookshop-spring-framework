@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -182,6 +183,12 @@ public class BooksRestApiController {
     @ResponseBody
     public ValidatedResponseDto createBook(@RequestBody BookCreateDto bookDto) {
         return adminService.createBook(bookDto);
+    }
+
+    @PatchMapping(value = "/books/{slug}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public ValidatedResponseDto editBook(@RequestBody BookCreateDto bookDto, @PathVariable String slug) {
+        return adminService.editBook(bookDto, slug);
     }
 
     @DeleteMapping(value = "/books/{slug}", produces = MediaType.APPLICATION_JSON_VALUE)
