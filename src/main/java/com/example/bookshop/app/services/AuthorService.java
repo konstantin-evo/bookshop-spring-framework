@@ -20,10 +20,15 @@ public class AuthorService {
 
     public AuthorDto getAuthor(Integer id) {
         return BookMapper.INSTANCE.map(authorRepo.findById(id)
-                        .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "id", id.toString())));
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "id", id.toString())));
     }
 
-    public Optional<Author> getAuthor(String fullName) {
+    public AuthorDto getAuthor(String slug) {
+        return BookMapper.INSTANCE.map(authorRepo.getAuthorBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Slug", slug)));
+    }
+
+    public Optional<Author> getAuthorByFullName(String fullName) {
         String[] firstAndLastNames = fullName.split(",");
         if (firstAndLastNames.length >= 2) {
             return authorRepo.getAuthorByFirstNameAndLastName(

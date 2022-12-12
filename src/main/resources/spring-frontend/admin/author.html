@@ -28,9 +28,77 @@
     </div>
     <div class="wrap">
         <main class="Middle-main">
-            <h2 class="Middle-title"
-                th:text="#{main.not.implemented}">n/a
-            </h2>
+
+            <!-- Form for editing an author - start -->
+            <div class="Tabs-block">
+                <!-- Before editing the author, you should upload the data using Author Slug -->
+                <!-- Form to upload data - start -->
+                <div class="Profile">
+                    <form class="form Profile-form" id="uploadAuthorDataToEdit">
+                        <div class="row">
+                            <div class="row-block">
+                                <div class="form-group">
+                                    <label class="form-label" for="slugAuthor"
+                                           th:text="#{admin.author.slug}">n/a
+                                    </label>
+                                    <input class="form-input" id="slugAuthor" name="slugAuthor" type="text"
+                                           th:placeholder="#{admin.author.slug.edit}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="Admin-btn">
+                                <button class="btn btn_primary" type="button" id="uploadAuthorDataSubmit"
+                                        style="margin: 1%"
+                                        th:text="#{admin.author.submit}">n/a
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Form to upload data - end -->
+                <!-- By default, all fields are not available for editing (disabled) -->
+                <div class="Profile">
+                    <form class="form Profile-form" id="editAuthorForm"
+                          action="/author" method="post" style="display: none">
+                        <div class="row">
+                            <div class="row-block">
+                                <div class="form-group">
+                                    <label class="form-label" for="lastName"
+                                           th:text="#{admin.author.name.last}">n/a
+                                    </label>
+                                    <input class="form-input" id="lastName" name="lastName" type="text"
+                                           disabled/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="firstName"
+                                           th:text="#{admin.author.name.first}">n/a
+                                    </label>
+                                    <input class="form-input" id="firstName" name="firstName" type="text"
+                                           disabled/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="authorDescription"
+                                           th:text="#{admin.author.description}">n/a
+                                    </label>
+                                    <textarea class="form-input" id="authorDescription" name="authorDescription"
+                                              cols="40" disabled
+                                              rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="Admin-btn">
+                                <button class="btn btn_primary" type="submit" id="editAuthorSubmit"
+                                        style="margin: 1%"
+                                        th:text="#{admin.book.submit}">n/a
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Form for editing an author - end -->
         </main>
     </div>
 </div>

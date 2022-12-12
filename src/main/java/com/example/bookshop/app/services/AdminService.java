@@ -1,5 +1,6 @@
 package com.example.bookshop.app.services;
 
+import com.example.bookshop.app.model.dao.AuthorRepository;
 import com.example.bookshop.app.model.dao.BookRepository;
 import com.example.bookshop.app.model.dao.BookToGenreRepository;
 import com.example.bookshop.app.model.dao.GenreRepository;
@@ -7,6 +8,7 @@ import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.app.model.entity.BookToGenre;
 import com.example.bookshop.app.model.entity.Genre;
+import com.example.bookshop.web.dto.AuthorDto;
 import com.example.bookshop.web.dto.BookCreateDto;
 import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
@@ -24,6 +26,7 @@ public class AdminService {
 
     private final BookRepository bookRepo;
     private final AuthorService authorService;
+    private final AuthorRepository authorRepo;
     private final GenreRepository genreRepo;
     private final TagService tagService;
     private final BookToGenreRepository bookToGenreRepo;
@@ -36,7 +39,7 @@ public class AdminService {
 
         if (isDtoCorrect(bookDto, response)) {
             Book book = BookMapper.INSTANCE.map(bookDto);
-            Author author = authorService.getAuthor(bookDto.getAuthor())
+            Author author = authorService.getAuthorByFullName(bookDto.getAuthor())
                     .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
 
             book.setAuthor(author);
@@ -62,12 +65,22 @@ public class AdminService {
         Book book = bookRepo.findBookBySlug(slug)
                 .orElseThrow(() -> new BookshopEntityNotFoundException("The book is not found", Book.class.getSimpleName(), "Slug", slug));
 
-        Author author = authorService.getAuthor(bookDto.getAuthor())
+        Author author = authorService.getAuthorByFullName(bookDto.getAuthor())
                 .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
 
         BookMapper.INSTANCE.updateBook(bookDto, book);
         book.setAuthor(author);
         bookRepo.save(book);
+        return new ValidatedResponseDto(true, new HashMap<>());
+    }
+
+    @Transactional
+    public ValidatedResponseDto editAuthor(AuthorDto authorDto, String slug) {
+        Author author = authorRepo.getAuthorBySlug(slug)
+                .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Slug", slug));
+
+        AuthorMapper.INSTANCE.updateAuthor(authorDto, author);
+        authorRepo.save(author);
         return new ValidatedResponseDto(true, new HashMap<>());
     }
 
@@ -81,7 +94,7 @@ public class AdminService {
 
     private boolean isDtoCorrect(BookCreateDto bookDto, ValidatedResponseDto response) {
 
-        Optional<Author> author = authorService.getAuthor(bookDto.getAuthor());
+        Optional<Author> author = authorService.getAuthorByFullName(bookDto.getAuthor());
         Optional<Genre> genre = genreRepo.getGenreByName(bookDto.getGenre());
 
         if (author.isEmpty()) {

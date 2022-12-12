@@ -28,6 +28,15 @@ $(document).ready(function () {
     });
 
     // function to validate Slug input and send the data on success
+    $('#editAuthorSubmit').click(function (e) {
+        e.preventDefault();
+        clearPreviousResponseInfo()
+        if (validateAuthorToEdit()) {
+            sendEditAuthorRequest()
+        }
+    });
+
+    // function to validate Slug input and send the data on success
     $('#deleteBookSubmit').click(function (e) {
         e.preventDefault();
         clearPreviousResponseInfo()
@@ -42,6 +51,15 @@ $(document).ready(function () {
         clearPreviousResponseInfo()
         if (validateUploadBookCoverForm()) {
             sendUploadBookCoverRequest()
+        }
+    });
+
+    // function to upload Author data to edit further
+    $('#uploadAuthorDataSubmit').click(function (e) {
+        e.preventDefault();
+        clearPreviousResponseInfo()
+        if (validateSlug($("#uploadAuthorDataToEdit"))) {
+            sendGetAuthorRequest()
         }
     });
 
@@ -115,6 +133,32 @@ function sendEditBookRequest() {
             let error = errorResponse.responseJSON;
             createErrorElement(parentElement, error.message)
 
+        }
+    })
+}
+
+function sendEditAuthorRequest() {
+    let slug = $('#slugAuthor').val();
+    let parentElement = $('#editAuthorSubmit').parent();
+
+    let data = {
+        "lastName": $('#lastName').val(),
+        "firstName": $('#firstName').val(),
+        "description": $('#authorDescription').val(),
+    };
+
+    $.ajax({
+        url: '/api/authors/' + slug,
+        type: 'PATCH',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (validatedResponseDto) {
+            processValidatedResponseDto(validatedResponseDto, parentElement, "Author successfully edited")
+        },
+        error: function (errorResponse) {
+            let error = errorResponse.responseJSON;
+            createErrorElement(parentElement, error.message)
         }
     })
 }
@@ -203,6 +247,42 @@ function sendGetBookRequest() {
     })
 }
 
+function sendGetAuthorRequest() {
+    let slug = $('#slugAuthor').val();
+    let parentElement = $('#uploadAuthorDataToEdit').parent();
+    $.ajax({
+        url: '/api/authors/' + slug,
+        type: 'GET',
+        dataType: 'json',
+        success: function (result) {
+
+            // in case of business error we have 200 HTTP Status
+            // and info about error in ValidatedResponseDto object
+            if (!result.validated) {
+                $.each(result.errorMessages, function (key, value) {
+                    createErrorElement(parentElement, value)
+                });
+            }
+
+            // check that the book is present in response
+            if (result.id != null) {
+                $("#editAuthorForm").show("fast");
+                $("#lastName").val(result.lastName);
+                $("#lastName").prop("disabled", false);
+                $("#firstName").val(result.firstName);
+                $("#firstName").prop("disabled", false);
+                $("#authorDescription").val(result.description);
+                $("#authorDescription").prop("disabled", false);
+            }
+        },
+        // in case of technical and unexpected error
+        error: function (errorResponse) {
+            let error = errorResponse.responseJSON;
+            createErrorElement(parentElement, error.message)
+        }
+    })
+}
+
 function processValidatedResponseDto(validatedResponseDto, parent, message) {
     if (validatedResponseDto.validated) {
         $('<div class="Profile-success">' + message + '</div>')
@@ -266,6 +346,17 @@ function validateBookToEdit() {
     return !!validator.form();
 }
 
+function validateAuthorToEdit() {
+    let validator = $("#editAuthorForm").validate({
+        rules: {
+            firsName: "required",
+            lastName: "required",
+            authorDescription: "required"
+            }
+    });
+    return !!validator.form();
+}
+
 function validateSlug(form) {
     let validator = form.validate({
         // can be improved by using validation using classes rather than id
@@ -277,6 +368,11 @@ function validateSlug(form) {
                 maxlength: 12
             },
             slugEdit: {
+                required: true,
+                minlength: 3,
+                maxlength: 12
+            },
+            slugAuthor: {
                 required: true,
                 minlength: 3,
                 maxlength: 12

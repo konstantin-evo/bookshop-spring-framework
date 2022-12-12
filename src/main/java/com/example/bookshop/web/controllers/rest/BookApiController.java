@@ -38,7 +38,7 @@ import java.util.List;
 @RequestMapping("/api")
 @Api(value = "book data api")
 @RequiredArgsConstructor
-public class BooksRestApiController {
+public class BookApiController {
 
     private final BookService bookService;
     private final AdminService adminService;
