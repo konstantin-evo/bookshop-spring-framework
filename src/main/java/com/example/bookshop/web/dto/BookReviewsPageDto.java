@@ -6,10 +6,11 @@ import lombok.Setter;
 
 import java.util.List;
 
+// Using for display information about Reviews on Book page
 @Getter
 @Setter
 @Builder
-public class ReviewDto {
+public class BookReviewsPageDto {
     private Integer totalReviews;
     private List<Review> reviews;
 

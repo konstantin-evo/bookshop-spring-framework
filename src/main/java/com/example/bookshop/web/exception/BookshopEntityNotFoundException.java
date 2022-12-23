@@ -7,17 +7,19 @@ import javax.persistence.EntityNotFoundException;
 @Getter
 public class BookshopEntityNotFoundException extends EntityNotFoundException {
 
-    private String entityName;
-    private String message;
+    private final String entityName;
+    private final String message;
 
-    public BookshopEntityNotFoundException(String message) {
-        super(message);
-    }
-
-    public BookshopEntityNotFoundException(String message, String entityName, String parameter, String value) {
-        super(message);
+    public BookshopEntityNotFoundException(String entityName, String parameter, String value) {
+        super("The " + entityName + " not found by parameter \"" + parameter + "\" with value \""
+                + value + "\" .");
         this.entityName = entityName;
         this.message = "The " + entityName + " not found by parameter \"" + parameter + "\" with value \""
                 + value + "\" .";
     }
+
+    public BookshopEntityNotFoundException(String entityName, Integer id) {
+        this(entityName, "Id", id.toString());
+    }
+
 }

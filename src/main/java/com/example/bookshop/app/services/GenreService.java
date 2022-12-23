@@ -21,7 +21,7 @@ public class GenreService {
 
     public Genre getGenreData(Integer id) throws BookshopEntityNotFoundException {
         return genreRepo.findById(id)
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The genre is not found", Genre.class.getSimpleName(), "id", id.toString()));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Genre.class.getSimpleName(), id));
     }
 
     public List<Genre> getGenresData() {

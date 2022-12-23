@@ -38,7 +38,7 @@ public class BookRateService {
      */
     public boolean setBookRate(String slug, Integer userRate, Integer userId) {
         Book book = bookRepo.findBookBySlug(slug)
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The Book is not found", Book.class.getSimpleName(), "Slug", slug));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)
@@ -55,7 +55,7 @@ public class BookRateService {
      */
     public Integer getUserRate(String slug, Integer userId) {
         Book book = bookRepo.findBookBySlug(slug)
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The Book is not found", Book.class.getSimpleName(), "Slug", slug));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         User user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId));
 
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user).orElse(null);

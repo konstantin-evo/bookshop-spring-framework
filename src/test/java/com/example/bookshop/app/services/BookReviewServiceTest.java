@@ -40,7 +40,7 @@ class BookReviewServiceTest {
 
     @Test
     void setRateBookReviewIfReviewIsExist() {
-        when(reviewRateRepo.findByBookReviewAndUser(REVIEW_ID, USER_ID)).thenReturn(mock(BookReviewRate.class));
+        when(reviewRateRepo.findByBookReviewAndUser(REVIEW_ID, USER_ID).get()).thenReturn(mock(BookReviewRate.class));
 
         boolean result = service.setRateBookReview(REVIEW_ID, REVIEW_VALUE, USER_ID);
 

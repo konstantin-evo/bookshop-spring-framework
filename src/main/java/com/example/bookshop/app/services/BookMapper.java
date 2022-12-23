@@ -11,7 +11,7 @@ import com.example.bookshop.web.dto.BookCreateDto;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookFileDto;
 import com.example.bookshop.web.dto.BookRateDto;
-import com.example.bookshop.web.dto.ReviewDto;
+import com.example.bookshop.web.dto.BookReviewsPageDto;
 import com.example.bookshop.web.dto.TagDto;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -113,11 +113,12 @@ public interface BookMapper {
         return map;
     }
 
-    default ReviewDto getBookReviews(Book book) {
+    default BookReviewsPageDto getBookReviews(Book book) {
 
-        List<ReviewDto.Review> reviews = book.getBookRates().stream()
+        List<BookReviewsPageDto.Review> reviews = book.getBookRates().stream()
                 .filter(bookRate -> bookRate.getReview() != null)
-                .map(bookRate -> ReviewDto.Review.builder()
+                .filter(bookRate -> bookRate.getReview().getIsActive() == 1)
+                .map(bookRate -> BookReviewsPageDto.Review.builder()
                         .id(bookRate.getReview().getId())
                         .rate(bookRate.getRating())
                         .text(bookRate.getReview().getText())
@@ -130,9 +131,10 @@ public interface BookMapper {
                 ).collect(Collectors.toList());
 
         Integer totalReviews = (int) book.getBookRates().stream()
+                .filter(bookRate -> bookRate.getReview().getIsActive() == 1)
                 .filter(bookRate -> bookRate.getReview() != null).count();
 
-        return ReviewDto.builder()
+        return BookReviewsPageDto.builder()
                 .reviews(reviews)
                 .totalReviews(totalReviews)
                 .build();

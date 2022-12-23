@@ -10,19 +10,18 @@ import com.example.bookshop.app.model.entity.BookRate;
 import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookReviewRate;
 import com.example.bookshop.app.model.entity.User;
-import com.example.bookshop.web.exception.BookRateNotFoundException;
+import com.example.bookshop.web.dto.UserReviewDto;
 import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import com.example.bookshop.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class BookReviewService {
-
-    private final static String ERROR_MESSAGE = "No rating found for this review. Please rate the book first.";
 
     private final BookReviewRateRepository reviewRateRepo;
     private final BookReviewRepository reviewRepo;
@@ -41,21 +40,10 @@ public class BookReviewService {
      * @return true if the rating update was successful
      */
     public boolean setRateBookReview(Integer reviewId, Integer value, Integer userId) {
-
-        if (reviewRateRepo.findByBookReviewAndUser(reviewId, userId) != null) {
-            BookReviewRate bookReview = reviewRateRepo.findByBookReviewAndUser(reviewId, userId);
-            bookReview.setRate(value);
-            reviewRateRepo.save(bookReview);
-        } else {
-            BookReview bookReview = reviewRepo.findById(reviewId).orElse(null);
-            User user = userRepo.findById(userId).orElse(null);
-            reviewRateRepo.save(
-                    BookReviewRate.builder()
-                            .review(bookReview)
-                            .user(user)
-                            .rate(value)
-                            .build());
-        }
+        BookReviewRate bookReview = reviewRateRepo.findByBookReviewAndUser(reviewId, userId)
+                .orElse(createBookReviewRate(reviewId, userId));
+        bookReview.setRate(value);
+        reviewRateRepo.save(bookReview);
         return true;
     }
 
@@ -66,17 +54,16 @@ public class BookReviewService {
      * @param text   Review texts
      * @param userId Unique user ID
      * @return a boolean value if the save was successful
-     *
-     * @throws BookRateNotFoundException in order to save a review, the Book must have Rate,
-     *                                   if Rate is absent, the Exception is returned (relevant for API)
+     * @throws BookshopEntityNotFoundException in order to save a review, the Book must have Rate, User and Book
+     *                                         if one is absent, the Exception is throws
      */
-    public boolean saveBookReview(String slug, String text, Integer userId) throws BookRateNotFoundException {
+    public boolean saveBookReview(String slug, String text, Integer userId) {
         Book book = bookRepo.findBookBySlug(slug)
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The Book is not found", Book.class.getSimpleName(), "Slug", slug));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)
-                .orElseThrow(() -> new BookRateNotFoundException(ERROR_MESSAGE));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(BookRate.class.getSimpleName(), "Book and User", slug));
 
         if (reviewRepo.findByRate(bookRate) != null) {
             BookReview bookReview = reviewRepo.findByRate(bookRate);
@@ -89,6 +76,31 @@ public class BookReviewService {
             reviewRepo.save(bookReview);
         }
         return true;
+    }
+
+    public List<UserReviewDto> getReviewsByUser(Integer userId) {
+
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(User.class.getSimpleName(), userId));
+
+        List<BookRate> bookRates = bookRateRepo.findBookRateByUser(user);
+
+        if (bookRates.isEmpty()) {
+            throw new BookshopEntityNotFoundException(BookRate.class.getSimpleName(), "userId", userId.toString());
+        } else {
+            return BookReviewMapper.INSTANCE.map(bookRates);
+        }
+    }
+
+    private BookReviewRate createBookReviewRate(Integer reviewId, Integer userId) {
+        BookReview bookReview = reviewRepo.findById(reviewId)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(BookReview.class.getSimpleName(), reviewId));
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(User.class.getSimpleName(), userId));
+        return BookReviewRate.builder()
+                .review(bookReview)
+                .user(user)
+                .build();
     }
 
 }

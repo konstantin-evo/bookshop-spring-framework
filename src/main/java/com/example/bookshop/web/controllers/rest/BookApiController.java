@@ -2,11 +2,9 @@ package com.example.bookshop.web.controllers.rest;
 
 import com.example.bookshop.app.services.AdminService;
 import com.example.bookshop.app.services.BookService;
-import com.example.bookshop.app.services.GoogleApiService;
 import com.example.bookshop.web.dto.ApiResponse;
 import com.example.bookshop.web.dto.BookCreateDto;
 import com.example.bookshop.web.dto.BookDto;
-import com.example.bookshop.web.dto.BooksPageGoogleDto;
 import com.example.bookshop.web.dto.BooksPageDto;
 import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.exception.BookstoreApiWrongParameterException;
@@ -35,23 +33,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/books")
 @Api(value = "book data api")
 @RequiredArgsConstructor
 public class BookApiController {
 
     private final BookService bookService;
     private final AdminService adminService;
-    private final GoogleApiService googleService;
     private final ResourceStorage storage;
 
-    @GetMapping("/books/by-author")
+    @GetMapping("/by-author")
     @ApiOperation("operation to get book list of bookshop by passed author first name")
     public ResponseEntity<List<BookDto>> booksByAuthor(@RequestParam("author") String authorName) {
         return ResponseEntity.ok(bookService.getBooksByAuthorName(authorName));
     }
 
-    @GetMapping("/books/by-title")
+    @GetMapping("/by-title")
     @ApiOperation("get books by title")
     public ResponseEntity<ApiResponse<BookDto>> booksByTitle(@RequestParam("title") String title)
             throws BookstoreApiWrongParameterException {
@@ -65,53 +62,51 @@ public class BookApiController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/books/by-price")
+    @GetMapping("/by-price")
     @ApiOperation("get books by price")
     public ResponseEntity<List<BookDto>> booksByPrice(@RequestParam("price") Integer price) {
         return ResponseEntity.ok(bookService.getBooksWithPrice(price));
     }
 
-    @GetMapping("/books/by-discount-range")
+    @GetMapping("/by-discount-range")
     @ApiOperation("get books by discount range from min to max discount")
     public ResponseEntity<List<BookDto>> discountRangeBooks(@RequestParam("min") Double min,
                                                             @RequestParam("max") Double max) {
         return ResponseEntity.ok(bookService.getBooksWithDiscountBetween(min, max));
     }
 
-    @GetMapping("/books/by-price-range")
+    @GetMapping("/by-price-range")
     @ApiOperation("get books by price range from min to max price")
     public ResponseEntity<List<BookDto>> priceRangeBooks(@RequestParam("min") Integer min,
                                                          @RequestParam("max") Integer max) {
         return ResponseEntity.ok(bookService.getBooksWithPriceBetween(min, max));
     }
 
-    @GetMapping("/books/with-max-discount")
+    @GetMapping("/with-max-discount")
     @ApiOperation("get list of book with max price")
     public ResponseEntity<List<BookDto>> maxPriceBooks() {
         return ResponseEntity.ok(bookService.getBooksWithMaxPrice());
     }
 
-    @GetMapping("/books/bestsellers")
+    @GetMapping("/bestsellers")
     @ApiOperation("get bestseller book (which is_bestseller = 1)")
     public ResponseEntity<List<BookDto>> bestSellerBooks() {
         return ResponseEntity.ok(bookService.getBestsellers());
     }
 
-    @GetMapping("/books/recent")
+    @GetMapping("/recent")
     @ResponseBody
     public BooksPageDto getRecentBooksPage(@RequestParam("from") String from,
                                            @RequestParam("to") String to,
                                            @RequestParam("offset") Integer offset,
                                            @RequestParam("limit") Integer limit) {
-
         LocalDate dateFrom = bookService.convertToLocalDate(from);
         LocalDate dateTo = bookService.convertToLocalDate(to);
-
         return new BooksPageDto(bookService.getPageOfRecentBooks(dateFrom, dateTo, offset, limit)
                 .getContent());
     }
 
-    @GetMapping("/books/recommended")
+    @GetMapping("/recommended")
     @ResponseBody
     public BooksPageDto getRecommendedBooksPage(@RequestParam("offset") Integer offset,
                                                 @RequestParam("limit") Integer limit) {
@@ -121,7 +116,7 @@ public class BookApiController {
                         .getContent());
     }
 
-    @GetMapping("/books/popular")
+    @GetMapping("/popular")
     @ResponseBody
     public BooksPageDto getPopularBooksPage(@RequestParam("offset") Integer offset,
                                             @RequestParam("limit") Integer limit) {
@@ -131,13 +126,13 @@ public class BookApiController {
                         .getContent());
     }
 
-    @GetMapping("/books/{slug}")
+    @GetMapping("/{slug}")
     @ResponseBody
     public BookDto getBooksByTag(@PathVariable String slug) {
         return bookService.getBook(slug);
     }
 
-    @GetMapping("/books/tags/{id}")
+    @GetMapping("/tags/{id}")
     @ResponseBody
     public BooksPageDto getBooksByTag(@PathVariable Integer id,
                                       @RequestParam("offset") Integer offset,
@@ -148,7 +143,7 @@ public class BookApiController {
                         .getContent());
     }
 
-    @GetMapping("/books/genre/{id}")
+    @GetMapping("/genre/{id}")
     @ResponseBody
     public BooksPageDto getBooksByGenre(@PathVariable Integer id,
                                         @RequestParam("offset") Integer offset,
@@ -159,7 +154,7 @@ public class BookApiController {
                         .getContent());
     }
 
-    @GetMapping("/books/author/{id}")
+    @GetMapping("/author/{id}")
     @ResponseBody
     public BooksPageDto getBooksByAuthor(@PathVariable Integer id,
                                          @RequestParam("offset") Integer offset,
@@ -170,34 +165,25 @@ public class BookApiController {
                         .getContent());
     }
 
-    @GetMapping("/search/{searchWord}")
-    @ResponseBody
-    public BooksPageGoogleDto getBooksBySearchQuery(@PathVariable String searchWord,
-                                                    @RequestParam("offset") Integer offset,
-                                                    @RequestParam("limit") Integer limit) {
-        return new BooksPageGoogleDto(googleService
-                .getPageOfSearchResult(searchWord, offset, limit));
-    }
-
-    @PostMapping(value = "/books", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ValidatedResponseDto createBook(@RequestBody BookCreateDto bookDto) {
         return adminService.createBook(bookDto);
     }
 
-    @PatchMapping(value = "/books/{slug}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PatchMapping(value = "/{slug}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ValidatedResponseDto editBook(@RequestBody BookCreateDto bookDto, @PathVariable String slug) {
         return adminService.editBook(bookDto, slug);
     }
 
-    @DeleteMapping(value = "/books/{slug}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/{slug}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ValidatedResponseDto deleteBook(@PathVariable String slug) {
         return adminService.deleteBook(slug);
     }
 
-    @PostMapping("/books/{slug}/img/save")
+    @PostMapping("/{slug}/img/save")
     @ResponseBody
     public ValidatedResponseDto saveNewBookImage(@RequestParam("file") MultipartFile file,
                                                  @PathVariable("slug") String slug) throws IOException {

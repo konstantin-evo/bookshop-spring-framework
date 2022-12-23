@@ -2,10 +2,12 @@ package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.dao.AuthorRepository;
 import com.example.bookshop.app.model.dao.BookRepository;
+import com.example.bookshop.app.model.dao.BookReviewRepository;
 import com.example.bookshop.app.model.dao.BookToGenreRepository;
 import com.example.bookshop.app.model.dao.GenreRepository;
 import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookToGenre;
 import com.example.bookshop.app.model.entity.Genre;
 import com.example.bookshop.web.dto.AuthorDto;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class AdminService {
 
     private final BookRepository bookRepo;
+    private final BookReviewRepository reviewRepo;
     private final AuthorService authorService;
     private final AuthorRepository authorRepo;
     private final GenreRepository genreRepo;
@@ -40,7 +43,7 @@ public class AdminService {
         if (isDtoCorrect(bookDto, response)) {
             Book book = BookMapper.INSTANCE.map(bookDto);
             Author author = authorService.getAuthorByFullName(bookDto.getAuthor())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
+                    .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
 
             book.setAuthor(author);
             book.setSlug(generateSlug());
@@ -48,7 +51,7 @@ public class AdminService {
             bookRepo.save(book);
 
             Genre genre = genreRepo.getGenreByName(bookDto.getGenre())
-                    .orElseThrow(() -> new BookshopEntityNotFoundException("The genre is not found", Genre.class.getSimpleName(), "Name", bookDto.getGenre()));
+                    .orElseThrow(() -> new BookshopEntityNotFoundException(Genre.class.getSimpleName(), "Name", bookDto.getGenre()));
 
             bookToGenreRepo.save(new BookToGenre(book, genre));
 
@@ -63,10 +66,10 @@ public class AdminService {
     @Transactional
     public ValidatedResponseDto editBook(BookCreateDto bookDto, String slug) {
         Book book = bookRepo.findBookBySlug(slug)
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The book is not found", Book.class.getSimpleName(), "Slug", slug));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
 
         Author author = authorService.getAuthorByFullName(bookDto.getAuthor())
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
 
         BookMapper.INSTANCE.updateBook(bookDto, book);
         book.setAuthor(author);
@@ -77,7 +80,7 @@ public class AdminService {
     @Transactional
     public ValidatedResponseDto editAuthor(AuthorDto authorDto, String slug) {
         Author author = authorRepo.getAuthorBySlug(slug)
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The author is not found", Author.class.getSimpleName(), "Slug", slug));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Slug", slug));
 
         AuthorMapper.INSTANCE.updateAuthor(authorDto, author);
         authorRepo.save(author);
@@ -87,9 +90,22 @@ public class AdminService {
     @Transactional
     public ValidatedResponseDto deleteBook(String slug) {
         Book book = bookRepo.findBookBySlug(slug)
-                .orElseThrow(() -> new BookshopEntityNotFoundException("The book is not found", Book.class.getSimpleName(), "Slug", slug));
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
         bookRepo.updateIsActive(0, book.getId());
         return new ValidatedResponseDto(true, new HashMap<>());
+    }
+
+    @Transactional
+    public ValidatedResponseDto deleteReview(Integer reviewId) {
+
+        Optional<BookReview> bookReview = reviewRepo.findById(reviewId);
+
+        if (bookReview.isPresent()) {
+            reviewRepo.updateIsActive(0, reviewId);
+            return new ValidatedResponseDto(true, new HashMap<>());
+        } else {
+            throw new BookshopEntityNotFoundException(BookReview.class.getSimpleName(), reviewId);
+        }
     }
 
     private boolean isDtoCorrect(BookCreateDto bookDto, ValidatedResponseDto response) {
