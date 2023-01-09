@@ -1,21 +1,26 @@
 package com.example.bookshop.app.services;
 
+import com.example.bookshop.app.config.security.BookshopUserDetails;
 import com.example.bookshop.app.model.dao.AuthorRepository;
 import com.example.bookshop.app.model.dao.BookRepository;
 import com.example.bookshop.app.model.dao.BookReviewRepository;
 import com.example.bookshop.app.model.dao.BookToGenreRepository;
 import com.example.bookshop.app.model.dao.GenreRepository;
+import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookToGenre;
 import com.example.bookshop.app.model.entity.Genre;
+import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.dto.AuthorDto;
 import com.example.bookshop.web.dto.BookCreateDto;
+import com.example.bookshop.web.dto.UserDto;
 import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +35,7 @@ public class AdminService {
     private final BookReviewRepository reviewRepo;
     private final AuthorService authorService;
     private final AuthorRepository authorRepo;
+    private final UserRepository userRepo;
     private final GenreRepository genreRepo;
     private final TagService tagService;
     private final BookToGenreRepository bookToGenreRepo;
@@ -74,6 +80,22 @@ public class AdminService {
         BookMapper.INSTANCE.updateBook(bookDto, book);
         book.setAuthor(author);
         bookRepo.save(book);
+        return new ValidatedResponseDto(true, new HashMap<>());
+    }
+
+    @Transactional
+    public ValidatedResponseDto editUser(UserDto userDto, Integer userId, Authentication authentication) {
+        User user = userRepo.findById(userId).
+                orElseThrow(() -> new BookshopEntityNotFoundException(User.class.getSimpleName(), userId));
+
+        // set updated info in database
+        UserMapper.INSTANCE.updateUser(userDto, user);
+        userRepo.save(user);
+
+        // update SecurityContext to display updated information in the current session
+        BookshopUserDetails userDetails = (BookshopUserDetails) authentication.getPrincipal();
+        userDetails.setIsBlocked(userDto.getIsBlocked());
+
         return new ValidatedResponseDto(true, new HashMap<>());
     }
 

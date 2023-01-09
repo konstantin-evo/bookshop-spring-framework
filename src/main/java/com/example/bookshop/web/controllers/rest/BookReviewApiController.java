@@ -42,10 +42,7 @@ public class BookReviewApiController {
             throws CustomAuthenticationException {
         User user = (User) userRegisterService.getCurrentUser();
         if (user != null) {
-            return bookReviewService.saveBookReview(
-                    bookReview.getSlug(),
-                    bookReview.getText(),
-                    user.getId());
+            return bookReviewService.saveBookReview(bookReview.getSlug(), bookReview.getText(), user);
         } else {
             throw new CustomAuthenticationException("Please authenticate in order to send the review.");
         }

@@ -42,6 +42,7 @@ public class BookPageController {
 
         if (user != null) {
             model.addAttribute("userRate", rateService.getUserRate(slug, user.getId()));
+            model.addAttribute("isBlocked", user.getIsBlocked());
             bookService.viewBookByUser(user, slug);
         }
 

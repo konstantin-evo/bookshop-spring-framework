@@ -12,7 +12,6 @@ import com.example.bookshop.app.model.entity.BookReviewRate;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.dto.UserReviewDto;
 import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
-import com.example.bookshop.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -48,34 +47,23 @@ public class BookReviewService {
     }
 
     /**
-     * Saves in Repository a new review for a Book
+     * Saves in Repository a new review for a Book in case User is not blocked
      *
-     * @param slug   Unique identifier for the book
-     * @param text   Review texts
-     * @param userId Unique user ID
+     * @param slug Unique identifier for the book
+     * @param text Review texts
+     * @param user User from current session
+     *
      * @return a boolean value if the save was successful
-     * @throws BookshopEntityNotFoundException in order to save a review, the Book must have Rate, User and Book
-     *                                         if one is absent, the Exception is throws
+     * @throws BookshopEntityNotFoundException in order to save a review, the Book must have Rate and exist
+     *                                         if one is absent the exception is thrown
      */
-    public boolean saveBookReview(String slug, String text, Integer userId) {
+    public boolean saveBookReview(String slug, String text, User user) {
         Book book = bookRepo.findBookBySlug(slug)
                 .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", slug));
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
         BookRate bookRate = bookRateRepo.findBookRateByBookAndUser(book, user)
                 .orElseThrow(() -> new BookshopEntityNotFoundException(BookRate.class.getSimpleName(), "Book and User", slug));
 
-        if (reviewRepo.findByRate(bookRate) != null) {
-            BookReview bookReview = reviewRepo.findByRate(bookRate);
-            bookReview.setText(text);
-            bookReview.setPubDate(new Timestamp(System.currentTimeMillis()));
-            reviewRepo.save(bookReview);
-        } else {
-            BookReview bookReview = new BookReview(bookRate, text);
-            bookRate.setReview(new BookReview(bookRate, text));
-            reviewRepo.save(bookReview);
-        }
-        return true;
+        return user.getIsBlocked() != 1 && saveBookReview(bookRate, text);
     }
 
     public List<UserReviewDto> getReviewsByUser(Integer userId) {
@@ -90,6 +78,20 @@ public class BookReviewService {
         } else {
             return BookReviewMapper.INSTANCE.map(bookRates);
         }
+    }
+
+    private boolean saveBookReview(BookRate bookRate, String text) {
+        if (reviewRepo.findByRate(bookRate) != null) {
+            BookReview bookReview = reviewRepo.findByRate(bookRate);
+            bookReview.setText(text);
+            bookReview.setPubDate(new Timestamp(System.currentTimeMillis()));
+            reviewRepo.save(bookReview);
+        } else {
+            BookReview bookReview = new BookReview(bookRate, text);
+            bookRate.setReview(new BookReview(bookRate, text));
+            reviewRepo.save(bookReview);
+        }
+        return true;
     }
 
     private BookReviewRate createBookReviewRate(Integer reviewId, Integer userId) {

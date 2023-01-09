@@ -49,6 +49,11 @@ public class User {
     private String phone;
     private String password;
 
+    // if isBlocked = 1 so the User can't write Reviews
+    // using by the Admin role to moderate reviews
+    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 1")
+    private Integer isBlocked;
+
     @OneToMany(mappedBy = "user")
     private List<BookToUser> bookToUsers;
 
@@ -76,6 +81,7 @@ public class User {
         this.hash = "user-" + hash.substring(0, 2) + "-" + hash.substring(3, 6);
         this.regTime = new Timestamp(System.currentTimeMillis());
         this.balance = 0;
+        this.isBlocked = 0;
     }
 
     public User(String name, String email) {

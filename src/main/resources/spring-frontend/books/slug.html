@@ -216,8 +216,8 @@
                 </div>
                 <!-- Reviews List Section (end) -->
                 <!-- Form to write new Review by user (start) -->
-                <div class="container" style="margin-top: 4%; text-align: center;"
-                     sec:authorize="isAuthenticated()">
+                <!-- Form is created only for Authenticated and not blocked users -->
+                <div th:if="${isBlocked == 0}" sec:authorize="isAuthenticated()" class="form-review">
                     <form id="userReviewForm" action="/api/reviews" method="post">
                         <span class="ProductCard-socialTitle" style="text-align: center; background: rgba(0, 0, 0, 0);"
                               th:text="'Book Review'">n/a

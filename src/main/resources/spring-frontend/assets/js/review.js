@@ -16,10 +16,15 @@ $(document).ready(function () {
     });
 
     // function to delete Review by ID
-    // $('.review_hide').click(function (e) {
     $(document).on('click', '.review_hide', function (e) {
         e.preventDefault();
         sendDeleteReviewRequest($(this))
+    });
+
+    // function to delete (hide) Review by ID
+    $(document).on('click', '.block_user', function (e) {
+        e.preventDefault();
+        sendBlockUserRequest($(this))
     });
 
 });
@@ -83,6 +88,40 @@ function sendDeleteReviewRequest(deleteReviewButton) {
             }
 
             processValidatedResponseDto(validatedResponseDto, parentElement, "Review successfully deleted")
+
+        },
+        // in case of technical and unexpected error
+        error: function (errorResponse) {
+            let error = errorResponse.responseJSON;
+            createErrorElement(parentElement, error.message)
+        }
+    })
+}
+
+function sendBlockUserRequest(blockUserButton) {
+    let userId = $('#userId').val();
+    let parentElement = blockUserButton.closest('.AdminReview-btn');
+    let data = {
+        "isBlocked": 1
+    };
+
+    $.ajax({
+        url: '/api/users/' + userId,
+        type: 'PATCH',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(data),
+        success: function (validatedResponseDto) {
+
+            // in case of business error we have 200 HTTP Status
+            // and info about error in ValidatedResponseDto object
+            if (!validatedResponseDto.validated) {
+                $.each(response.errorMessages, function (key, value) {
+                    createErrorElement(parentElement, value)
+                });
+            }
+
+            processValidatedResponseDto(validatedResponseDto, parentElement, "User successfully blocked")
 
         },
         // in case of technical and unexpected error
