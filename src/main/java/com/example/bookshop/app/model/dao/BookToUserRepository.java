@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public interface BookToUserRepository extends JpaRepository<BookToUser, Integer> {
 
@@ -27,4 +28,7 @@ public interface BookToUserRepository extends JpaRepository<BookToUser, Integer>
     boolean existsBookToUserByBookAndUserAndType(Book book, User user, BookToUserType type);
 
     Page<BookToUser> findByUserAndType(User user, BookToUserType type, Pageable nextPage);
+
+    List<BookToUser> findByUser(User user);
+
 }

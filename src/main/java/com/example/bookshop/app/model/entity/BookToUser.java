@@ -1,7 +1,6 @@
 package com.example.bookshop.app.model.entity;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.Column;
@@ -19,7 +18,6 @@ import java.sql.Timestamp;
 @Setter
 @Table(name = "book2user")
 @Entity
-@NoArgsConstructor
 public class BookToUser {
 
     @Id
@@ -43,11 +41,14 @@ public class BookToUser {
     @JoinColumn(name = "user_id", referencedColumnName = "id", columnDefinition = "INT NOT NULL")
     private User user;
 
+    public BookToUser() {
+        this.time = new Timestamp(System.currentTimeMillis());
+    }
     public BookToUser(User user, Book book, BookToUserType type) {
+        this();
         this.user = user;
         this.book = book;
         this.type = type;
-        this.time = new Timestamp(System.currentTimeMillis());
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.bookshop.web.controllers;
 
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.services.BookService;
+import com.example.bookshop.app.services.BookToUserService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.ValidatedResponseDto;
@@ -28,6 +29,7 @@ import java.util.List;
 public class CartPageController {
 
     private final BookService bookService;
+    private final BookToUserService bookToUserService;
     private final UserRegisterService userRegisterService;
 
     @Value("${default.offset}")
@@ -71,7 +73,7 @@ public class CartPageController {
     public ValidatedResponseDto handleOrderBook(@CookieValue(name = "cartContents", required = false) String cartContents,
                                                 HttpServletResponse response) {
         User user = (User) userRegisterService.getCurrentUser();
-        return bookService.orderBooks(cartContents, user, response);
+        return bookToUserService.orderBooks(cartContents, user, response);
     }
 
     @PostMapping("/changeBookStatus/cart/remove/{slug}")

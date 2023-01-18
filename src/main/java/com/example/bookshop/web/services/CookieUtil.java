@@ -5,7 +5,11 @@ import org.springframework.web.util.WebUtils;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringJoiner;
 
 public class CookieUtil {
 
@@ -44,6 +48,23 @@ public class CookieUtil {
             cookie.setValue(stringJoiner.toString());
         }
         response.addCookie(cookie);
+    }
+
+    /**
+     * The method generates List of cookies separated by "/"
+     *
+     * @param cookie value of the cookie, can contain several books at once
+     *               for example "book-bqr-bsi/book-ebf-jyu/book-ekp-gdh"
+     * @return List<String> contains cookie names
+     */
+    public static List<String> getValues(String cookie) {
+        if (cookie == null) {
+            return Collections.emptyList();
+        } else {
+            cookie = cookie.startsWith("/") ? cookie.substring(1) : cookie;
+            cookie = cookie.endsWith("/") ? cookie.substring(0, cookie.length() - 1) : cookie;
+            return List.of(cookie.split("/"));
+        }
     }
 
     public static void clearCookieByName(HttpServletResponse response, String name) {

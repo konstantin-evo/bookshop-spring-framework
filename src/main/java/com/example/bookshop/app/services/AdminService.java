@@ -5,16 +5,22 @@ import com.example.bookshop.app.model.dao.AuthorRepository;
 import com.example.bookshop.app.model.dao.BookRepository;
 import com.example.bookshop.app.model.dao.BookReviewRepository;
 import com.example.bookshop.app.model.dao.BookToGenreRepository;
+import com.example.bookshop.app.model.dao.BookToUserRepository;
+import com.example.bookshop.app.model.dao.BookToUserTypeRepository;
 import com.example.bookshop.app.model.dao.GenreRepository;
 import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.app.model.entity.Book;
 import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookToGenre;
+import com.example.bookshop.app.model.entity.BookToUser;
+import com.example.bookshop.app.model.entity.BookToUserType;
 import com.example.bookshop.app.model.entity.Genre;
 import com.example.bookshop.app.model.entity.User;
+import com.example.bookshop.app.model.entity.enumuration.BookToUserEnum;
 import com.example.bookshop.web.dto.AuthorDto;
 import com.example.bookshop.web.dto.BookCreateDto;
+import com.example.bookshop.web.dto.BookToUserDto;
 import com.example.bookshop.web.dto.UserDto;
 import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
@@ -25,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -39,14 +46,17 @@ public class AdminService {
     private final GenreRepository genreRepo;
     private final TagService tagService;
     private final BookToGenreRepository bookToGenreRepo;
+    private final BookToUserRepository bookToUserRepo;
+    private final BookToUserTypeRepository bookToUserTypeRepo;
 
     private static final String DUMMY_IMAGE = "http://dummyimage.com/200x300.png/5fa2dd/ffffff";
 
+    @Transactional
     public ValidatedResponseDto createBook(BookCreateDto bookDto) {
 
         ValidatedResponseDto response = new ValidatedResponseDto(true, new HashMap<>());
 
-        if (isDtoCorrect(bookDto, response)) {
+        if (isBookDtoCorrect(bookDto, response)) {
             Book book = BookMapper.INSTANCE.map(bookDto);
             Author author = authorService.getAuthorByFullName(bookDto.getAuthor())
                     .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
@@ -64,6 +74,27 @@ public class AdminService {
             if (!bookDto.getTags().isEmpty()) {
                 tagService.setTagsToBook(bookDto.getTags(), book);
             }
+        }
+
+        return response;
+    }
+
+    @Transactional
+    public ValidatedResponseDto createBookToUser(BookToUserDto bookToUserDto) {
+
+        ValidatedResponseDto response = new ValidatedResponseDto(true, new HashMap<>());
+
+        if (isBookToUserDtoCorrect(bookToUserDto, response)) {
+
+            Book book = bookRepo.findBookBySlug(bookToUserDto.getBookSlug())
+                    .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", bookToUserDto.getBookSlug()));
+            BookToUserType bookToUserType = bookToUserTypeRepo.findByCode(BookToUserEnum.valueOf(bookToUserDto.getBookStatus()))
+                    .orElseThrow(() -> new BookshopEntityNotFoundException(BookToUserType.class.getSimpleName(), "Book Status", BookToUserEnum.VIEWED.toString()));
+            User user = userRepo.findUserByName(bookToUserDto.getUsername()).get(0);
+
+            BookToUser bookToUser = new BookToUser(user, book, bookToUserType);
+
+            bookToUserRepo.save(bookToUser);
         }
 
         return response;
@@ -100,6 +131,21 @@ public class AdminService {
     }
 
     @Transactional
+    public ValidatedResponseDto editBookToUser(BookToUserDto bookToUserDto, Integer bookToUserId) {
+
+        BookToUser bookToUser = bookToUserRepo.findById(bookToUserId)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(BookToUser.class.getSimpleName(), bookToUserId));
+        BookToUserType bookToUserType = bookToUserTypeRepo.findByCode(BookToUserEnum.valueOf(bookToUserDto.getBookStatus()))
+                .orElseThrow(() -> new BookshopEntityNotFoundException(BookToUserType.class.getSimpleName(), "Book Status", bookToUserDto.getBookStatus()));
+
+        BookToUserMapper.INSTANCE.updateBookToUser(bookToUserDto, bookToUser, bookToUserTypeRepo);
+        bookToUser.setType(bookToUserType);
+        bookToUserRepo.save(bookToUser);
+
+        return new ValidatedResponseDto(true, new HashMap<>());
+    }
+
+    @Transactional
     public ValidatedResponseDto editAuthor(AuthorDto authorDto, String slug) {
         Author author = authorRepo.getAuthorBySlug(slug)
                 .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Slug", slug));
@@ -130,7 +176,7 @@ public class AdminService {
         }
     }
 
-    private boolean isDtoCorrect(BookCreateDto bookDto, ValidatedResponseDto response) {
+    private boolean isBookDtoCorrect(BookCreateDto bookDto, ValidatedResponseDto response) {
 
         Optional<Author> author = authorService.getAuthorByFullName(bookDto.getAuthor());
         Optional<Genre> genre = genreRepo.getGenreByName(bookDto.getGenre());
@@ -153,6 +199,35 @@ public class AdminService {
         }
 
         return author.isPresent() && genre.isPresent() && isTagsCorrect;
+    }
+
+    private boolean isBookToUserDtoCorrect(BookToUserDto bookToUserDto, ValidatedResponseDto response) {
+
+        List<User> users = userRepo.findUserByName(bookToUserDto.getUsername());
+        Optional<Book> book = bookRepo.findBookBySlug(bookToUserDto.getBookSlug());
+        Optional<BookToUserType> bookToUserType = bookToUserTypeRepo.findByCode(BookToUserEnum.valueOf(bookToUserDto.getBookStatus()));
+
+        if (users.isEmpty()) {
+            response.setValidated(false);
+            response.getErrorMessages().put("User", "User not found in database");
+        }
+
+        if (users.size() > 1) {
+            response.setValidated(false);
+            response.getErrorMessages().put("User", "Not uniq username");
+        }
+
+        if (book.isEmpty()) {
+            response.setValidated(false);
+            response.getErrorMessages().put("Book", "Book not find by slug");
+        }
+
+        if (bookToUserType.isEmpty()) {
+            response.setValidated(false);
+            response.getErrorMessages().put("Status", "BookToUserEnum not contained books status");
+        }
+
+        return (users.size() == 1) && book.isPresent() && bookToUserType.isPresent();
     }
 
     private String generateSlug() {

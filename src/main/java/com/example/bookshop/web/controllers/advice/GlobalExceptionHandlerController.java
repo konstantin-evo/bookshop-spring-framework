@@ -114,4 +114,14 @@ public class GlobalExceptionHandlerController {
                 e),
                 HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ApiResponse<Exception>> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("IllegalArgumentException has occurred. {}", e.getLocalizedMessage());
+        return new ResponseEntity<>(new ApiResponse<>(
+                HttpStatus.BAD_REQUEST,
+                e.getMessage(),
+                e),
+                HttpStatus.BAD_REQUEST);
+    }
 }

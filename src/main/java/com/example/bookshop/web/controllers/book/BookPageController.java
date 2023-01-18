@@ -3,6 +3,7 @@ package com.example.bookshop.web.controllers.book;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.services.BookRateService;
 import com.example.bookshop.app.services.BookService;
+import com.example.bookshop.app.services.BookToUserService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.services.ResourceStorage;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ import java.nio.file.Path;
 public class BookPageController {
 
     private final BookService bookService;
+    private final BookToUserService bookToUserService;
     private final BookRateService rateService;
     private final UserRegisterService userRegisterService;
     private final ResourceStorage storage;
@@ -43,7 +45,7 @@ public class BookPageController {
         if (user != null) {
             model.addAttribute("userRate", rateService.getUserRate(slug, user.getId()));
             model.addAttribute("isBlocked", user.getIsBlocked());
-            bookService.viewBookByUser(user, slug);
+            bookToUserService.viewBookByUser(user, slug);
         }
 
         return "books/slug";

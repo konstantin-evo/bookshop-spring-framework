@@ -36,8 +36,8 @@ public class AdminPageController {
         return "admin/review";
     }
 
-    @GetMapping("/user")
-    public String adminUserPage(){
-        return "admin/user";
+    @GetMapping("/bookshelf")
+    public String adminBookshelfPage(){
+        return "admin/bookshelf";
     }
 }

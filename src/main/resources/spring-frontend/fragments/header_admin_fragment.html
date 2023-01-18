@@ -64,7 +64,7 @@
                                 <g> </g>
                             </svg>
                             <span class="CartBlock-amount"
-                                  th:text="${PaidBookCount}">n/a</span>
+                                  th:text="${bookPaidCount}">n/a</span>
                         </a>
                         <a class="CartBlock-block" th:href="@{/books/postponed}">
                             <svg class="CartBlock-img" xmlns="http://www.w3.org/2000/svg" height="23" width="23"
@@ -163,11 +163,11 @@
                     </li>
                     <li class="menu-item"
                         sec:authorize="isAuthenticated()"
-                        th:class="(${#httpServletRequest.requestURI}=='/admin/user')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        th:class="(${#httpServletRequest.requestURI}=='/admin/bookshelf')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
                            th:id="nav-adm-user"
-                           th:href="@{/admin/user}"
-                           th:text="#{topbar.admin.user}">n/a</a>
+                           th:href="@{/admin/bookshelf}"
+                           th:text="#{topbar.admin.bookshelf}">n/a</a>
                     </li>
                     <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/')?'menu-item menu-item_ACTIVE':'menu-item'">

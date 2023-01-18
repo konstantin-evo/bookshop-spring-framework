@@ -1004,5 +1004,6 @@ insert into book2user (id, time, book_id, type_id, user_id) values (997, '2020-0
 insert into book2user (id, time, book_id, type_id, user_id) values (998, '2021-12-01 13:41:00', 993, 3, 75);
 insert into book2user (id, time, book_id, type_id, user_id) values (999, '2021-06-18 10:14:36', 803, 1, 86);
 insert into book2user (id, time, book_id, type_id, user_id) values (1000, '2021-09-29 14:16:41', 813, 1, 41);
+insert into book2user (id, time, book_id, type_id, user_id) values (1001, '2021-10-10 06:25:47', 813, 3, 101);
 
 SELECT setval('book2user_id_seq', max(id)) FROM book2user;
