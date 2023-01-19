@@ -34,7 +34,7 @@ class BookMapperTest {
      */
     @Test
     void testBookRate() {
-        assertEquals(bookRate.getRate(), 3);
+        assertEquals(3, bookRate.getRate());
     }
 
     /**
@@ -45,11 +45,11 @@ class BookMapperTest {
      */
     @Test
     void testBookRateDistribution() {
-        assertEquals(bookRate.getRateDistribution().get(1), 1);
-        assertEquals(bookRate.getRateDistribution().get(2), 1);
-        assertEquals(bookRate.getRateDistribution().get(3), 1);
-        assertEquals(bookRate.getRateDistribution().get(4), 1);
-        assertEquals(bookRate.getRateDistribution().get(5), 1);
+        assertEquals(1, bookRate.getRateDistribution().get(1));
+        assertEquals(1, bookRate.getRateDistribution().get(2));
+        assertEquals(1, bookRate.getRateDistribution().get(3));
+        assertEquals(1, bookRate.getRateDistribution().get(4));
+        assertEquals(1, bookRate.getRateDistribution().get(5));
     }
 
     private Book generateBook() {

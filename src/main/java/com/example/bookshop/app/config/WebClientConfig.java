@@ -18,19 +18,19 @@ import java.time.Duration;
 public class WebClientConfig {
 
     @Value("${google.books.api.url}")
-    private String GOOGLE_URL;
+    private String googleUrl;
 
     @Value("${google.books.api.timeout}")
-    private int TIMEOUT;
+    private int timeout;
 
     @Bean
     public WebClient webClientGoogle() {
 
         final HttpClient client = HttpClient.create()
-                .responseTimeout(Duration.ofSeconds(TIMEOUT));
+                .responseTimeout(Duration.ofSeconds(timeout));
 
         return org.springframework.web.reactive.function.client.WebClient.builder()
-                .baseUrl(GOOGLE_URL)
+                .baseUrl(googleUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                 .defaultCookie("SameSite", "None")
                 .clientConnector(new ReactorClientHttpConnector(client))

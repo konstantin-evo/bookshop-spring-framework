@@ -30,6 +30,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -231,17 +232,18 @@ public class AdminService {
     }
 
     private String generateSlug() {
-        String slug = "book-"
-                + RandomStringUtils.randomAlphabetic(3) + "-"
-                + RandomStringUtils.randomAlphabetic(3);
+        String slug = "book-" + generateRandomAlphabetic(3) + "-" + generateRandomAlphabetic(3);
 
         // If a book with this Slug exists, generate a new random value
         while (bookRepo.existsBySlug(slug)) {
-            slug = "book-"
-                    + RandomStringUtils.randomAlphabetic(3) + "-"
-                    + RandomStringUtils.randomAlphabetic(3);
+            slug = "book-" + generateRandomAlphabetic(3) + "-" + generateRandomAlphabetic(3);
         }
+
         return slug;
+    }
+
+    private String generateRandomAlphabetic(int count) {
+        return RandomStringUtils.random(count, 0, 0, true, true, null, new SecureRandom());
     }
 
 }

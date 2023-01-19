@@ -26,24 +26,24 @@ public class BookPopularityScheduler {
     private final BookToUserRepository bookToUserRepo;
 
     @Value("${book.coefficient.paid}")
-    private double BOOK_COEFFICIENT_PAID;
+    private double bookCoefficientPaid;
 
     @Value("${book.coefficient.viewed}")
-    private double BOOK_COEFFICIENT_VIEWED;
+    private double bookCoefficientViewed;
 
     @Value("${book.coefficient.cart}")
-    private double BOOK_COEFFICIENT_CART;
+    private double bookCoefficientCart;
 
     @Value("${book.coefficient.kept}")
-    private double BOOK_COEFFICIENT_KEPT;
+    private double bookCoefficientKept;
 
     @Value("${book.time.popular.month}")
-    private int TIME_OF_RELEVANCE;
+    private int timeOfRelevance;
 
     @Value("${book.size.popular.update}")
-    private int NUMBER_OF_BOOKS_TO_UPDATE;
+    private int numberOfBooksToUpdate;
 
-    private static int CURRENT_UPDATING_PAGE;
+    private int currentUpdatingPage;
 
     /*
     The book's popularity rating is calculated every hour
@@ -51,17 +51,17 @@ public class BookPopularityScheduler {
     @Scheduled(fixedDelay = 60_000)
     @Transactional
     public void calculateBooksPopularity() {
-        Pageable nextPage = PageRequest.of(CURRENT_UPDATING_PAGE, NUMBER_OF_BOOKS_TO_UPDATE);
+        Pageable nextPage = PageRequest.of(currentUpdatingPage, numberOfBooksToUpdate);
         Page<Book> books = bookRepo.findActualBooks(nextPage);
         int totalPages = books.getTotalPages();
 
-        if (totalPages > CURRENT_UPDATING_PAGE) {
+        if (totalPages > currentUpdatingPage) {
             books.forEach(this::updateBookRating);
-            CURRENT_UPDATING_PAGE++;
+            this.currentUpdatingPage++;
             log.info("The Rating of the books has been updated. Total books on the update list: {}, The books have been updated so far: {}, Time: {}",
-                    totalPages * NUMBER_OF_BOOKS_TO_UPDATE, CURRENT_UPDATING_PAGE * NUMBER_OF_BOOKS_TO_UPDATE, LocalDateTime.now());
+                    totalPages * numberOfBooksToUpdate, currentUpdatingPage * numberOfBooksToUpdate, LocalDateTime.now());
         } else {
-            CURRENT_UPDATING_PAGE = 0;
+            this.currentUpdatingPage = 0;
             log.info("All the books have been updated. The popularity update process has started from the beginning of the list." +
                     "Time: {}", LocalDateTime.now());
         }
@@ -69,14 +69,14 @@ public class BookPopularityScheduler {
 
     private void updateBookRating(Book book) {
 
-        Timestamp relevanceTime = Timestamp.valueOf(LocalDateTime.now().minusMonths(TIME_OF_RELEVANCE));
+        Timestamp relevanceTime = Timestamp.valueOf(LocalDateTime.now().minusMonths(timeOfRelevance));
 
         double cart = bookToUserRepo.countByBookAndTypeCode(book, BookToUserEnum.CART);
         double kept = bookToUserRepo.countByBookAndTypeCode(book, BookToUserEnum.KEPT);
         double paid = bookToUserRepo.countByBookAndTypeCode(book, BookToUserEnum.PAID);
         double viewed = bookToUserRepo.countByBookAndTypeCodeAndTimeAfter(book, BookToUserEnum.VIEWED, relevanceTime);
 
-        double rating = BOOK_COEFFICIENT_PAID * paid + BOOK_COEFFICIENT_CART * cart + BOOK_COEFFICIENT_KEPT * kept + BOOK_COEFFICIENT_VIEWED * viewed;
+        double rating = bookCoefficientPaid * paid + bookCoefficientCart * cart + bookCoefficientKept * kept + bookCoefficientViewed * viewed;
         bookRepo.updatePopularity(rating, book.getId());
     }
 }

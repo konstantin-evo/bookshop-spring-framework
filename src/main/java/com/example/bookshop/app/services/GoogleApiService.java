@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,9 +29,9 @@ public class GoogleApiService {
 
         Root root = getRootElement(searchWord, offset, limit);
 
-        return root.getItems().stream()
-                .map(GoogleApiMapper.INSTANCE::mapGoogleBookToEntity)
-                .collect(Collectors.toList());
+        return (root == null || root.getItems().isEmpty())
+                ? Collections.emptyList()
+                : root.getItems().stream().map(GoogleApiMapper.INSTANCE::mapGoogleBookToEntity).collect(Collectors.toList());
     }
 
     private Root getRootElement(String searchWord, Integer offset, Integer limit) {

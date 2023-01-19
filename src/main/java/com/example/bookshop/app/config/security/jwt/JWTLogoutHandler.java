@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 @Service
 public class JWTLogoutHandler implements LogoutHandler {
 
-    private final static String JWT_COOKIE_NAME = "token";
+    private static final String JWT_COOKIE_NAME = "token";
 
     private final UserRegisterService userRegisterService;
 

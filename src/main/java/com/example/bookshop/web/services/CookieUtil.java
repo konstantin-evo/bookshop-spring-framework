@@ -13,6 +13,10 @@ import java.util.StringJoiner;
 
 public class CookieUtil {
 
+    private CookieUtil() {
+        throw new IllegalStateException(CookieUtil.class.getSimpleName());
+    }
+
     /**
      * The method removes a book from a specific Cookie
      *
@@ -26,6 +30,7 @@ public class CookieUtil {
         cookieBooks.remove(slug);
         Cookie cookie = new Cookie(cookieName, String.join("/", cookieBooks));
         cookie.setPath("/");
+        cookie.setHttpOnly(true);
         response.addCookie(cookie);
     }
 

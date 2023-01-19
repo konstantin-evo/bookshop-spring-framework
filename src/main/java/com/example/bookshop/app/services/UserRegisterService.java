@@ -1,19 +1,18 @@
 package com.example.bookshop.app.services;
 
-import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetailsService;
 import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
 import com.example.bookshop.app.model.dao.JwtBlockListRepository;
+import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.JwtBlockList;
 import com.example.bookshop.app.model.entity.OneTimeCode;
+import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
-import com.example.bookshop.app.config.security.BookshopUserDetails;
-import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.web.dto.RegistrationFormDto;
-import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.CustomAuthenticationException;
-import com.example.bookshop.web.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,8 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Transient;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
+
+import static com.example.bookshop.app.services.RegexUtil.isEmail;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class UserRegisterService {
     private final JwtBlockListRepository jwtBlockListRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
+    private final BookshopUserDetailsService userDetailsService;
     private final OneTimeCodeService oneTimeCodeService;
     private final JWTUtil jwtUtil;
 
@@ -43,32 +44,24 @@ public class UserRegisterService {
      * and it is impossible to guarantee the operation of the operation of the service during launch
      */
     @Value("${twilio.magic_code}")
-    private String SMS_CODE;
+    private String smsCode;
 
     @Value("${twilio.expire_time_sec}")
-    private int EXPIRE_TIME_SEC;
+    private int expireTimeSec;
 
-    private static final String EMAIL_PATTERN = "[A-Za-z\\d._%+-]+@[A-Za-z\\d.-]+\\.[A-Za-z]{2,4}";
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Transient
     public boolean registerNewUser(RegistrationFormDto registrationForm) {
 
-        User userByEmail = userRepo.findUserByEmail(registrationForm.getEmail())
-                .orElseThrow(() -> new UserNotFoundException(registrationForm.getEmail(), true));
-        User userByPhone = userRepo.findUserByPhone(registrationForm.getPhone())
-                .orElseThrow(() -> new UserNotFoundException(registrationForm.getPhone(), false));
+        Optional<User> userByEmail = userRepo.findUserByEmail(registrationForm.getEmail());
+        Optional<User> userByPhone = userRepo.findUserByPhone(registrationForm.getPhone());
 
-        if (userByEmail == null && userByPhone == null) {
-            User user = new User();
-            user.setName(registrationForm.getName());
-            user.setEmail(registrationForm.getEmail());
-            user.setPhone(registrationForm.getPhone());
-            user.setPassword(passwordEncoder.encode(registrationForm.getPassword()));
+        if (userByEmail.isEmpty() && userByPhone.isEmpty()) {
+            User user = UserMapper.INSTANCE.map(registrationForm, passwordEncoder.encode(registrationForm.getPassword()));
             userRepo.save(user);
             return true;
         } else {
-            // TODO: Add error handling if user already exists
             return false;
         }
     }
@@ -97,11 +90,11 @@ public class UserRegisterService {
         jwtBlockListRepo.save(jwtBlockList);
     }
 
-    public void contactConfirmation(String contact) {
+    public void contactConfirmation(String contact) throws NoSuchAlgorithmException {
         String code = isEmail(contact)
                 ? oneTimeCodeService.sendSecretCodeEmail(contact)
-                : SMS_CODE;
-        oneTimeCodeService.saveCode(new OneTimeCode(code, EXPIRE_TIME_SEC));
+                : smsCode;
+        oneTimeCodeService.saveCode(new OneTimeCode(code, expireTimeSec));
     }
 
     public Object getCurrentUser() {
@@ -132,9 +125,4 @@ public class UserRegisterService {
         return new ContactConfirmationResponse(jwtToken);
     }
 
-    private boolean isEmail(String payload) {
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(payload);
-        return matcher.matches();
-    }
 }

@@ -7,16 +7,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import static com.example.bookshop.app.services.RegexUtil.isEmail;
 
 @Service
 @RequiredArgsConstructor
-public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
+public class BookshopUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     private final UserRepository userRepository;
-
-    private static final String EMAIL_PATTERN = "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
 
     @Override
     public UserDetails loadUserByUsername(String contact) throws UserNotFoundException {
@@ -28,9 +25,4 @@ public class UserDetailsService implements org.springframework.security.core.use
         return new BookshopUserDetails(user);
     }
 
-    private boolean isEmail(String payload) {
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(payload);
-        return matcher.matches();
-    }
 }

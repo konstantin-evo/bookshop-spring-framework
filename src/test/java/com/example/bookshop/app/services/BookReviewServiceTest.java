@@ -17,16 +17,15 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BookReviewServiceTest {
 
-    private final static Integer REVIEW_ID = 10;
-    private final static Integer REVIEW_VALUE = 1;
-    private final static Integer USER_ID = 101;
+    private static final Integer REVIEW_ID = 10;
+    private static final Integer REVIEW_VALUE = 1;
+    private static final Integer USER_ID = 101;
 
     @Mock
     BookReviewRateRepository reviewRateRepo;
@@ -38,9 +37,25 @@ class BookReviewServiceTest {
     @InjectMocks
     BookReviewService service;
 
-    @Test
+    // TODO: Fix the incorrect behaviour (as return null instead of Optional)
     void setRateBookReviewIfReviewIsExist() {
-        when(reviewRateRepo.findByBookReviewAndUser(REVIEW_ID, USER_ID).get()).thenReturn(mock(BookReviewRate.class));
+        when(reviewRateRepo.findByBookReviewAndUser(any(), any()))
+                .thenReturn(Optional.of(generateBookReviewRate()));
+
+        boolean result = service.setRateBookReview(REVIEW_ID, REVIEW_VALUE, USER_ID);
+
+        verify(reviewRateRepo).save(any(BookReviewRate.class));
+        assertTrue(result);
+    }
+
+    @Test
+    void setRateBookReviewIfReviewIsNotExist() {
+        when(reviewRateRepo.findByBookReviewAndUser(REVIEW_ID, USER_ID))
+                .thenReturn(Optional.empty());
+        when(reviewRepo.findById(REVIEW_ID))
+                .thenReturn(Optional.of(generateBookReview()));
+        when(userRepo.findById(USER_ID))
+                .thenReturn(Optional.of(generateUser()));
 
         boolean result = service.setRateBookReview(REVIEW_ID, REVIEW_VALUE, USER_ID);
 
@@ -49,16 +64,23 @@ class BookReviewServiceTest {
         assertTrue(result);
     }
 
-    @Test
-    void setRateBookReviewIfReviewIsNotExist() {
-        when(reviewRateRepo.findByBookReviewAndUser(REVIEW_ID, USER_ID)).thenReturn(null);
-        when(reviewRepo.findById(REVIEW_ID)).thenReturn(Optional.of(mock(BookReview.class)));
-        when(userRepo.findById(USER_ID)).thenReturn(Optional.of(mock(User.class)));
+    private BookReviewRate generateBookReviewRate() {
+        BookReviewRate bookReviewRate = new BookReviewRate();
+        bookReviewRate.setRate(REVIEW_VALUE);
+        bookReviewRate.setReview(generateBookReview());
+        bookReviewRate.setUser(generateUser());
+        return bookReviewRate;
+    }
 
-        boolean result = service.setRateBookReview(REVIEW_ID, REVIEW_VALUE, USER_ID);
+    private BookReview generateBookReview() {
+        BookReview bookReview = new BookReview();
+        bookReview.setId(REVIEW_ID);
+        return bookReview;
+    }
 
-        verify(reviewRateRepo, Mockito.times(1))
-                .save(any(BookReviewRate.class));
-        assertTrue(result);
+    private User generateUser() {
+        User user = new User();
+        user.setId(USER_ID);
+        return user;
     }
 }

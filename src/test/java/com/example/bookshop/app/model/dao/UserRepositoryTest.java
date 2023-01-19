@@ -3,17 +3,13 @@ package com.example.bookshop.app.model.dao;
 import com.example.bookshop.app.model.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/**
- * Tests are written according to the course materials,
- * in the future it should be replaced with @DataJpaTest
- */
-@SpringBootTest
-@TestPropertySource("/application-test.properties")
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserRepositoryTest {
 
     private final UserRepository userRepository;
@@ -24,7 +20,7 @@ class UserRepositoryTest {
     }
 
     @Test
-    public void testAddNewUser(){
+    void testAddNewUser(){
         User user = new User();
         user.setPassword("1234567890");
         user.setPhone("+79030000000");

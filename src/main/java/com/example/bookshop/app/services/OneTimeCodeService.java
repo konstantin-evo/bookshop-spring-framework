@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Random;
 
 @Service
@@ -17,32 +19,32 @@ import java.util.Random;
 public class OneTimeCodeService {
 
     @Value("${twilio.account_sid}")
-    private String ACCOUNT_SID;
+    private String accountSid;
 
     @Value("${twilio.auth_token}")
-    private String AUTH_TOKEN;
+    private String authToken;
 
     @Value("${twilio.twilio_number}")
-    private String TWILIO_NUMBER;
+    private String twilioNumber;
 
     @Value("${twilio.text}")
-    private String TWILIO_TEXT;
+    private String twilioText;
 
     @Value("${mail.username}")
-    private String BOOKSTORE_EMAIL;
+    private String bookstoreEmail;
 
     @Value("${mail.subject}")
-    private String SUBJECT_EMAIL;
+    private String subjectEmail;
 
     @Value("${mail.text}")
-    private String TEXT_EMAIL;
+    private String textEmail;
 
     /**
      * The SMS_CODE value is temporarily hardcoded due to the fact that the TWILIO service in free mode does not work stably,
      * and it is impossible to guarantee the operation of the operation of the service during launch
      */
     @Value("${twilio.magic_code}")
-    private String SMS_CODE;
+    private String smsCode;
 
     private final OneTimeCodeRepository oneTimeCodeRepository;
     private final SimpleMailSender mailSender;
@@ -55,21 +57,21 @@ public class OneTimeCodeService {
      * @return the generated value of the code
      */
     @SuppressWarnings("unused")
-    public String sendSecretCodeSms(String contact) {
-        Twilio.init(ACCOUNT_SID, AUTH_TOKEN);
+    public String sendSecretCodeSms(String contact) throws NoSuchAlgorithmException {
+        Twilio.init(accountSid, authToken);
         String formattedContact = contact.replaceAll("[()-]]", "");
         String generatedCode = generateCode();
 
         Message.creator(new PhoneNumber(formattedContact),
-                        new PhoneNumber(TWILIO_NUMBER), TWILIO_TEXT + generatedCode)
+                        new PhoneNumber(twilioNumber), twilioText + generatedCode)
                 .create();
 
         return generatedCode;
     }
 
-    public String sendSecretCodeEmail(String contact) {
+    public String sendSecretCodeEmail(String contact) throws NoSuchAlgorithmException {
         String generatedCode = generateCode();
-        mailSender.send(SUBJECT_EMAIL, TEXT_EMAIL + generatedCode, BOOKSTORE_EMAIL, contact);
+        mailSender.send(subjectEmail, textEmail + generatedCode, bookstoreEmail, contact);
         return generatedCode;
     }
 
@@ -79,20 +81,20 @@ public class OneTimeCodeService {
         }
     }
 
-    public Boolean verifyCode(String code) {
+    public boolean verifyCode(String code) {
         OneTimeCode oneTimeCode = oneTimeCodeRepository.findByCode(code);
-        return (code.equals(SMS_CODE)) || (oneTimeCode != null && !oneTimeCode.isExpired());
+        return (code.equals(smsCode)) || (oneTimeCode != null && !oneTimeCode.isExpired());
     }
 
     /**
      * The method generates a random numeric value in the format "XXX XXX"
      * For example, "158 927"
      */
-    private String generateCode() {
-        Random random = new Random();
+    private String generateCode() throws NoSuchAlgorithmException {
+        Random rand = SecureRandom.getInstanceStrong(); // SecureRandom is preferred to Random
         StringBuilder sb = new StringBuilder();
         while (sb.length() < 6) {
-            sb.append(random.nextInt(9));
+            sb.append(rand.nextInt(9));
         }
         sb.insert(3, " ");
         return sb.toString();

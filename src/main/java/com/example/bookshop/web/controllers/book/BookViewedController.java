@@ -19,15 +19,15 @@ public class BookViewedController {
     private final UserRegisterService userRegisterService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     @GetMapping("/viewed")
     public String popularPage(Model model) {
         User user = (User) userRegisterService.getCurrentUser();
         model.addAttribute("viewedBooks", bookService
-                .getPageOfViewedBooks(user, OFFSET, LIMIT)
+                .getPageOfViewedBooks(user, offset, limit)
                 .getContent());
         return "books/viewed";
     }

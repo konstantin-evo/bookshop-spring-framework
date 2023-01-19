@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
+import java.security.NoSuchAlgorithmException;
 
 @Controller
 public class UserAuthController {
@@ -42,7 +43,7 @@ public class UserAuthController {
     @PostMapping("/requestContactConfirmation")
     @ResponseBody
     public ContactConfirmationResponse handleRequestContactConfirmation(
-            @RequestBody ContactConfirmationPayload payload) {
+            @RequestBody ContactConfirmationPayload payload) throws NoSuchAlgorithmException {
 
         ContactConfirmationResponse response = new ContactConfirmationResponse(true);
         userRegisterService.contactConfirmation(payload.getContact());
@@ -72,6 +73,7 @@ public class UserAuthController {
             throws CustomAuthenticationException {
         ContactConfirmationResponse loginResponse = userRegisterService.login(payload);
         Cookie cookie = new Cookie("token", loginResponse.getResult());
+        cookie.setHttpOnly(true);
         httpServletResponse.addCookie(cookie);
         return loginResponse;
     }

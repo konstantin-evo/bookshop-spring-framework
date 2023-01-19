@@ -23,9 +23,9 @@ public class UserProfilePageController {
     private final TransactionService transactionService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     @ModelAttribute("currentUser")
     public User searchWord() {
@@ -36,7 +36,7 @@ public class UserProfilePageController {
     public String handleProfile(Model model) {
         User user = (User) userRegisterService.getCurrentUser();
         model.addAttribute("transactions", transactionService
-                .getPageOfTransaction(user, OFFSET, LIMIT)
+                .getPageOfTransaction(user, offset, limit)
                 .getContent());
         return "profile";
     }

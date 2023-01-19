@@ -1,7 +1,7 @@
 package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.config.security.BookshopUserDetails;
-import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.BookshopUserDetailsService;
 import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
 import com.example.bookshop.app.model.dao.JwtBlockListRepository;
@@ -17,7 +17,6 @@ import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.RetryingTest;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
@@ -25,14 +24,13 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Date;
@@ -42,19 +40,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@TestPropertySource("/application-test.properties")
-public class UserRegisterServiceTest {
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class UserRegisterServiceTest {
 
     @Value("${auth.secret}")
     private String authSecret;
@@ -63,21 +55,21 @@ public class UserRegisterServiceTest {
     private ContactConfirmationPayload contactConfirmation;
     private CustomOAuth2User oAuth2User;
 
-    private final static String REGISTER_USER_NAME = "Tester";
-    private final static String REGISTER_USER_EMAIL = "test@mail.org";
-    private final static String REGISTER_USER_PASSWORD = "111";
-    private final static String REGISTER_USER_PHONE = "+79030000000";
-    private final static String EXISTING_USER_NAME = "Admin Admin";
-    private final static String EXISTING_USER_EMAIL = "admin@gmail.com";
-    private final static String ONE_TIME_CODE = "111 111";
-    private final static String EXCEPTION_MESSAGE = "user not found doh!";
+    private static final String REGISTER_USER_NAME = "Tester";
+    private static final String REGISTER_USER_EMAIL = "test@mail.org";
+    private static final String REGISTER_USER_PASSWORD = "111";
+    private static final String REGISTER_USER_PHONE = "+79030000000";
+    private static final String EXISTING_USER_NAME = "Admin Admin";
+    private static final String EXISTING_USER_EMAIL = "admin@gmail.com";
+    private static final String ONE_TIME_CODE = "111 111";
+    private static final String EXCEPTION_MESSAGE = "user not found doh!";
 
     @Mock
     UserRepository userRepo;
     @Mock
     PasswordEncoder passwordEncoder;
     @Mock
-    UserDetailsService userDetailsService;
+    BookshopUserDetailsService userDetailsService;
     @Mock
     JwtBlockListRepository jwtBlockListRepository;
     @Mock
@@ -165,7 +157,7 @@ public class UserRegisterServiceTest {
         Exception exception = assertThrows(UsernameNotFoundException.class, () -> service.login(contactConfirmation));
 
         verify(jwtUtil, never()).generateToken(any(BookshopUserDetails.class));
-        assertEquals(exception.getMessage(), EXCEPTION_MESSAGE);
+        assertEquals(EXCEPTION_MESSAGE, exception.getMessage());
     }
 
     private RegistrationFormDto generateRegistrationForm() {

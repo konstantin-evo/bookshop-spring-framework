@@ -2,23 +2,21 @@ package com.example.bookshop.web.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.servlet.http.Cookie;
 
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource("/application-test.properties")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class CartPageControllerTest {
 
     private final MockMvc mockMvc;
@@ -33,7 +31,7 @@ class CartPageControllerTest {
     }
 
     @Test
-    public void putBookInCartTest() throws Exception {
+    void putBookInCartTest() throws Exception {
         mockMvc.perform(post("/books/changeBookStatus/buy/{slug}", BOOK_SLUG))
                 .andExpect(cookie().value(COOKIE_NAME, BOOK_SLUG))
                 .andExpect(redirectedUrl("/books/" + BOOK_SLUG))
@@ -41,7 +39,7 @@ class CartPageControllerTest {
     }
 
     @Test
-    public void removeBookFromCartTest() throws Exception {
+    void removeBookFromCartTest() throws Exception {
         mockMvc.perform(post("/books/changeBookStatus/cart/remove/{slug}", BOOK_SLUG)
                         .cookie(CART_CONTENTS_COOKIE))
                 .andExpect(cookie().value(COOKIE_NAME, emptyOrNullString()))

@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface ProfileChangesRepository extends JpaRepository<ProfileChanges, Long> {
 
-    ProfileChanges findByUserAndEnabled(User user, boolean enabled);
+    Optional<ProfileChanges> findByUserAndEnabled(User user, boolean enabled);
 
     @Modifying
     @Query("update ProfileChanges p set p.enabled = :enabled where p.id = :profile_id")

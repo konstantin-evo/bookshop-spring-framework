@@ -1,7 +1,7 @@
 package com.example.bookshop.app.config.security.jwt;
 
 import com.example.bookshop.app.config.security.BookshopUserDetails;
-import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.BookshopUserDetailsService;
 import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,9 +25,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JWTRequestFilter extends OncePerRequestFilter {
 
-    private final static String JWT_COOKIE_NAME = "token";
+    private static final String JWT_COOKIE_NAME = "token";
 
-    private final UserDetailsService userDetailsService;
+    private final BookshopUserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
 
     @Override

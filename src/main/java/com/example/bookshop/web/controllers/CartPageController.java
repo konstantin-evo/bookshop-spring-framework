@@ -33,9 +33,9 @@ public class CartPageController {
     private final UserRegisterService userRegisterService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     @ModelAttribute(name = "bookCart")
     public List<BookDto> bookCart(@CookieValue(value = "cartContents", required = false) String cartContents) {
@@ -60,7 +60,7 @@ public class CartPageController {
                                     Model model) {
         if (CookieUtil.isCookieEmpty(cartContents)) {
             model.addAttribute("popularBooks", bookService
-                    .getPageOfPopularBooks(OFFSET, LIMIT)
+                    .getPageOfPopularBooks(offset, limit)
                     .getContent());
         } else {
             model.addAttribute("totalPrices", bookService.getTotalPricesInCart(cartContents));

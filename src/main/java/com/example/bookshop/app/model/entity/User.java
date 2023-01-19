@@ -77,8 +77,8 @@ public class User {
     private Set<Role> roles = new HashSet<>();
 
     public User() {
-        String hash = String.valueOf(this.hashCode());
-        this.hash = "user-" + hash.substring(0, 2) + "-" + hash.substring(3, 6);
+        String userHash = String.valueOf(this.hashCode());
+        this.hash = "user-" + userHash.substring(0, 2) + "-" + userHash.substring(3, 6);
         this.regTime = new Timestamp(System.currentTimeMillis());
         this.balance = 0;
         this.isBlocked = 0;

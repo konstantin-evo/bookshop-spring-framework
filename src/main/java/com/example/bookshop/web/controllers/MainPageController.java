@@ -21,14 +21,12 @@ public class MainPageController {
     private final TagService tagService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
-    @Value("${default.recentmonth}")
-    private int DEFAULT_RECENT_MONTH;
+    private int limit;
 
     private final LocalDate dateTo = LocalDate.of(2021, 12, 31);
-    private final LocalDate dateFrom = dateTo.minusMonths(DEFAULT_RECENT_MONTH);
+    private final LocalDate dateFrom = LocalDate.of(2021, 6, 30);
 
     @GetMapping("/")
     public String mainPage() {
@@ -38,21 +36,21 @@ public class MainPageController {
     @ModelAttribute("recommendedBooks")
     public List<BookDto> recommendedBooks() {
         return bookService
-                .getPageOfRecommendedBooks(OFFSET, LIMIT)
+                .getPageOfRecommendedBooks(offset, limit)
                 .getContent();
     }
 
     @ModelAttribute("recentBooks")
     public List<BookDto> recentBooks() {
         return bookService
-                .getPageOfRecentBooks(dateFrom, dateTo, OFFSET, LIMIT)
+                .getPageOfRecentBooks(dateFrom, dateTo, offset, limit)
                 .getContent();
     }
 
     @ModelAttribute("popularBooks")
     public List<BookDto> popularBooks() {
         return bookService
-                .getPageOfPopularBooks(OFFSET,LIMIT)
+                .getPageOfPopularBooks(offset, limit)
                 .getContent();
     }
 
@@ -67,7 +65,7 @@ public class MainPageController {
     }
 
     @ModelAttribute("tags")
-    public List<TagDto> tags(){
+    public List<TagDto> tags() {
         return tagService.getTagsData();
     }
 

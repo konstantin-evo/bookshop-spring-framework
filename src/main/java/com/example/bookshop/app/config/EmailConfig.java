@@ -26,7 +26,7 @@ public class EmailConfig {
     @Value("${mail.protocol}")
     private String protocol;
 
-    private final static String IS_ENABLED = "true";
+    private static final String IS_ENABLED = "true";
 
     @Bean
     public JavaMailSender getJavaMailSender() {
