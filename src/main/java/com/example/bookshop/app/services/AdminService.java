@@ -40,15 +40,19 @@ import java.util.Optional;
 public class AdminService {
 
     private final BookRepository bookRepo;
+    private final BookMapper bookMapper;
     private final BookReviewRepository reviewRepo;
     private final AuthorService authorService;
+    private final AuthorMapper authorMapper;
     private final AuthorRepository authorRepo;
     private final UserRepository userRepo;
+    private final UserMapper userMapper;
     private final GenreRepository genreRepo;
     private final TagService tagService;
     private final BookToGenreRepository bookToGenreRepo;
     private final BookToUserRepository bookToUserRepo;
     private final BookToUserTypeRepository bookToUserTypeRepo;
+    private final BookToUserMapper bookToUserMapper;
 
     private static final String DUMMY_IMAGE = "http://dummyimage.com/200x300.png/5fa2dd/ffffff";
 
@@ -58,7 +62,7 @@ public class AdminService {
         ValidatedResponseDto response = new ValidatedResponseDto(true, new HashMap<>());
 
         if (isBookDtoCorrect(bookDto, response)) {
-            Book book = BookMapper.INSTANCE.map(bookDto);
+            Book book = bookMapper.map(bookDto);
             Author author = authorService.getAuthorByFullName(bookDto.getAuthor())
                     .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
 
@@ -109,7 +113,7 @@ public class AdminService {
         Author author = authorService.getAuthorByFullName(bookDto.getAuthor())
                 .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Full name", bookDto.getAuthor()));
 
-        BookMapper.INSTANCE.updateBook(bookDto, book);
+        bookMapper.updateBook(bookDto, book);
         book.setAuthor(author);
         bookRepo.save(book);
         return new ValidatedResponseDto(true, new HashMap<>());
@@ -121,7 +125,7 @@ public class AdminService {
                 orElseThrow(() -> new BookshopEntityNotFoundException(User.class.getSimpleName(), userId));
 
         // set updated info in database
-        UserMapper.INSTANCE.updateUser(userDto, user);
+        userMapper.updateUser(userDto, user);
         userRepo.save(user);
 
         // update SecurityContext to display updated information in the current session
@@ -139,7 +143,7 @@ public class AdminService {
         BookToUserType bookToUserType = bookToUserTypeRepo.findByCode(BookToUserEnum.valueOf(bookToUserDto.getBookStatus()))
                 .orElseThrow(() -> new BookshopEntityNotFoundException(BookToUserType.class.getSimpleName(), "Book Status", bookToUserDto.getBookStatus()));
 
-        BookToUserMapper.INSTANCE.updateBookToUser(bookToUserDto, bookToUser, bookToUserTypeRepo);
+        bookToUserMapper.updateBookToUser(bookToUserDto, bookToUser, bookToUserTypeRepo);
         bookToUser.setType(bookToUserType);
         bookToUserRepo.save(bookToUser);
 
@@ -151,7 +155,7 @@ public class AdminService {
         Author author = authorRepo.getAuthorBySlug(slug)
                 .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Slug", slug));
 
-        AuthorMapper.INSTANCE.updateAuthor(authorDto, author);
+        authorMapper.updateAuthor(authorDto, author);
         authorRepo.save(author);
         return new ValidatedResponseDto(true, new HashMap<>());
     }

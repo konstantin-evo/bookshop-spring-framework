@@ -7,6 +7,8 @@ import com.example.bookshop.web.dto.BookRateDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class BookMapperTest {
+    @Spy
+    private BookMapper bookMapper = Mappers.getMapper(BookMapper.class);
 
     private Book book;
     private BookRateDto bookRate;
@@ -23,7 +27,7 @@ class BookMapperTest {
     @BeforeEach
     void setUp() {
         book = generateBook();
-        bookRate = BookMapper.INSTANCE.mapBookRateDto(book);
+        bookRate = bookMapper.mapBookRateDto(book);
     }
 
     /**
@@ -39,7 +43,7 @@ class BookMapperTest {
 
     /**
      * Test checks Rate Distribution based on the Users' assessment
-     *
+     * <p>
      * Rate Distribution is a Map<Integer, Integer> which contains the key "Rating" from 1 to 5
      * and the value "Count", which shows the number of users who gave this rating
      */

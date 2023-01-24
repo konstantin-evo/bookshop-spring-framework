@@ -2,14 +2,13 @@ package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.entity.Author;
 import com.example.bookshop.web.dto.AuthorDto;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
-@org.mapstruct.Mapper
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD)
 public interface AuthorMapper {
-
-    AuthorMapper INSTANCE = Mappers.getMapper(AuthorMapper.class);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "photo", ignore = true)

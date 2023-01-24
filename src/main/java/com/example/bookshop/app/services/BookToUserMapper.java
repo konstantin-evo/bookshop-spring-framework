@@ -5,15 +5,14 @@ import com.example.bookshop.app.model.entity.BookToUser;
 import com.example.bookshop.app.model.entity.BookToUserType;
 import com.example.bookshop.web.dto.BookToUserDto;
 import org.mapstruct.Context;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
-@org.mapstruct.Mapper
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD)
 public interface BookToUserMapper {
-
-    BookToUserMapper INSTANCE = Mappers.getMapper(BookToUserMapper.class);
 
     @Mapping(target = "bookToUserId", source = "id")
     @Mapping(target = "bookStatus", source = "type")

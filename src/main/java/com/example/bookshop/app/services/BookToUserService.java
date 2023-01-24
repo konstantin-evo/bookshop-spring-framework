@@ -34,7 +34,9 @@ import java.util.Map;
 public class BookToUserService {
 
     private final BookRepository bookRepo;
+    private final BookMapper bookMapper;
     private final BookToUserRepository bookToUserRepo;
+    private final BookToUserMapper bookToUserMapper;
     private final BookToUserTypeRepository bookToUserTypeRepo;
     private final BookToFileRepository bookToFileRepository;
     private final UserRepository userRepo;
@@ -96,7 +98,7 @@ public class BookToUserService {
         List<BookToUser> booksToUser = bookToUserRepo.findByUser(user);
 
         List<BookToUserDto> result = new ArrayList<>();
-        booksToUser.forEach(bookToUser -> result.add(BookToUserMapper.INSTANCE.map(bookToUser)));
+        booksToUser.forEach(bookToUser -> result.add(bookToUserMapper.map(bookToUser)));
 
         return result;
     }
@@ -114,13 +116,13 @@ public class BookToUserService {
             book.setBookToTag(bookToTags);
         });
 
-        return BookMapper.INSTANCE.map(books);
+        return bookMapper.map(books);
     }
 
     public List<BookDto> getArchivedBooks(String userEmail) {
         User user = userRepo.findUserByEmail(userEmail).orElseThrow(() -> new UserNotFoundException(userEmail, true));
         List<Book> books = bookRepo.findArchivedBooksByUser(user.getId());
-        return BookMapper.INSTANCE.map(books);
+        return bookMapper.map(books);
     }
 
     /**

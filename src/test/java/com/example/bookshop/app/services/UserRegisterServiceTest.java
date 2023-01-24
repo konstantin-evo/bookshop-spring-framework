@@ -18,6 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.RetryingTest;
+import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -76,6 +77,8 @@ class UserRegisterServiceTest {
     OneTimeCodeService oneTimeCodeService;
     @Spy
     JWTUtil jwtUtil = new JWTUtil(jwtBlockListRepository);
+    @Spy
+    private UserMapper userMapper = Mappers.getMapper(UserMapper.class);
 
     @InjectMocks
     UserRegisterService service;

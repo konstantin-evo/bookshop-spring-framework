@@ -27,6 +27,7 @@ public class BookReviewService {
     private final BookRateRepository bookRateRepo;
     private final BookRepository bookRepo;
     private final UserRepository userRepo;
+    private final BookReviewMapper bookReviewMapper;
 
     /**
      * The method updates the "Like", "Dislike" counter for a specific review
@@ -76,7 +77,7 @@ public class BookReviewService {
         if (bookRates.isEmpty()) {
             throw new BookshopEntityNotFoundException(BookRate.class.getSimpleName(), "userId", userId.toString());
         } else {
-            return BookReviewMapper.INSTANCE.map(bookRates);
+            return bookReviewMapper.map(bookRates);
         }
     }
 

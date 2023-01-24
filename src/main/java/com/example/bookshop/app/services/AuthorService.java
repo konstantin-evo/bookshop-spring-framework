@@ -17,14 +17,15 @@ import java.util.stream.Collectors;
 public class AuthorService {
 
     private final AuthorRepository authorRepo;
+    private final BookMapper bookMapper;
 
     public AuthorDto getAuthor(Integer id) {
-        return BookMapper.INSTANCE.map(authorRepo.findById(id)
+        return bookMapper.map(authorRepo.findById(id)
                 .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), id)));
     }
 
     public AuthorDto getAuthor(String slug) {
-        return BookMapper.INSTANCE.map(authorRepo.getAuthorBySlug(slug)
+        return bookMapper.map(authorRepo.getAuthorBySlug(slug)
                 .orElseThrow(() -> new BookshopEntityNotFoundException(Author.class.getSimpleName(), "Slug", slug)));
     }
 
@@ -50,7 +51,7 @@ public class AuthorService {
     }
 
     private List<AuthorDto> getAuthors() {
-        return authorRepo.findAll().stream().map(BookMapper.INSTANCE::map)
+        return authorRepo.findAll().stream().map(bookMapper::map)
                 .collect(Collectors.toList());
     }
 

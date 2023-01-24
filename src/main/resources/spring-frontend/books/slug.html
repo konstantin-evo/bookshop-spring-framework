@@ -124,6 +124,7 @@
                                 <span class="ProductCard-titleProp"
                                       th:text="#{book.price}">n/a</span>
                                 <span class="ProductCard-priceOld"
+                                      th:if="${book.priceOld != null}"
                                       th:text="'₽'+${book.priceOld}">n/a</span>
                                 <span class="ProductCard-price"
                                       th:text="'₽'+${book.price}">n/a</span>

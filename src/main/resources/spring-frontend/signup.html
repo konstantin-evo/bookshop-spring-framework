@@ -41,6 +41,25 @@
                         </div>
                         <div class="form-group form-group_row">
                             <div class="form-group">
+                                <input class="form-input form-input_mail" id="mail" name="mail" type="text"
+                                       data-validate="mail require"
+                                       th:placeholder="#{signup.email}"
+                                       th:field="*{email}"/>
+                            </div>
+                            <div class="form-group form-group_key">
+                                <input class="form-input form-input_code" id="mailCode" name="mailCode" type="text"
+                                       data-mask="999 999" data-validate="require key"
+                                       th:placeholder="#{signup.email.code}"/>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn_success btn_sm form-btn" type="button" name="submitMail"
+                                        disabled="disabled" id="submitMail"
+                                        th:text="#{signup.submit}">n/a
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-group form-group_row">
+                            <div class="form-group">
                                 <input class="form-input form-input_phone" id="phone" name="phone" type="text"
                                        data-mask="+7 (999) 999-99-99" data-validate="require"
                                        th:placeholder="#{signup.phone}"
@@ -59,23 +78,6 @@
                             </div>
                         </div>
                         <div class="form-group form-group_row">
-                            <div class="form-group">
-                                <input class="form-input form-input_mail" id="mail" name="mail" type="text"
-                                       data-validate="mail require"
-                                       th:placeholder="#{signup.email}"
-                                       th:field="*{email}"/>
-                            </div>
-                            <div class="form-group form-group_key">
-                                <input class="form-input form-input_code" id="mailCode" name="mailCode" type="text"
-                                       data-mask="999 999" data-validate="require key"
-                                       th:placeholder="#{signup.email.code}"/>
-                            </div>
-                            <div class="form-group">
-                                <button class="btn btn_success btn_sm form-btn" type="button" name="submitMail"
-                                        disabled="disabled" id="submitMail"
-                                        th:text="#{signup.submit}">n/a
-                                </button>
-                            </div>
                             <div class="form-group">
                                 <input class="form-input form-input_password" id="password" name="password"
                                        type="password" data-validate="password require"

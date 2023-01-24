@@ -217,7 +217,7 @@ function sendUploadBookCoverRequest() {
         contentType: false,
         cache: false,
         success: function (validatedResponseDto) {
-            processValidatedResponseDto(validatedResponseDto, parentElement, "Book successfully deleted")
+            processValidatedResponseDto(validatedResponseDto, parentElement, "Book cover updated")
         },
         error: function (errorResponse) {
             let error = errorResponse.responseJSON;

@@ -13,10 +13,11 @@ import com.example.bookshop.web.dto.BookFileDto;
 import com.example.bookshop.web.dto.BookRateDto;
 import com.example.bookshop.web.dto.BookReviewsPageDto;
 import com.example.bookshop.web.dto.TagDto;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -31,10 +32,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@org.mapstruct.Mapper
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD)
 public interface BookMapper {
-
-    BookMapper INSTANCE = Mappers.getMapper(BookMapper.class);
 
     @Mapping(target = "priceOld", source = ".", qualifiedByName = "calculatePriceOld")
     @Mapping(target = "tags", source = ".", qualifiedByName = "getTags")
@@ -58,7 +57,7 @@ public interface BookMapper {
 
     @Named("calculatePriceOld")
     static String calculatePriceOld(Book book) {
-        if (book.getDiscount() != null) {
+        if (book.getDiscount() != null && Double.compare(book.getDiscount(), 0.0) > 0) {
             double discount = book.getDiscount() / 100;
             return String.valueOf((int) (book.getPrice() / (1 - discount)));
         } else {
@@ -131,8 +130,9 @@ public interface BookMapper {
                 ).collect(Collectors.toList());
 
         Integer totalReviews = (int) book.getBookRates().stream()
+                .filter(bookRate -> bookRate.getReview() != null)
                 .filter(bookRate -> bookRate.getReview().getIsActive() == 1)
-                .filter(bookRate -> bookRate.getReview() != null).count();
+                .count();
 
         return BookReviewsPageDto.builder()
                 .reviews(reviews)

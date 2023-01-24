@@ -32,6 +32,7 @@ import static com.example.bookshop.app.services.RegexUtil.isEmail;
 public class UserRegisterService {
 
     private final UserRepository userRepo;
+    private final UserMapper userMapper;
     private final JwtBlockListRepository jwtBlockListRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -58,7 +59,7 @@ public class UserRegisterService {
         Optional<User> userByPhone = userRepo.findUserByPhone(registrationForm.getPhone());
 
         if (userByEmail.isEmpty() && userByPhone.isEmpty()) {
-            User user = UserMapper.INSTANCE.map(registrationForm, passwordEncoder.encode(registrationForm.getPassword()));
+            User user = userMapper.map(registrationForm, passwordEncoder.encode(registrationForm.getPassword()));
             userRepo.save(user);
             return true;
         } else {

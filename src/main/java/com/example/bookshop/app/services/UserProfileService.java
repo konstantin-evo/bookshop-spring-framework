@@ -27,6 +27,7 @@ public class UserProfileService {
     private final UserRepository userRepo;
     private final ProfileChangesRepository profileChangesRepo;
     private final VerificationTokenRepository tokenRepo;
+    private final UserProfileMapper userProfileMapper;
     private final PasswordEncoder passwordEncoder;
 
 
@@ -47,7 +48,7 @@ public class UserProfileService {
         // otherwise not validated result with error messages will be sent
         if (isDtoCorrect) {
             String encryptedPassword = passwordEncoder.encode(profile.getPassword());
-            ProfileChanges profileChanges = UserProfileMapper.INSTANCE.map(profile, user, encryptedPassword);
+            ProfileChanges profileChanges = userProfileMapper.map(profile, user, encryptedPassword);
             profileChangesRepo.save(profileChanges);
         }
 
@@ -71,8 +72,7 @@ public class UserProfileService {
             ProfileChanges profileChanges = profileChangesRepo.findByUserAndEnabled(user, false)
                     .orElseThrow(() -> new BookshopEntityNotFoundException(ProfileChanges.class.getSimpleName(), "User", user.toString()));
             profileChangesRepo.updateEnabled(true, profileChanges.getId());
-
-            UserProfileMapper.INSTANCE.update(user, profileChanges);
+            userProfileMapper.update(user, profileChanges);
             userRepo.save(user);
         }
     }
