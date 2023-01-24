@@ -1,0 +1,11 @@
+apiVersion: v2
+name: bookshop-app
+description: A Helm chart for Bookshop application
+type: application
+version: 0.1.0
+appVersion: 1.16.0
+keywords:
+  - bookshop-app
+maintainers:
+  - name: Konstantin Priluchnyi
+    url: https://github.com/konstantin-evo
