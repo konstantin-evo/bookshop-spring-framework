@@ -4,5 +4,6 @@ public enum BookToUserEnum {
     KEPT,
     CART,
     PAID,
-    ARCHIVED
+    ARCHIVED,
+    VIEWED
 }

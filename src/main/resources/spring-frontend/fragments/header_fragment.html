@@ -64,7 +64,7 @@
                                 <g> </g>
                             </svg>
                             <span class="CartBlock-amount"
-                                  th:text="${PaidBookCount}">n/a</span>
+                                  th:text="${bookPaidCount}">n/a</span>
                         </a>
                         <a class="CartBlock-block" th:href="@{/books/postponed}">
                             <svg class="CartBlock-img" xmlns="http://www.w3.org/2000/svg" height="23" width="23"
@@ -124,7 +124,6 @@
                                 </g>
                             </svg>
                         </a>
-                        </a>
                     </div>
                 </div>
                 <div class="row-block Header-trigger"><a class="menuTrigger" href="#navigate">
@@ -169,11 +168,27 @@
                            th:text="#{topbar.popular}">n/a</a>
                     </li>
                     <li class="menu-item"
+                        sec:authorize="isAuthenticated()"
+                        th:class="(${#httpServletRequest.requestURI}=='/books/viewed')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-popular"
+                           th:href="@{/books/viewed}"
+                           th:text="#{topbar.viewed}">n/a</a>
+                    </li>
+                    <li class="menu-item"
                         th:class="(${#httpServletRequest.requestURI}=='/authors')?'menu-item menu-item_ACTIVE':'menu-item'">
                         <a class="menu-link"
                            th:id="nav-authors"
                            th:href="@{/authors}"
                            th:text="#{topbar.authors}">n/a</a>
+                    </li>
+                    <li class="menu-item"
+                        sec:authorize="hasAuthority('ADMIN')"
+                        th:class="(${#httpServletRequest.requestURI}=='/admin')?'menu-item menu-item_ACTIVE':'menu-item'">
+                        <a class="menu-link"
+                           th:id="nav-admin"
+                           th:href="@{/admin/book}"
+                           th:text="#{topbar.admin}">n/a</a>
                     </li>
                 </ul>
             </nav>

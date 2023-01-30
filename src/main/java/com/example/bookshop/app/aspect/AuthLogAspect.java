@@ -1,11 +1,12 @@
 package com.example.bookshop.app.aspect;
 
-import com.example.bookshop.app.config.security.UserDetails;
-import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetailsService;
 import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,18 +23,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Aspect
+@RequiredArgsConstructor
 @Log4j2
 public class AuthLogAspect {
 
-    private final UserDetailsService userDetailsService;
+    private final BookshopUserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
     private String username;
-
-    public AuthLogAspect(UserDetailsService userDetailsService,
-                         JWTUtil jwtUtil) {
-        this.userDetailsService = userDetailsService;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Pointcut("execution(public * com.example.bookshop.web.controllers.user.UserAuthController.handleLogin(..)) && args(payload, ..)")
     public void loginByPassword(ContactConfirmationPayload payload) {
@@ -48,14 +44,13 @@ public class AuthLogAspect {
     }
 
     @Before(value = "loginByPassword(payload)", argNames = "payload")
-    public void loginStart(ContactConfirmationPayload payload) throws Throwable {
-
-        UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(payload.getContact());
+    public void loginStart(ContactConfirmationPayload payload) {
+        BookshopUserDetails userDetails = (BookshopUserDetails) userDetailsService.loadUserByUsername(payload.getContact());
         log.info("The user (email = {}) is trying to login by login/password", userDetails.getUsername());
     }
 
     @Before(value = "loginByOauth(authentication)", argNames = "authentication")
-    public void loginStart(Authentication authentication) throws Throwable {
+    public void loginStart(Authentication authentication) {
 
         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
         username = oauthUser.getEmail();
@@ -70,18 +65,11 @@ public class AuthLogAspect {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     @AfterReturning(pointcut = "callAfterLoginSuccess()", returning = "jwt")
     public void loginSuccess(ContactConfirmationResponse jwt) {
-
         username = jwtUtil.extractUsername(jwt.getResult());
-
-        if (username == null) {
-            log.info("The user isn't logged in");
-        } else {
-            log.info("The user (email = {}) logged in successfully. JWT has been generated: {}",
-                    username, jwt.getResult());
-        }
+        log.info("The user (email = {}) logged in successfully. JWT has been generated: {}",
+                username, jwt.getResult());
     }
 
     @Before("execution(public * com.example.bookshop.app.config.security.jwt.JWTLogoutHandler.logout(..))")

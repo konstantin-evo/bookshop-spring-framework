@@ -2,10 +2,10 @@ package com.example.bookshop.web.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -13,15 +13,12 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.authenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource("/application-test.properties")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MainPageControllerTests {
 
     private final MockMvc mockMvc;
@@ -32,7 +29,7 @@ class MainPageControllerTests {
     }
 
     @Test
-    public void mainPageAccessTest() throws Exception {
+    void mainPageAccessTest() throws Exception {
         mockMvc.perform(get("/"))
                 .andDo(print())
                 .andExpect(content().string(containsString("")))
@@ -40,7 +37,7 @@ class MainPageControllerTests {
     }
 
     @Test
-    public void accessOnlyAuthorizedPageFailTest() throws Exception {
+    void accessOnlyAuthorizedPageFailTest() throws Exception {
         mockMvc.perform(get("/home"))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
@@ -48,21 +45,20 @@ class MainPageControllerTests {
     }
 
     @Test
-    public void correctLoginTest() throws Exception {
+    void correctLoginTest() throws Exception {
         mockMvc.perform(formLogin("/signin").user("admin@gmail.com").password("111111"))
                 .andDo(print())
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
     }
 
-    //TODO:Modify HTML structure according to standard XML rules to avoid DOMParser Exception
-    // Or check UI with Selenium tests
     @WithUserDetails("admin@gmail.com")
-    public void testAuthenticatedAccessToProfilePage() throws Exception {
+    @Test
+    void testAuthenticatedAccessToProfilePage() throws Exception {
         mockMvc.perform(get("/profile"))
                 .andDo(print())
                 .andExpect(authenticated())
-                .andExpect(xpath("/html/body/div/div[2]/main/div/div[2]/div[1]/div/form/div/div[1]/div[1]")
+                .andExpect(xpath("/html/body/header/div[1]/div/div/div[3]/div/div/a/span")
                         .string("Admin Admin"));
     }
 }

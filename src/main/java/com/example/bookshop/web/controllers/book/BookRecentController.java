@@ -20,11 +20,11 @@ public class BookRecentController {
     private final BookService bookService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
     @Value("${default.recentmonth}")
-    private int DEFAULT_RECENT_MONTH;
+    private int defaultRecentMonth;
 
     @GetMapping("/recent")
     public String recentPage(Model model) {
@@ -34,9 +34,9 @@ public class BookRecentController {
 
     private List<BookDto> recentBooks() {
         LocalDate dateTo = LocalDate.of(2021, 12, 31);
-        LocalDate dateFrom = dateTo.minusMonths(DEFAULT_RECENT_MONTH);
+        LocalDate dateFrom = dateTo.minusMonths(defaultRecentMonth);
         return bookService
-                .getPageOfRecentBooks(dateFrom, dateTo, OFFSET, LIMIT)
+                .getPageOfRecentBooks(dateFrom, dateTo, offset, limit)
                 .getContent();
     }
 }

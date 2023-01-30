@@ -2,15 +2,22 @@ package com.example.bookshop.web.controllers;
 
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.services.BookService;
+import com.example.bookshop.app.services.BookToUserService;
 import com.example.bookshop.app.services.UserRegisterService;
-import com.example.bookshop.web.dto.BalanceResponseDto;
 import com.example.bookshop.web.dto.BookDto;
+import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
@@ -22,12 +29,13 @@ import java.util.List;
 public class CartPageController {
 
     private final BookService bookService;
+    private final BookToUserService bookToUserService;
     private final UserRegisterService userRegisterService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     @ModelAttribute(name = "bookCart")
     public List<BookDto> bookCart(@CookieValue(value = "cartContents", required = false) String cartContents) {
@@ -52,7 +60,7 @@ public class CartPageController {
                                     Model model) {
         if (CookieUtil.isCookieEmpty(cartContents)) {
             model.addAttribute("popularBooks", bookService
-                    .getPageOfPopularBooks(OFFSET, LIMIT)
+                    .getPageOfPopularBooks(offset, limit)
                     .getContent());
         } else {
             model.addAttribute("totalPrices", bookService.getTotalPricesInCart(cartContents));
@@ -62,11 +70,10 @@ public class CartPageController {
 
     @PostMapping("/order")
     @ResponseBody
-    public BalanceResponseDto handleOrderBook(@CookieValue(name = "cartContents", required = false) String cartContents,
-                                              HttpServletResponse response) {
+    public ValidatedResponseDto handleOrderBook(@CookieValue(name = "cartContents", required = false) String cartContents,
+                                                HttpServletResponse response) {
         User user = (User) userRegisterService.getCurrentUser();
-        boolean booksBought = bookService.orderBooks(cartContents, user, response);
-        return new BalanceResponseDto(booksBought);
+        return bookToUserService.orderBooks(cartContents, user, response);
     }
 
     @PostMapping("/changeBookStatus/cart/remove/{slug}")

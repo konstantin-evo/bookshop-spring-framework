@@ -1,7 +1,7 @@
 package com.example.bookshop.app.config.security.jwt;
 
-import com.example.bookshop.app.config.security.UserDetails;
-import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetailsService;
 import com.example.bookshop.web.services.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,9 +25,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JWTRequestFilter extends OncePerRequestFilter {
 
-    private final static String JWT_COOKIE_NAME = "token";
+    private static final String JWT_COOKIE_NAME = "token";
 
-    private final UserDetailsService userDetailsService;
+    private final BookshopUserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
 
     @Override
@@ -38,7 +38,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
 
         if (token != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             String username = jwtUtil.extractUsername(token);
-            UserDetails userDetails = (UserDetails) userDetailsService.loadUserByUsername(username);
+            BookshopUserDetails userDetails = (BookshopUserDetails) userDetailsService.loadUserByUsername(username);
 
             if (jwtUtil.isTokenValid(token, userDetails)) {
                 setAuthentication(request, userDetails);
@@ -48,7 +48,7 @@ public class JWTRequestFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void setAuthentication(HttpServletRequest request, UserDetails userDetails) {
+    private void setAuthentication(HttpServletRequest request, BookshopUserDetails userDetails) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());
 

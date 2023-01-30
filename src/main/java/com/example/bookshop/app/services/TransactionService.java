@@ -15,11 +15,12 @@ import java.util.List;
 public class TransactionService {
 
     private final TransactionRepository transactionRepo;
+    private final TransactionMapper transactionMapper;
 
     public Page<TransactionDto> getPageOfTransaction(User user, Integer offset, Integer limit) {
         Pageable nextPage = PageRequest.of(offset, limit, Sort.by("time").descending());
         Page<Transaction> transactions = transactionRepo.findByUser(user, nextPage);
-        List<TransactionDto> transactionDto = TransactionMapper.INSTANCE.map(transactions.getContent());
+        List<TransactionDto> transactionDto = transactionMapper.map(transactions.getContent());
         return new PageImpl<>(transactionDto, nextPage, transactions.getTotalElements());
     }
 }

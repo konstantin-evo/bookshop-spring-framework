@@ -3,6 +3,7 @@ package com.example.bookshop.web.controllers.book;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.services.BookRateService;
 import com.example.bookshop.app.services.BookService;
+import com.example.bookshop.app.services.BookToUserService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.services.ResourceStorage;
 import lombok.RequiredArgsConstructor;
@@ -15,10 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -30,6 +28,7 @@ import java.nio.file.Path;
 public class BookPageController {
 
     private final BookService bookService;
+    private final BookToUserService bookToUserService;
     private final BookRateService rateService;
     private final UserRegisterService userRegisterService;
     private final ResourceStorage storage;
@@ -45,17 +44,11 @@ public class BookPageController {
 
         if (user != null) {
             model.addAttribute("userRate", rateService.getUserRate(slug, user.getId()));
+            model.addAttribute("isBlocked", user.getIsBlocked());
+            bookToUserService.viewBookByUser(user, slug);
         }
 
         return "books/slug";
-    }
-
-    @PostMapping("/{slug}/img/save")
-    public String saveNewBookImage(@RequestParam("file") MultipartFile file,
-                                   @PathVariable("slug") String slug) throws IOException {
-        String path = storage.saveNewBookCover(file, slug);
-        bookService.updateBook(slug, path);
-        return "redirect:/books/" + slug;
     }
 
     @GetMapping("/download/{hash}")
@@ -67,7 +60,7 @@ public class BookPageController {
         log.info("book file mime type: " + mediaType);
 
         byte[] data = storage.getBookFileByteArray(hash);
-        log.info("book file data len: " + data.length);
+        log.info("book file data length: " + data.length);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment;filename=" + path.getFileName().toString())

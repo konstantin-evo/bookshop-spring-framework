@@ -35,6 +35,11 @@ public class BookReview {
     @Column(columnDefinition = "TEXT NOT NULL")
     private String text;
 
+    // if isActive = 1 so the review to be shown
+    // using by the Admin role to moderate reviews
+    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 1")
+    private Integer isActive;
+
     @OneToOne
     @JoinColumn(name = "rate_id", referencedColumnName = "id")
     private BookRate rate;
@@ -44,6 +49,7 @@ public class BookReview {
 
     public BookReview() {
         this.pubDate = new Timestamp(System.currentTimeMillis());
+        this.isActive = 1;
     }
 
     public BookReview(BookRate rate, String text) {

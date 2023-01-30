@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{topbar.admin}">n/a</title>
+    <meta name="description" content="Описание страницы"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <link th:href="@{/spring-frontend/favicon.ico}" rel="shortcut icon"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-ExtraBold.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="/assets/css/fonts.min.css?v=45744385"/>
+    <link rel="stylesheet" href="/assets/css/basic.min.css?v=45744385"/>
+    <link rel="stylesheet" href="/assets/css/extra.min.css?v=45744385"/>
+    <link rel="stylesheet" href="/assets/css/jquery.css"/>
+    <script src="/assets/js/scripts.min.js?v=45744385"></script>
+</head>
+<body class="Site">
+<header th:replace="~{fragments/header_admin_fragment :: headFragment}"></header>
+<div class="Middle">
+    <div class="Middle-top">
+        <div class="wrap">
+            <h1 class="Middle-title"
+                th:text="#{topbar.admin}">n/a
+            </h1>
+        </div>
+    </div>
+    <div class="wrap">
+        <main class="Middle-main">
+
+            <!-- Form for editing an author - start -->
+            <div class="Tabs-block">
+                <!-- Before editing the author, you should upload the data using Author Slug -->
+                <!-- Form to upload data - start -->
+                <div class="Profile">
+                    <form class="form Profile-form" id="uploadAuthorDataToEdit">
+                        <div class="row">
+                            <div class="row-block">
+                                <div class="form-group">
+                                    <label class="form-label" for="slugAuthor"
+                                           th:text="#{admin.author.slug}">n/a
+                                    </label>
+                                    <input class="form-input" id="slugAuthor" name="slugAuthor" type="text"
+                                           th:placeholder="#{admin.author.slug.edit}"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="Admin-btn">
+                                <button class="btn btn_primary" type="button" id="uploadAuthorDataSubmit"
+                                        style="margin: 1%"
+                                        th:text="#{admin.author.submit}">n/a
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- Form to upload data - end -->
+                <!-- By default, all fields are not available for editing (disabled) -->
+                <div class="Profile">
+                    <form class="form Profile-form" id="editAuthorForm"
+                          action="/author" method="post" style="display: none">
+                        <div class="row">
+                            <div class="row-block">
+                                <div class="form-group">
+                                    <label class="form-label" for="lastName"
+                                           th:text="#{admin.author.name.last}">n/a
+                                    </label>
+                                    <input class="form-input" id="lastName" name="lastName" type="text"
+                                           disabled/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="firstName"
+                                           th:text="#{admin.author.name.first}">n/a
+                                    </label>
+                                    <input class="form-input" id="firstName" name="firstName" type="text"
+                                           disabled/>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="authorDescription"
+                                           th:text="#{admin.author.description}">n/a
+                                    </label>
+                                    <textarea class="form-input" id="authorDescription" name="authorDescription"
+                                              cols="40" disabled
+                                              rows="5"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="Admin-btn">
+                                <button class="btn btn_primary" type="submit" id="editAuthorSubmit"
+                                        style="margin: 1%"
+                                        th:text="#{admin.book.submit}">n/a
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <!-- Form for editing an author - end -->
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/footer_fragment :: footFragment}"></footer>
+<script src="/assets/plg/jQuery/jquery-3.5.1.min.js"></script>
+<script src="/assets/plg/jQuery/jquery.validate.js"></script>
+<script src="/assets/js/changeprofile.js"></script>
+<script src="/assets/js/admin.js"></script>
+<script src="/assets/js/local.js"></script>
+</body>
+</html>

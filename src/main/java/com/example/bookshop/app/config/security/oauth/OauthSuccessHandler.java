@@ -5,8 +5,8 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.example.bookshop.app.config.security.UserDetails;
-import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetailsService;
 import com.example.bookshop.app.services.UserRegisterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,11 +22,11 @@ import org.springframework.stereotype.Component;
 public class OauthSuccessHandler implements AuthenticationSuccessHandler {
 
     private final UserRegisterService userRegisterService;
-    private final UserDetailsService userDetailsService;
+    private final BookshopUserDetailsService userDetailsService;
 
     @Autowired
     public OauthSuccessHandler(@Lazy UserRegisterService userRegisterService,
-                               UserDetailsService userDetailsService) {
+                               BookshopUserDetailsService userDetailsService) {
         this.userRegisterService = userRegisterService;
         this.userDetailsService = userDetailsService;
     }
@@ -34,11 +34,11 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-        UserDetails userDetails;
+        BookshopUserDetails userDetails;
         CustomOAuth2User oauthUser = (CustomOAuth2User) authentication.getPrincipal();
 
         try {
-            userDetails = (UserDetails) userDetailsService.loadUserByUsername(oauthUser.getEmail());
+            userDetails = (BookshopUserDetails) userDetailsService.loadUserByUsername(oauthUser.getEmail());
         } catch (UsernameNotFoundException e) {
             userDetails = userRegisterService.registerNewUser(oauthUser);
         }

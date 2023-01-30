@@ -16,6 +16,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -32,10 +33,10 @@ public class ChangeProfileAspect {
     private final VerificationTokenRepository tokenRepo;
 
     @Value("${base.url}")
-    private String BASE_URL;
+    private String baseUrl;
 
     @Value("${mail.username}")
-    private String BOOKSTORE_EMAIL;
+    private String bookstoreEmail;
 
     @Pointcut(value = "execution(public * com.example.bookshop.app.services.UserProfileService.changeProfileInfo(..))"
             + "&& args(profile, user, ..)", argNames = "profile, user")
@@ -52,16 +53,19 @@ public class ChangeProfileAspect {
     @AfterReturning(value = "changeProfile(profile, user)", argNames = "profile, user")
     public void confirmChanges(ProfileDto profile, User user) {
 
-        ProfileChanges profileChanges = profileChangesRepo.findByUserAndEnabled(user, false);
-        VerificationToken token = new VerificationToken(profileChanges, UUID.randomUUID().toString());
-        tokenRepo.save(token);
+        Optional<ProfileChanges> profileChanges = profileChangesRepo.findByUserAndEnabled(user, false);
 
-        String recipientAddress = user.getEmail();
-        String subject = messages.getMessage("message.changeProfile.subject", null, Locale.ENGLISH);
-        String confirmationUrl = "profile/confirmChanges?token=" + token.getToken();
-        String message = messages.getMessage("message.changeProfile.info", null, Locale.ENGLISH)
-                + "\r\n" + BASE_URL + confirmationUrl;
+        if (profileChanges.isPresent()) {
+            VerificationToken token = new VerificationToken(profileChanges.get(), UUID.randomUUID().toString());
+            tokenRepo.save(token);
 
-        mailSender.send(subject, message, BOOKSTORE_EMAIL, recipientAddress);
+            String recipientAddress = user.getEmail();
+            String subject = messages.getMessage("message.changeProfile.subject", null, Locale.ENGLISH);
+            String confirmationUrl = "profile/confirmChanges?token=" + token.getToken();
+            String message = messages.getMessage("message.changeProfile.info", null, Locale.ENGLISH)
+                    + "\r\n" + baseUrl + confirmationUrl;
+
+            mailSender.send(subject, message, bookstoreEmail, recipientAddress);
+        }
     }
 }

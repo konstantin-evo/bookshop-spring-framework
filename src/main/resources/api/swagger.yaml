@@ -1,0 +1,847 @@
+---
+swagger: "2.0"
+info:
+  description: The Book API is a generic, flexible, configurable endpoint which allows
+    requesting information on one or more books.
+  version: 1.0.0
+  title: Bookshop API
+  termsOfService: http://www.termsofservice.org
+  contact:
+    name: Konstantin Priluchnyi
+    url: https://github.com/konstantin-evo
+    email: konstantin.priluchnyi@gmail.com
+  license:
+    name: License of API
+    url: API license URL
+basePath: /bookshop/1.0.0
+schemes:
+  - https
+  - http
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: author-api-controller
+  - name: book-api-controller
+paths:
+  "/api/authors/{slug}":
+    get:
+      tags:
+        - author-api-controller
+      summary: getAuthorBySlug
+      operationId: getAuthorBySlugUsingGET
+      parameters:
+        - name: slug
+          in: path
+          description: slug
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/AuthorDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    patch:
+      tags:
+        - author-api-controller
+      summary: editAuthor
+      operationId: editAuthorUsingPATCH
+      parameters:
+        - in: body
+          name: authorDto
+          description: authorDto
+          required: true
+          schema:
+            "$ref": "#/definitions/AuthorDto"
+        - name: slug
+          in: path
+          description: slug
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/ValidatedResponseDto"
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  "/api/books":
+    post:
+      tags:
+        - book-api-controller
+      summary: createBook
+      operationId: createBookUsingPOST
+      parameters:
+        - in: body
+          name: bookDto
+          description: bookDto
+          required: true
+          schema:
+            "$ref": "#/definitions/BookCreateDto"
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/ValidatedResponseDto"
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/author/{id}":
+    get:
+      tags:
+        - book-api-controller
+      summary: getBooksByAuthor
+      operationId: getBooksByAuthorUsingGET
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: limit
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/BooksPageDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/bestsellers":
+    get:
+      tags:
+        - book-api-controller
+      summary: get bestseller book (which is_bestseller = 1)
+      operationId: bestSellerBooksUsingGET
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/BookDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/by-author":
+    get:
+      tags:
+        - book-api-controller
+      summary: operation to get book list of bookshop by passed author first name
+      operationId: booksByAuthorUsingGET
+      parameters:
+        - name: author
+          in: query
+          description: author
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/BookDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/by-discount-range":
+    get:
+      tags:
+        - book-api-controller
+      summary: get books by discount range from min to max discount
+      operationId: discountRangeBooksUsingGET
+      parameters:
+        - name: max
+          in: query
+          description: max
+          required: true
+          type: number
+          format: double
+        - name: min
+          in: query
+          description: min
+          required: true
+          type: number
+          format: double
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/BookDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/by-price":
+    get:
+      tags:
+        - book-api-controller
+      summary: get books by price
+      operationId: booksByPriceUsingGET
+      parameters:
+        - name: price
+          in: query
+          description: price
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/BookDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/by-price-range":
+    get:
+      tags:
+        - book-api-controller
+      summary: get books by price range from min to max price
+      operationId: priceRangeBooksUsingGET
+      parameters:
+        - name: max
+          in: query
+          description: max
+          required: true
+          type: integer
+          format: int32
+        - name: min
+          in: query
+          description: min
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/BookDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/by-title":
+    get:
+      tags:
+        - book-api-controller
+      summary: get books by title
+      operationId: booksByTitleUsingGET
+      parameters:
+        - name: title
+          in: query
+          description: title
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/ApiResponse«BookDto»"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/genre/{id}":
+    get:
+      tags:
+        - book-api-controller
+      summary: getBooksByGenre
+      operationId: getBooksByGenreUsingGET
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: limit
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/BooksPageDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/popular":
+    get:
+      tags:
+        - book-api-controller
+      summary: getPopularBooksPage
+      operationId: getPopularBooksPageUsingGET
+      parameters:
+        - name: limit
+          in: query
+          description: limit
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/BooksPageDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/recent":
+    get:
+      tags:
+        - book-api-controller
+      summary: getRecentBooksPage
+      operationId: getRecentBooksPageUsingGET
+      parameters:
+        - name: from
+          in: query
+          description: from
+          required: true
+          type: string
+        - name: limit
+          in: query
+          description: limit
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          type: integer
+          format: int32
+        - name: to
+          in: query
+          description: to
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/BooksPageDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/recommended":
+    get:
+      tags:
+        - book-api-controller
+      summary: getRecommendedBooksPage
+      operationId: getRecommendedBooksPageUsingGET
+      parameters:
+        - name: limit
+          in: query
+          description: limit
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/BooksPageDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/tags/{id}":
+    get:
+      tags:
+        - book-api-controller
+      summary: getBooksByTag
+      operationId: getBooksByTagUsingGET_1
+      parameters:
+        - name: id
+          in: path
+          description: id
+          required: true
+          type: integer
+          format: int32
+        - name: limit
+          in: query
+          description: limit
+          required: true
+          type: integer
+          format: int32
+        - name: offset
+          in: query
+          description: offset
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/BooksPageDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/with-max-discount":
+    get:
+      tags:
+        - book-api-controller
+      summary: get list of book with max price
+      operationId: maxPriceBooksUsingGET
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              "$ref": "#/definitions/BookDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+  "/api/books/{slug}":
+    get:
+      tags:
+        - book-api-controller
+      summary: getBooksByTag
+      operationId: getBooksByTagUsingGET
+      parameters:
+        - name: slug
+          in: path
+          description: slug
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/BookDto"
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+    delete:
+      tags:
+        - book-api-controller
+      summary: deleteBook
+      operationId: deleteBookUsingDELETE
+      produces:
+        - application/json
+      parameters:
+        - name: slug
+          in: path
+          description: slug
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/ValidatedResponseDto"
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+    patch:
+      tags:
+        - book-api-controller
+      summary: editBook
+      operationId: editBookUsingPATCH
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: bookDto
+          description: bookDto
+          required: true
+          schema:
+            "$ref": "#/definitions/BookCreateDto"
+        - name: slug
+          in: path
+          description: slug
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/ValidatedResponseDto"
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+  "/api/books/{slug}/img/save":
+    post:
+      tags:
+        - book-api-controller
+      summary: saveNewBookImage
+      operationId: saveNewBookImageUsingPOST
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: body
+          name: file
+          description: file
+          required: true
+          schema:
+            type: string
+            format: binary
+        - name: slug
+          in: path
+          description: slug
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            "$ref": "#/definitions/ValidatedResponseDto"
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+definitions:
+  ApiResponse«BookDto»:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          "$ref": "#/definitions/BookDto"
+      debugMessage:
+        type: string
+      message:
+        type: string
+      status:
+        type: string
+        enum:
+          - ACCEPTED
+          - ALREADY_REPORTED
+          - BAD_GATEWAY
+          - BAD_REQUEST
+          - BANDWIDTH_LIMIT_EXCEEDED
+          - CHECKPOINT
+          - CONFLICT
+          - CONTINUE
+          - CREATED
+          - DESTINATION_LOCKED
+          - EXPECTATION_FAILED
+          - FAILED_DEPENDENCY
+          - FORBIDDEN
+          - FOUND
+          - GATEWAY_TIMEOUT
+          - GONE
+          - HTTP_VERSION_NOT_SUPPORTED
+          - IM_USED
+          - INSUFFICIENT_SPACE_ON_RESOURCE
+          - INSUFFICIENT_STORAGE
+          - INTERNAL_SERVER_ERROR
+          - I_AM_A_TEAPOT
+          - LENGTH_REQUIRED
+          - LOCKED
+          - LOOP_DETECTED
+          - METHOD_FAILURE
+          - METHOD_NOT_ALLOWED
+          - MOVED_PERMANENTLY
+          - MOVED_TEMPORARILY
+          - MULTIPLE_CHOICES
+          - MULTI_STATUS
+          - NETWORK_AUTHENTICATION_REQUIRED
+          - NON_AUTHORITATIVE_INFORMATION
+          - NOT_ACCEPTABLE
+          - NOT_EXTENDED
+          - NOT_FOUND
+          - NOT_IMPLEMENTED
+          - NOT_MODIFIED
+          - NO_CONTENT
+          - OK
+          - PARTIAL_CONTENT
+          - PAYLOAD_TOO_LARGE
+          - PAYMENT_REQUIRED
+          - PERMANENT_REDIRECT
+          - PRECONDITION_FAILED
+          - PRECONDITION_REQUIRED
+          - PROCESSING
+          - PROXY_AUTHENTICATION_REQUIRED
+          - REQUESTED_RANGE_NOT_SATISFIABLE
+          - REQUEST_ENTITY_TOO_LARGE
+          - REQUEST_HEADER_FIELDS_TOO_LARGE
+          - REQUEST_TIMEOUT
+          - REQUEST_URI_TOO_LONG
+          - RESET_CONTENT
+          - SEE_OTHER
+          - SERVICE_UNAVAILABLE
+          - SWITCHING_PROTOCOLS
+          - TEMPORARY_REDIRECT
+          - TOO_EARLY
+          - TOO_MANY_REQUESTS
+          - UNAUTHORIZED
+          - UNAVAILABLE_FOR_LEGAL_REASONS
+          - UNPROCESSABLE_ENTITY
+          - UNSUPPORTED_MEDIA_TYPE
+          - UPGRADE_REQUIRED
+          - URI_TOO_LONG
+          - USE_PROXY
+          - VARIANT_ALSO_NEGOTIATES
+      timeStamp:
+        type: string
+        example: dd-MM-yyyy hh:mm:ss
+    title: ApiResponse«BookDto»
+  AuthorDto:
+    type: object
+    properties:
+      description:
+        type: object
+        example: Dostoevsky's paternal ancestors were part of a noble family of Russian
+          Orthodox Christians.The family traced its roots back to Danilo Irtishch,
+          who was granted lands in the Pinsk region(for centuries part of the Grand
+          Duchy of Lithuania, now in modern-day Belarus)in 1509 for his services under
+          a local prince, his progeny then taking the name "Dostoevsky"based on a
+          village there called Dostoïevo (derived from Old Polish dostojnik – dignitary).
+        description: author's life story
+      firstName:
+        type: object
+        example: Fyodor
+        description: personal name of the author
+      id:
+        type: object
+        example: 346
+        description: uniq identifier
+      lastName:
+        type: object
+        example: Dostoevsky
+        description: family name of the author
+    title: AuthorDto
+    description: DTO Object for a person who writes book(s)
+  BookCreateDto:
+    type: object
+    properties:
+      author:
+        type: string
+      description:
+        type: string
+      discount:
+        type: integer
+        format: int32
+      genre:
+        type: string
+      isBestseller:
+        type: integer
+        format: int32
+      price:
+        type: integer
+        format: int32
+      pubDate:
+        type: string
+        format: date-time
+      tags:
+        type: string
+      title:
+        type: string
+    title: BookCreateDto
+  BookDto:
+    type: object
+    properties:
+      author:
+        "$ref": "#/definitions/AuthorDto"
+      description:
+        type: string
+        example: 'Raskolnikov, a destitute and desperate former student, wanders through
+          the slums of St Petersburg and commits a random murder without remorse or
+          regret. He imagines himself to be a great man, a Napoleon: acting for a
+          higher purpose beyond conventional moral law.'
+        description: book description text
+      fileList:
+        type: array
+        example: modern, psychological prose
+        description: tags added to the book
+        items:
+          "$ref": "#/definitions/BookFileDto"
+      id:
+        type: object
+        example: 346
+        description: uniq identifier
+      isActive:
+        type: integer
+        format: int32
+        example: 1
+        description: if isActive = 1 so the book is considered to be active (possible
+          to possibly buy, etc.)
+      isBestseller:
+        type: integer
+        format: int32
+        example: 1
+        description: if isBestseller = 1 so the book is considered to be bestseller
+          and if 0 the book is not a bestseller
+      price:
+        type: object
+        example: 1250 ₽.
+        description: book price at the moment without discounts and so on
+      priceOld:
+        type: string
+        example: 1110 ₽.
+        description: book price with discounts
+      pubDate:
+        type: string
+        format: date
+        example: '1866-03-20'
+        description: date of book publication
+      rating:
+        type: integer
+        format: int32
+        example: 1280
+        description: rating of the book
+      tags:
+        type: array
+        example: modern, psychological prose
+        description: tags added to the book
+        uniqueItems: true
+        items:
+          "$ref": "#/definitions/TagDto"
+      title:
+        type: object
+        example: Crime and Punishment
+        description: the name of a book
+    title: BookDto
+    description: DTO Object for book entity
+  BookFileDto:
+    type: object
+    properties:
+      fileType:
+        type: string
+      hash:
+        type: string
+      path:
+        type: string
+    title: BookFileDto
+  BooksPageDto:
+    type: object
+    properties:
+      books:
+        type: array
+        items:
+          "$ref": "#/definitions/BookDto"
+      count:
+        type: integer
+        format: int32
+    title: BooksPageDto
+  TagDto:
+    type: object
+    properties:
+      htmlTag:
+        type: string
+      id:
+        type: integer
+        format: int32
+      name:
+        type: string
+    title: TagDto
+  ValidatedResponseDto:
+    type: object
+    properties:
+      errorMessages:
+        type: object
+        additionalProperties:
+          type: string
+      validated:
+        type: boolean
+    title: ValidatedResponseDto

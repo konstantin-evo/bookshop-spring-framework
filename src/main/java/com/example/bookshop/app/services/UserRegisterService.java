@@ -1,17 +1,17 @@
 package com.example.bookshop.app.services;
 
-import com.example.bookshop.app.config.security.UserDetailsService;
+import com.example.bookshop.app.config.security.BookshopUserDetails;
+import com.example.bookshop.app.config.security.BookshopUserDetailsService;
 import com.example.bookshop.app.config.security.jwt.JWTUtil;
 import com.example.bookshop.app.config.security.oauth.CustomOAuth2User;
 import com.example.bookshop.app.model.dao.JwtBlockListRepository;
+import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.app.model.entity.JwtBlockList;
 import com.example.bookshop.app.model.entity.OneTimeCode;
+import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
-import com.example.bookshop.app.config.security.UserDetails;
-import com.example.bookshop.app.model.dao.UserRepository;
 import com.example.bookshop.web.dto.RegistrationFormDto;
-import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,18 +22,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.Transient;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.security.NoSuchAlgorithmException;
+import java.util.Optional;
+
+import static com.example.bookshop.app.services.RegexUtil.isEmail;
 
 @Service
 @RequiredArgsConstructor
 public class UserRegisterService {
 
     private final UserRepository userRepo;
+    private final UserMapper userMapper;
     private final JwtBlockListRepository jwtBlockListRepo;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
-    private final UserDetailsService userDetailsService;
+    private final BookshopUserDetailsService userDetailsService;
     private final OneTimeCodeService oneTimeCodeService;
     private final JWTUtil jwtUtil;
 
@@ -42,46 +45,40 @@ public class UserRegisterService {
      * and it is impossible to guarantee the operation of the operation of the service during launch
      */
     @Value("${twilio.magic_code}")
-    private String SMS_CODE;
+    private String smsCode;
 
     @Value("${twilio.expire_time_sec}")
-    private int EXPIRE_TIME_SEC;
+    private int expireTimeSec;
 
-    private static final String EMAIL_PATTERN = "[A-Za-z\\d._%+-]+@[A-Za-z\\d.-]+\\.[A-Za-z]{2,4}";
     private static final String ANONYMOUS_USER = "anonymousUser";
 
     @Transient
     public boolean registerNewUser(RegistrationFormDto registrationForm) {
 
-        User userByEmail = userRepo.findUserByEmail(registrationForm.getEmail());
-        User userByPhone = userRepo.findUserByPhone(registrationForm.getPhone());
+        Optional<User> userByEmail = userRepo.findUserByEmail(registrationForm.getEmail());
+        Optional<User> userByPhone = userRepo.findUserByPhone(registrationForm.getPhone());
 
-        if (userByEmail == null && userByPhone == null) {
-            User user = new User();
-            user.setName(registrationForm.getName());
-            user.setEmail(registrationForm.getEmail());
-            user.setPhone(registrationForm.getPhone());
-            user.setPassword(passwordEncoder.encode(registrationForm.getPassword()));
+        if (userByEmail.isEmpty() && userByPhone.isEmpty()) {
+            User user = userMapper.map(registrationForm, passwordEncoder.encode(registrationForm.getPassword()));
             userRepo.save(user);
             return true;
         } else {
-            // TODO: Add error handling if user already exists
             return false;
         }
     }
 
     @Transient
-    public UserDetails registerNewUser(CustomOAuth2User oAuth2User) {
+    public BookshopUserDetails registerNewUser(CustomOAuth2User oAuth2User) {
         User user = new User(
                 (String) oAuth2User.getAttributes().get("name"),
                 (String) oAuth2User.getAttributes().get("email"));
         userRepo.save(user);
-        return new UserDetails(user);
+        return new BookshopUserDetails(user);
     }
 
     public ContactConfirmationResponse login(ContactConfirmationPayload payload) throws CustomAuthenticationException {
 
-        UserDetails userDetails = (UserDetails) userDetailsService
+        BookshopUserDetails userDetails = (BookshopUserDetails) userDetailsService
                 .loadUserByUsername(payload.getContact());
 
         return isEmail(payload.getContact())
@@ -94,16 +91,16 @@ public class UserRegisterService {
         jwtBlockListRepo.save(jwtBlockList);
     }
 
-    public void contactConfirmation(String contact) {
+    public void contactConfirmation(String contact) throws NoSuchAlgorithmException {
         String code = isEmail(contact)
                 ? oneTimeCodeService.sendSecretCodeEmail(contact)
-                : SMS_CODE;
-        oneTimeCodeService.saveCode(new OneTimeCode(code, EXPIRE_TIME_SEC));
+                : smsCode;
+        oneTimeCodeService.saveCode(new OneTimeCode(code, expireTimeSec));
     }
 
     public Object getCurrentUser() {
         if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() != ANONYMOUS_USER) {
-            UserDetails userDetails = (UserDetails) SecurityContextHolder
+            BookshopUserDetails userDetails = (BookshopUserDetails) SecurityContextHolder
                     .getContext().getAuthentication().getPrincipal();
             return userDetails.getUser();
         } else {
@@ -111,7 +108,7 @@ public class UserRegisterService {
         }
     }
 
-    private ContactConfirmationResponse loginByEmail(String code, UserDetails userDetails)
+    private ContactConfirmationResponse loginByEmail(String code, BookshopUserDetails userDetails)
             throws CustomAuthenticationException {
         if (oneTimeCodeService.verifyCode(code)) {
             String jwtToken = jwtUtil.generateToken(userDetails);
@@ -122,16 +119,11 @@ public class UserRegisterService {
     }
 
     private ContactConfirmationResponse loginByPhone(ContactConfirmationPayload payload,
-                                                     UserDetails userDetails) {
+                                                     BookshopUserDetails userDetails) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken
                 (payload.getContact(), payload.getCode()));
         String jwtToken = jwtUtil.generateToken(userDetails);
         return new ContactConfirmationResponse(jwtToken);
     }
 
-    private boolean isEmail(String payload) {
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-        Matcher matcher = pattern.matcher(payload);
-        return matcher.matches();
-    }
 }

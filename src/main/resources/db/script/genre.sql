@@ -1,4 +1,4 @@
-insert into genre (id, name, parent_id, slug) values (1, 'Entertainment Literature', null, 'genre-¹21');
+insert into genre (id, name, parent_id, slug) values (1, 'Entertainment Literature', null, 'genre-ï¿½21');
 insert into genre (id, name, parent_id, slug) values (2, 'Scientific Literature', null, 'genre-;25');
 insert into genre (id, name, parent_id, slug) values (3, 'Business Literature', null, 'genre-%12');
 insert into genre (id, name, parent_id, slug) values (4, 'Dramaturgy', null, 'genre-*12');
@@ -527,3 +527,5 @@ insert into book2genre (id, book_id, genre_id) values (497, 96, 9);
 insert into book2genre (id, book_id, genre_id) values (498, 281, 5);
 insert into book2genre (id, book_id, genre_id) values (499, 7, 10);
 insert into book2genre (id, book_id, genre_id) values (500, 209, 10);
+
+SELECT setval('book2genre_id_seq', max(id)) FROM book2genre;

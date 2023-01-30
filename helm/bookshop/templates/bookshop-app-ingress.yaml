@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.bookshop.ingress.name }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  defaultBackend:
+    service:
+      name: {{ .Values.bookshop.service.name }}
+      port:
+        number: {{ .Values.bookshop.container.port }}
+  rules:
+    - host: {{ .Values.bookshop.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.bookshop.service.name }}
+                port:
+                  number: {{ .Values.bookshop.container.port }}

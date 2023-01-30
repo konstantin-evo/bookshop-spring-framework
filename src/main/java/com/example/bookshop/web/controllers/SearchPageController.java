@@ -18,9 +18,9 @@ public class SearchPageController {
     private final GoogleApiService googleService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     public SearchPageController(GoogleApiService googleService) {
         this.googleService = googleService;
@@ -36,7 +36,7 @@ public class SearchPageController {
                                   Model model) {
         model.addAttribute("searchWord", searchWord);
         model.addAttribute("searchResults", googleService
-                .getPageOfSearchResult(searchWord, OFFSET, LIMIT));
+                .getPageOfSearchResult(searchWord, offset, limit));
         return "search/index";
     }
 

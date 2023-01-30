@@ -3,7 +3,7 @@ version: '3.5'
 services:
 
   app:
-    image: 'konstantinevo/bookshop:latest'
+    image: 'konstantinevo/bookshop:1.1.0'
     build:
       context: .
     container_name: bookshop-app
@@ -22,6 +22,8 @@ services:
       - SPRING.DATASOURCE.URL=jdbc:postgresql://db-api:5432/bookshop
       - SPRING.DATASOURCE.USERNAME=postgres
       - SPRING.DATASOURCE.PASSWORD=postgres
+      - UPLOAD.PATH=/apache-tomcat-9.0.55/external_uploads/book-covers
+      - DOWNLOAD.PATH=/apache-tomcat-9.0.55/external_uploads/book-files
 
   db-api:
     image: 'postgres:13.1-alpine'

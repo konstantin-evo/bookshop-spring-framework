@@ -2,10 +2,10 @@ package com.example.bookshop.app.services;
 
 import com.example.bookshop.app.model.google.api.books.Item;
 import com.example.bookshop.web.dto.BookGoogleDto;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.Objects;
 
@@ -14,10 +14,8 @@ import java.util.Objects;
  *
  * The data for the actual books is inside the `items` data field
  */
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD)
 public interface GoogleApiMapper {
-
-    GoogleApiMapper INSTANCE = Mappers.getMapper(GoogleApiMapper.class);
 
     @Mapping(target = "author", source = ".", qualifiedByName = "getAuthor")
     @Mapping(target = "price", source = ".", qualifiedByName = "getPrice")

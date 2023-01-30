@@ -1,21 +1,29 @@
 package com.example.bookshop.app.model.entity;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Getter
 @Setter
 @Table(name = "book2user")
 @Entity
-@NoArgsConstructor
 public class BookToUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
+    @SequenceGenerator(name = "pk_sequence", sequenceName = "book2user_id_seq", allocationSize = 1)
+    @Column(name = "id", unique = true, nullable = false)
     private Integer id;
 
     @Column(columnDefinition = "TIMESTAMP NOT NULL")
@@ -33,11 +41,14 @@ public class BookToUser {
     @JoinColumn(name = "user_id", referencedColumnName = "id", columnDefinition = "INT NOT NULL")
     private User user;
 
+    public BookToUser() {
+        this.time = new Timestamp(System.currentTimeMillis());
+    }
     public BookToUser(User user, Book book, BookToUserType type) {
+        this();
         this.user = user;
         this.book = book;
         this.type = type;
-        this.time = new Timestamp(System.currentTimeMillis());
     }
 
 }

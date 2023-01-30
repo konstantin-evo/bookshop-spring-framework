@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{topbar.admin}">n/a</title>
+    <meta name="description" content="Описание страницы"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <link th:href="@{/spring-frontend/favicon.ico}" rel="shortcut icon"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-SemiBold.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Light.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-Medium.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="preload" href="/assets/fonts/Montserrat/Montserrat-ExtraBold.woff2" as="font" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="/assets/css/fonts.min.css?v=45744385"/>
+    <link rel="stylesheet" href="/assets/css/basic.min.css?v=45744385"/>
+    <link rel="stylesheet" href="/assets/css/extra.min.css?v=45744385"/>
+    <link rel="stylesheet" href="/assets/css/jquery.css"/>
+    <script src="/assets/js/scripts.min.js?v=45744385"></script>
+    <script src="/assets/plg/jQuery/jquery-3.5.1.min.js"></script>
+    <script src="/assets/plg/jQuery/jquery.validate.js"></script>
+    <script src="/assets/js/changeprofile.js"></script>
+    <script src="/assets/js/admin.js"></script>
+    <script src="/assets/js/local.js"></script>
+</head>
+<body class="Site">
+<header th:replace="~{fragments/header_admin_fragment :: headFragment}"></header>
+<div class="Middle">
+    <div class="Middle-top">
+        <div class="wrap">
+            <h1 class="Middle-title"
+                th:text="#{topbar.admin}">n/a
+            </h1>
+        </div>
+    </div>
+    <div class="wrap">
+        <main class="Middle-main">
+            <div class="Tabs Tabs_default">
+                <div class="Tabs-links">
+                    <a class="Tabs-link Tabs-link_ACTIVE" href="#" id="book_create"
+                       th:text="#{admin.book.nav.add}">n/a
+                    </a>
+                    <a class="Tabs-link" href="#" id="book_edit"
+                       th:text="#{admin.book.nav.edit}">n/a
+                    </a>
+                    <a class="Tabs-link" href="#" id="book_cover"
+                       th:text="#{admin.book.nav.cover}">n/a
+                    </a>
+                    <a class="Tabs-link" href="#" id="book_remove"
+                       th:text="#{admin.book.nav.delete}">n/a
+                    </a>
+                </div>
+                <div class="Tabs-wrap">
+
+                    <!-- Form for creating a new book -->
+                    <div class="Tabs-block" style="visibility:visible">
+                        <div class="Profile">
+                            <form class="form Profile-form" id="createBookForm"
+                                  action="/book" method="post">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group">
+                                            <label class="form-label" for="title"
+                                                   th:text="#{admin.book.title}">n/a
+                                            </label>
+                                            <input class="form-input" id="title" name="title" type="text"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="author"
+                                                   th:text="#{admin.book.author}">n/a
+                                            </label>
+                                            <input class="form-input" id="author" name="author" type="text"
+                                                   th:placeholder="#{admin.book.author.placeholder}"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="description"
+                                                   th:text="#{admin.book.description}">n/a
+                                            </label>
+                                            <textarea class="form-input" id="description" name="description" cols="40"
+                                                      rows="5"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="pubDate"
+                                                   th:text="#{admin.book.date}">n/a
+                                            </label>
+                                            <input class="form-input" id="pubDate" name="pubDate" type="date"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="genre"
+                                                   th:text="#{admin.book.genre}">n/a
+                                            </label>
+                                            <select class="form-input" id="genre" name="genre">
+                                                <option value="" th:text="#{admin.book.genre.input}">n/a</option>
+                                                <option th:each="genre : ${genres}"
+                                                        th:value="${genre}"
+                                                        th:text="${genre}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="tags"
+                                                   th:text="#{admin.book.tag}">n/a
+                                            </label>
+                                            <input class="form-input" id="tags" name="tags" type="text"
+                                                   th:placeholder="#{admin.book.tag.placeholder}"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="price"
+                                                   th:text="#{admin.book.price}">n/a
+                                            </label>
+                                            <input class="form-input" id="price" name="price" type="text"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="discount"
+                                                   th:text="#{admin.book.discount}">n/a
+                                            </label>
+                                            <input class="form-input" id="discount" name="discount" type="text"
+                                                   value="0"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="isBestseller"
+                                                   th:text="#{admin.book.bestseller}">n/a
+                                            </label>
+                                            <select class="form-input" id="isBestseller" name="isBestseller">
+                                                <option value="" th:text="#{admin.book.bestseller.input}">n/a</option>
+                                                <option th:value="1"
+                                                        th:text="Yes">
+                                                </option>
+                                                <option th:value="0"
+                                                        th:text="No">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Admin-btn">
+                                        <button class="btn btn_primary" type="submit" id="createBookSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Form for editing a book -->
+                    <div class="Tabs-block" style="display: none">
+                        <!-- Before editing the book, you should upload the data using Book Slug -->
+                        <!-- Form to upload data - start -->
+                        <div class="Profile">
+                            <form class="form Profile-form" id="uploadBookDataToEdit">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group">
+                                            <label class="form-label" for="slugEdit"
+                                                   th:text="#{admin.book.slug}">n/a
+                                            </label>
+                                            <input class="form-input" id="slugEdit" name="slugEdit" type="text"
+                                                   th:placeholder="#{admin.book.slug.edit}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Admin-btn">
+                                        <button class="btn btn_primary" type="button" id="uploadBookDataSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- Form to upload data - end -->
+                        <!-- By default, all fields are not available for editing (disabled) -->
+                        <div class="Profile">
+                            <form class="form Profile-form" id="editBookForm"
+                                  action="/book" method="post" style="display: none">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookTitle"
+                                                   th:text="#{admin.book.title}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookTitle" name="bookTitle" type="text"
+                                                   disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookAuthor"
+                                                   th:text="#{admin.book.author}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookAuthor" name="bookAuthor" type="text"
+                                                   disabled
+                                                   th:placeholder="#{admin.book.author.placeholder}"/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookDescription"
+                                                   th:text="#{admin.book.description}">n/a
+                                            </label>
+                                            <textarea class="form-input" id="bookDescription" name="bookDescription"
+                                                      cols="40" disabled
+                                                      rows="5"></textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookPubDate"
+                                                   th:text="#{admin.book.date}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookPubDate" name="bookPubDate" type="date"
+                                                   disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookPrice"
+                                                   th:text="#{admin.book.price}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookPrice" name="bookPrice" type="text"
+                                                   disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="bookDiscount"
+                                                   th:text="#{admin.book.discount}">n/a
+                                            </label>
+                                            <input class="form-input" id="bookDiscount" name="bookDiscount" type="text"
+                                                   value="0" disabled/>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="isBookBestseller"
+                                                   th:text="#{admin.book.bestseller}">n/a
+                                            </label>
+                                            <select class="form-input" id="isBookBestseller" name="isBookBestseller"
+                                                    disabled>
+                                                <option value="" th:text="#{admin.book.bestseller.input}">n/a</option>
+                                                <option th:value="1"
+                                                        th:text="Yes">
+                                                </option>
+                                                <option th:value="0"
+                                                        th:text="No">
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Admin-btn">
+                                        <button class="btn btn_primary" type="submit" id="editBookSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <!-- Form to change the book cover -->
+                    <div class="Tabs-block" style="display: none">
+                        <div class="Profile">
+                            <form class="form Profile-form" id="uploadBookCoverForm">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group form-group_row">
+                                            <input class="form-input" id="slugUploadCover" name="slugUploadCover"
+                                                   type="text"
+                                                   th:placeholder="#{admin.book.slug.cover}"/>
+                                            <label for="fileUploadCover" class="form-input form-input_phone">
+                                                Upload the file
+                                            </label>
+                                            <input class="form-input" id="fileUploadCover" type="file" name="file"
+                                                   hidden/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Admin-btn">
+                                        <button class="btn btn_primary" type="button" id="uploadBookCoverSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Book deletion form (not active for purchase, etc.) -->
+                    <div class="Tabs-block" style="display: none">
+                        <div class="Profile">
+                            <form class="form Profile-form" id="deleteBookForm">
+                                <div class="row">
+                                    <div class="row-block">
+                                        <div class="form-group">
+                                            <label class="form-label" for="slugDelete"
+                                                   th:text="#{admin.book.slug}">n/a
+                                            </label>
+                                            <input class="form-input" id="slugDelete" name="slugDelete" type="text"
+                                                   th:placeholder="#{admin.book.slug.delete}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="Admin-btn">
+                                        <button class="btn btn_primary" type="button" id="deleteBookSubmit"
+                                                style="margin: 1%"
+                                                th:text="#{admin.book.submit}">n/a
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <!-- End of all Forms -->
+
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<footer th:replace="~{fragments/footer_fragment :: footFragment}"></footer>
+</body>
+</html>

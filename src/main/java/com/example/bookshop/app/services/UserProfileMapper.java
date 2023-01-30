@@ -3,14 +3,13 @@ package com.example.bookshop.app.services;
 import com.example.bookshop.app.model.entity.ProfileChanges;
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.web.dto.ProfileDto;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
 
-@org.mapstruct.Mapper
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD)
 public interface UserProfileMapper {
-
-    UserProfileMapper INSTANCE = Mappers.getMapper(UserProfileMapper.class);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", source = "profileDto.name")

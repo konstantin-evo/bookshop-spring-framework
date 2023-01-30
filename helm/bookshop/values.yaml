@@ -1,0 +1,22 @@
+bookshop:
+  name: bookshop-app
+  replicaCount: 3
+  container:
+    image: konstantinevo/bookshop:latest
+    port: 8080
+  storageClass:
+    name: bookshop-storage
+  ingress:
+    name: ingress-bookshop
+    host: bookshop.com
+  service:
+    name: bookshop-svc
+  postgres:
+    host: postgres
+    secret:
+      name: postgres-secret
+      key:
+        user: username
+        password: password
+  admin:
+    host: admin

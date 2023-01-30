@@ -1,7 +1,7 @@
 package com.example.bookshop.web.controllers;
 
-import com.example.bookshop.app.services.OneTimeCodeService;
 import com.example.bookshop.app.model.entity.OneTimeCode;
+import com.example.bookshop.app.services.OneTimeCodeService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.ContactConfirmationPayload;
 import com.example.bookshop.web.dto.ContactConfirmationResponse;
@@ -9,11 +9,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.RetryingTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
@@ -21,15 +21,11 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders.logout;
 import static org.springframework.security.test.web.servlet.response.SecurityMockMvcResultMatchers.unauthenticated;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@TestPropertySource("/application-test.properties")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class UserAuthControllerTest {
 
     private final MockMvc mockMvc;
@@ -53,7 +49,7 @@ class UserAuthControllerTest {
     }
 
     @Test
-    public void userRegistrationTest() throws Exception {
+    void userRegistrationTest() throws Exception {
         mockMvc.perform(post("/registration")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                         .content(USER_REGISTER_PAYLOAD)
@@ -64,7 +60,7 @@ class UserAuthControllerTest {
     }
 
     @RetryingTest(maxAttempts = 3)
-    public void userLoginEmailTest() throws Exception {
+    void userLoginEmailTest() throws Exception {
 
         ContactConfirmationPayload payload = generateContactConfirmationEmail();
         ContactConfirmationResponse loginResponse = userRegisterService.login(payload);
@@ -80,7 +76,7 @@ class UserAuthControllerTest {
     }
 
     @RetryingTest(maxAttempts = 3)
-    public void userLoginPhoneTest() throws Exception {
+    void userLoginPhoneTest() throws Exception {
 
         ContactConfirmationPayload payload = generateContactConfirmationPhone();
         ContactConfirmationResponse loginResponse = userRegisterService.login(payload);
@@ -97,7 +93,7 @@ class UserAuthControllerTest {
 
     @Test
     @WithUserDetails(USER_EMAIL)
-    public void userLogoutTest() throws Exception {
+    void userLogoutTest() throws Exception {
         mockMvc.perform(logout("/logout"))
                 .andExpect(cookie().value(COOKIE_JWT_NAME, nullValue(String.class)))
                 .andExpect(unauthenticated())

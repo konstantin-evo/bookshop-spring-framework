@@ -16,14 +16,14 @@ public class BookPopularController {
     private final BookService bookService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     @GetMapping("/popular")
     public String popularPage(Model model) {
         model.addAttribute("popularBooks", bookService
-                .getPageOfPopularBooks(OFFSET, LIMIT)
+                .getPageOfPopularBooks(offset, limit)
                 .getContent());
         return "books/popular";
     }

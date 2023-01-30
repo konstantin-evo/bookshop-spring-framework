@@ -1,0 +1,87 @@
+stages:
+  - test
+  - build
+  - dockerize
+  - deploy
+
+services:
+  - name: $NAME_REGISTRY/$USERNAME_REGISTRY/bookshop-postgres/postgres:10.1
+    command: [ "sh", "-c", "/bin/su", "-", "postgres", "postgres", "&&", "psql", "-U", "$POSTGRES_USER", "--password", "$POSTGRES_PASSWORD", "$POSTGRES_DB", "<", "./db/script/db_create.sql" ]
+
+variables:
+  POSTGRES_DB: $DB_NAME
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_USER: $DB_USER
+  POSTGRES_PASSWORD: $DB_PASSWORD
+  POSTGRES_HOST_AUTH_METHOD: trust
+  USERNAME_REGISTRY: konstantin.priluchnyi
+  PROJECTNAME_REGISTRY: bookshop-spring-framework
+  IMAGE_NAME: $NAME_REGISTRY/$USERNAME_REGISTRY/$PROJECTNAME_REGISTRY
+  MAVEN_OPTS: -Dmaven.test.skip -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
+test:
+  stage: test
+  image: $NAME_REGISTRY/images/maven:3-openjdk-11
+  script:
+    - mvn verify
+  artifacts:
+    when: always
+    reports:
+      junit:
+        - target/surefire-reports/TEST-*.xml
+        - target/failsafe-reports/TEST-*.xml
+
+maven-build:
+  image: $NAME_REGISTRY/images/maven:3-openjdk-11
+  stage: build
+  script: mvn clean package $MAVEN_OPTS
+  artifacts:
+    paths: [ 'target/my-bookshop-app.jar' ]
+    expire_in: 1 hour
+
+dockerize-app:
+  stage: dockerize
+  image: docker:19.03.12
+  tags:
+    - run_docker
+  script:
+    - docker login $NAME_REGISTRY -u $USERNAME_REGISTRY@telekom.com -p $TOKEN_REGISTRY
+    - docker build -t $IMAGE_NAME .
+    - docker tag $IMAGE_NAME $IMAGE_NAME:$CI_PIPELINE_ID
+    - docker image push $IMAGE_NAME
+
+deploy_development:
+  stage: deploy
+  image: $IMAGE_NAME/helm-aws:1.0
+  before_script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set region $AWS_DEFAULT_REGION
+    - aws eks update-kubeconfig --name school
+  script:
+    - helm upgrade --install bookshop-app ./helm/bookshop
+      --namespace $NAMESPACE-dev --create-namespace
+      --set bookshop.ingress.host=${URL_DEV}
+      --set bookshop.admin.host=admin-${URL_DEV}
+
+deploy_production:
+  stage: deploy
+  image: $IMAGE_NAME/helm-aws:1.0
+  before_script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set region $AWS_DEFAULT_REGION
+    - aws eks update-kubeconfig --name school
+  script:
+    - helm upgrade --install bookshop-app ./helm/bookshop
+      --namespace $NAMESPACE-prod --create-namespace
+      --set bookshop.ingress.host=${URL_PROD}
+      --set bookshop.admin.host=admin-${URL_PROD}
+  when: manual
+  only: [ 'main' ]

@@ -5,7 +5,7 @@ import com.example.bookshop.app.services.TransactionService;
 import com.example.bookshop.app.services.UserProfileService;
 import com.example.bookshop.app.services.UserRegisterService;
 import com.example.bookshop.web.dto.ProfileDto;
-import com.example.bookshop.web.dto.ProfileResponseDto;
+import com.example.bookshop.web.dto.ValidatedResponseDto;
 import com.example.bookshop.web.dto.TransactionPageDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +23,9 @@ public class UserProfilePageController {
     private final TransactionService transactionService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     @ModelAttribute("currentUser")
     public User searchWord() {
@@ -36,7 +36,7 @@ public class UserProfilePageController {
     public String handleProfile(Model model) {
         User user = (User) userRegisterService.getCurrentUser();
         model.addAttribute("transactions", transactionService
-                .getPageOfTransaction(user, OFFSET, LIMIT)
+                .getPageOfTransaction(user, offset, limit)
                 .getContent());
         return "profile";
     }
@@ -50,7 +50,7 @@ public class UserProfilePageController {
 
     @PostMapping(value = "/profile", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public ProfileResponseDto handleChangeProfile(@RequestBody ProfileDto profileInfo) {
+    public ValidatedResponseDto handleChangeProfile(@RequestBody ProfileDto profileInfo) {
         User user = (User) userRegisterService.getCurrentUser();
         return changeProfileService.changeProfileInfo(profileInfo, user);
     }

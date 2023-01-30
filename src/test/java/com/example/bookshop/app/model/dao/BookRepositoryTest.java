@@ -1,10 +1,11 @@
 package com.example.bookshop.app.model.dao;
 
 import com.example.bookshop.app.model.entity.Book;
+import com.example.bookshop.web.exception.BookshopEntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.TestPropertySource;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
 
@@ -13,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SpringBootTest
-@TestPropertySource("/application-test.properties")
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class BookRepositoryTest {
 
     private final BookRepository bookRepository;
@@ -59,10 +60,11 @@ class BookRepositoryTest {
     }
 
     @Test
-    void  testBookRating() {
-        Book book = bookRepository.findBookBySlug(BOOK_SLUG);
-        assertNotNull(book.getRating());
-        assertEquals(book.getRating(), 3.2);
+    void testBookDiscount() {
+        Book book = bookRepository.findBookBySlug(BOOK_SLUG)
+                .orElseThrow(() -> new BookshopEntityNotFoundException(Book.class.getSimpleName(), "Slug", BOOK_SLUG));
+        assertNotNull(book.getDiscount());
+        assertEquals(14.0, book.getDiscount());
     }
 
 }

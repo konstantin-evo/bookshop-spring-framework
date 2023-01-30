@@ -4,12 +4,14 @@ import com.example.bookshop.app.model.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookRepository extends JpaRepository<Book, Integer> {
 
@@ -28,6 +30,11 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     @Query("from Book where isBestseller=1")
     List<Book> findBestsellers();
 
+    @Query(value = "SELECT * FROM BOOKS WHERE IS_ACTIVE = 1",
+            countQuery = "SELECT count(*) FROM BOOKS WHERE IS_ACTIVE = 1",
+            nativeQuery = true)
+    Page<Book> findActualBooks(Pageable pageable);
+
     @Query("from Book where discount = (select max(b.discount) from Book b)")
     List<Book> findBooksWithMaxDiscount();
 
@@ -45,9 +52,17 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     Page<Book> findBooksByAuthorId(Integer id, Pageable nextPage);
 
-    Page<Book> findBookByTitleContaining(String bookTitle, Pageable nextPage);
-
     Page<Book> findBookByPubDateIsBetween(Date dateFrom, Date dateTo, Pageable nextPage);
 
-    Book findBookBySlug(String slug);
+    Optional<Book> findBookBySlug(String slug);
+
+    boolean existsBySlug(String slug);
+
+    @Modifying
+    @Query("update Book b set b.popularity = b.popularity + :amount where b.id = :book_id")
+    void updatePopularity(@Param("amount") Double amount, @Param("book_id") Integer id);
+
+    @Modifying
+    @Query("update Book b set b.isActive = :isActive where b.id = :id")
+    void updateIsActive(@Param("isActive") Integer isActive, @Param("id") Integer id);
 }

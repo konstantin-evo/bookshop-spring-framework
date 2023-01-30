@@ -7,14 +7,17 @@ import com.example.bookshop.app.model.entity.BookReview;
 import com.example.bookshop.app.model.entity.BookToFile;
 import com.example.bookshop.app.model.entity.FileType;
 import com.example.bookshop.web.dto.AuthorDto;
+import com.example.bookshop.web.dto.BookCreateDto;
 import com.example.bookshop.web.dto.BookDto;
 import com.example.bookshop.web.dto.BookFileDto;
 import com.example.bookshop.web.dto.BookRateDto;
-import com.example.bookshop.web.dto.ReviewDto;
+import com.example.bookshop.web.dto.BookReviewsPageDto;
 import com.example.bookshop.web.dto.TagDto;
+import org.mapstruct.InjectionStrategy;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -29,18 +32,22 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@org.mapstruct.Mapper
+@Mapper(componentModel = "spring", injectionStrategy = InjectionStrategy.FIELD)
 public interface BookMapper {
-
-    BookMapper INSTANCE = Mappers.getMapper(BookMapper.class);
 
     @Mapping(target = "priceOld", source = ".", qualifiedByName = "calculatePriceOld")
     @Mapping(target = "tags", source = ".", qualifiedByName = "getTags")
     BookDto map(Book book);
 
+    @Mapping(target = "author", ignore = true)
+    Book map(BookCreateDto bookDto);
+
     @Mapping(target = "rate", source = ".", qualifiedByName = "getBookRate")
     @Mapping(target = "rateDistribution", source = ".", qualifiedByName = "getRateDistribution")
     BookRateDto mapBookRateDto(Book book);
+
+    @Mapping(target = "author", ignore = true)
+    void updateBook(BookCreateDto bookDto, @MappingTarget Book book);
 
     List<BookDto> map(List<Book> books);
 
@@ -50,7 +57,7 @@ public interface BookMapper {
 
     @Named("calculatePriceOld")
     static String calculatePriceOld(Book book) {
-        if (book.getDiscount() != null) {
+        if (book.getDiscount() != null && Double.compare(book.getDiscount(), 0.0) > 0) {
             double discount = book.getDiscount() / 100;
             return String.valueOf((int) (book.getPrice() / (1 - discount)));
         } else {
@@ -105,11 +112,12 @@ public interface BookMapper {
         return map;
     }
 
-    default ReviewDto getBookReviews(Book book) {
+    default BookReviewsPageDto getBookReviews(Book book) {
 
-        List<ReviewDto.Review> reviews = book.getBookRates().stream()
+        List<BookReviewsPageDto.Review> reviews = book.getBookRates().stream()
                 .filter(bookRate -> bookRate.getReview() != null)
-                .map(bookRate -> ReviewDto.Review.builder()
+                .filter(bookRate -> bookRate.getReview().getIsActive() == 1)
+                .map(bookRate -> BookReviewsPageDto.Review.builder()
                         .id(bookRate.getReview().getId())
                         .rate(bookRate.getRating())
                         .text(bookRate.getReview().getText())
@@ -122,9 +130,11 @@ public interface BookMapper {
                 ).collect(Collectors.toList());
 
         Integer totalReviews = (int) book.getBookRates().stream()
-                .filter(bookRate -> bookRate.getReview() != null).count();
+                .filter(bookRate -> bookRate.getReview() != null)
+                .filter(bookRate -> bookRate.getReview().getIsActive() == 1)
+                .count();
 
-        return ReviewDto.builder()
+        return BookReviewsPageDto.builder()
                 .reviews(reviews)
                 .totalReviews(totalReviews)
                 .build();

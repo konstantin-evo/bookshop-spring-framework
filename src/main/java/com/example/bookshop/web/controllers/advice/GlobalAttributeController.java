@@ -2,20 +2,20 @@ package com.example.bookshop.web.controllers.advice;
 
 import com.example.bookshop.app.model.entity.User;
 import com.example.bookshop.app.services.BookService;
+import com.example.bookshop.app.services.BookToUserService;
 import com.example.bookshop.app.services.UserRegisterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 
 @ControllerAdvice
-@SessionAttributes("testBook")
 @RequiredArgsConstructor
 public class GlobalAttributeController {
 
     private final BookService bookService;
+    private final BookToUserService bookToUserService;
     private final UserRegisterService userRegisterService;
 
     @ModelAttribute("searchWord")
@@ -28,14 +28,11 @@ public class GlobalAttributeController {
         return bookService.getBooksByCookies(cartContents).size();
     }
 
-    @ModelAttribute("PaidBookCount")
-    public Integer home() {
-        if (userRegisterService.getCurrentUser() != null) {
-            User user = (User) userRegisterService.getCurrentUser();
-            return bookService.getPaidBooks(user.getEmail()).size();
-        } else {
-            return 0;
-        }
+    @ModelAttribute("bookPaidCount")
+    public Integer bookPaidCount() {
+        User user = (User) userRegisterService.getCurrentUser();
+        return (userRegisterService.getCurrentUser() != null)
+                ? bookToUserService.getPaidBooks(user.getEmail()).size() : 0;
     }
 
     @ModelAttribute(name = "bookPostponedCount")

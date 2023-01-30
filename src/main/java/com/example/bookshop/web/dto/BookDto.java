@@ -43,6 +43,11 @@ public class BookDto {
     private Integer isBestseller;
 
     @ApiModelProperty(
+            value = "if isActive = 1 so the book is considered to be active (possible to possibly buy, etc.)",
+            example = "1")
+    private Integer isActive;
+
+    @ApiModelProperty(
             value = "book price with discounts",
             example = "1110 ₽.")
     private String priceOld;

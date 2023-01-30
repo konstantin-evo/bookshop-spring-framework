@@ -1,6 +1,5 @@
 package com.example.bookshop.app.model.entity;
 
-import com.example.bookshop.app.model.entity.enumuration.BookToUserEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,13 +11,11 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.PostPersist;
-import javax.persistence.PostUpdate;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
 
 @Getter
 @Setter
@@ -27,14 +24,20 @@ import java.util.List;
 public class Book {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "pk_sequence")
+    @SequenceGenerator(name = "pk_sequence", sequenceName = "book_id_seq", allocationSize = 1)
     private Integer id;
 
     @Column(columnDefinition = "DATE NOT NULL")
     private Date pubDate;
 
-    @Column(columnDefinition = "SMALLINT NOT NULL")
+    // if isBestseller = 1 so the book is considered to be bestseller
+    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 0")
     private Integer isBestseller;
+
+    // if isActive = 1 so the book is considered to be active (possible to possibly buy)
+    @Column(columnDefinition = "SMALLINT NOT NULL DEFAULT 1")
+    private Integer isActive;
 
     @Column(columnDefinition = "VARCHAR(255) NOT NULL")
     private String slug;
@@ -54,20 +57,24 @@ public class Book {
     @Column(columnDefinition = "FLOAT8")
     private Double discount;
 
+    /*
+    The popularity of a book is a non-negative number
+    calculated using a formula based on the number of books bought, kept, viewed, etc.
+     */
     @Column(columnDefinition = "FLOAT8 NOT NULL DEFAULT 0")
-    private Double rating;
+    private Double popularity;
 
     @ManyToOne
     @JoinColumn(name = "author_id", referencedColumnName = "id")
     private Author author;
 
-    @OneToMany(mappedBy="book")
+    @OneToMany(mappedBy = "book")
     private List<BookToUser> bookToUsers;
 
-    @OneToMany(mappedBy="book")
+    @OneToMany(mappedBy = "book")
     private List<BookToGenre> bookToGenre;
 
-    @OneToMany(mappedBy="book")
+    @OneToMany(mappedBy = "book")
     private List<BookToTag> bookToTag;
 
     @OneToMany(mappedBy = "book")
@@ -76,19 +83,11 @@ public class Book {
     @OneToMany(mappedBy = "book")
     private List<BookRate> bookRates = new ArrayList<>();
 
-    @PostPersist
-    @PostUpdate
-    private void postLoadFunction(){
-        long cart = this.bookToUsers.stream()
-                .filter(bookToUser -> bookToUser.getType().getCode().equals(BookToUserEnum.CART))
-                .count();
-        long paid = this.bookToUsers.stream()
-                .filter(bookToUser -> bookToUser.getType().getCode().equals(BookToUserEnum.PAID))
-                .count();
-        long kept = this.bookToUsers.stream()
-                .filter(bookToUser -> bookToUser.getType().getCode().equals(BookToUserEnum.KEPT))
-                .count();
-        this.rating = paid + 0.7 * cart + 0.4 * kept;
+    // The "Popularity" parameters is calculated later,
+    // by default they are zero
+    public Book() {
+        this.popularity = 0.0;
+        this.isActive = 1;
     }
 
 }

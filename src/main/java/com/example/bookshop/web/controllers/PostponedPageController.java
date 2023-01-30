@@ -22,9 +22,9 @@ public class PostponedPageController {
     private final BookService bookService;
 
     @Value("${default.offset}")
-    private int OFFSET;
+    private int offset;
     @Value("${default.limit}")
-    private int LIMIT;
+    private int limit;
 
     @ModelAttribute(name = "postponedBooks")
     public List<BookDto> bookPostponed(@CookieValue(value = "postponedBooks", required = false) String bookPostponed) {
@@ -43,7 +43,7 @@ public class PostponedPageController {
                                 Model model) {
         if (CookieUtil.isCookieEmpty(postponedBooks)) {
             model.addAttribute("recommendedBooks", bookService
-                    .getPageOfRecommendedBooks(OFFSET, LIMIT)
+                    .getPageOfRecommendedBooks(offset, limit)
                     .getContent());
         }
         return "postponed";
